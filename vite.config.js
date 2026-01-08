@@ -15,6 +15,7 @@ export default defineConfig({
           {
             urlPattern: /^https:\/\/localhost:7172\/api\/.*/i,
             handler: 'NetworkFirst',
+            method: 'GET', // Solo cachear GET
             options: {
               cacheName: 'api-cache',
               networkTimeoutSeconds: 10,
@@ -22,6 +23,27 @@ export default defineConfig({
                 statuses: [0, 200]
               }
             }
+          },
+          {
+            // NO cachear POST, PUT, DELETE, PATCH
+            urlPattern: /^https:\/\/localhost:7172\/api\/.*/i,
+            handler: 'NetworkOnly', // Siempre ir a la red
+            method: 'POST'
+          },
+          {
+            urlPattern: /^https:\/\/localhost:7172\/api\/.*/i,
+            handler: 'NetworkOnly',
+            method: 'PUT'
+          },
+          {
+            urlPattern: /^https:\/\/localhost:7172\/api\/.*/i,
+            handler: 'NetworkOnly',
+            method: 'DELETE'
+          },
+          {
+            urlPattern: /^https:\/\/localhost:7172\/api\/.*/i,
+            handler: 'NetworkOnly',
+            method: 'PATCH'
           }
         ]
       },
