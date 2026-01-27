@@ -1,162 +1,284 @@
-import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import logoNegro from "../assets/logo-negro.png";
 
 const Login = () => {
-  const [login, setLogin] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [focusedField, setFocusedField] = useState(null);
+
   const { login: loginUser } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
+
+    if (loading) return;
+
     setLoading(true);
-    setError('');
+    setError("");
+
     try {
       await loginUser(login, password);
-      navigate('/');
+      navigate("/");
     } catch (err) {
-      setError('Credenciales inválidas. Intente nuevamente.');
+      console.error("Error capturado:", err);
+      setError("No se pudo iniciar sesión. Verifique sus datos.");
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-black flex items-center justify-center p-4 relative overflow-hidden">
-      
-      {/* Elementos decorativos de fondo */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl -z-10"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-slate-700/10 rounded-full blur-3xl -z-10"></div>
-
-      <div className="w-full max-w-md relative z-10">
-        
-        {/* Header */}
-        <div className="text-center mb-12">
-          {/* Logo simplificado - solo texto */}
-          <h1 className="text-5xl font-bold text-white mb-2 tracking-tight">
-            Hantonio
-            <span className="text-amber-500 block">Jaramillo</span>
-          </h1>
-          <p className="text-slate-400 text-sm font-medium">Sistema de Gestión Profesional</p>
-        </div>
-
-        {/* Card Principal */}
-        <div className="bg-slate-800/40 border border-slate-700/50 rounded-3xl p-10 backdrop-blur-xl shadow-2xl shadow-black/50 relative overflow-hidden">
+    <>
+      <style>
+        {`
+          input[type="password"]::-ms-reveal,
+          input[type="password"]::-ms-clear { display: none; }
           
-          {/* Shine effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent rounded-3xl opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+          input:focus {
+            border-color: #444 !important;
+            background: #1a1a1a !important;
+          }
 
-          <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-            
-            {/* Usuario Input */}
-            <div className="space-y-3">
-              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
-                Usuario
+          .login-button:hover:not(:disabled) {
+            background: #eee !important;
+            transform: translateY(-1px);
+          }
+
+          .login-button:disabled {
+            background: #333 !important;
+            color: #666 !important;
+            cursor: not-allowed;
+          }
+          
+          .error-fade {
+            animation: fadeIn 0.3s ease-in-out;
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}
+      </style>
+
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#000",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "'Inter', sans-serif",
+        }}
+      >
+        <div
+          style={{
+            background: "#0d0d0d",
+            padding: "50px 40px",
+            borderRadius: 20,
+            border: "1px solid #222",
+            boxShadow: "0 0 40px rgba(255, 255, 255, 0.06)",
+            width: "100%",
+            maxWidth: 360,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <img
+            src={logoNegro}
+            alt="Logo"
+            style={{
+              height: 180,
+              width: "auto",
+              marginBottom: 10,
+              objectFit: "contain",
+            }}
+          />
+
+          <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+            <div style={{ marginBottom: 15 }}>
+              <label
+                style={{
+                  color: "#666",
+                  fontSize: "11px",
+                  marginBottom: 5,
+                  display: "block",
+                  fontWeight: 600,
+                  letterSpacing: "0.8px",
+                }}
+              >
+                USUARIO
               </label>
-              <div className={`relative px-5 py-4 bg-slate-900/50 border-2 rounded-xl transition-all duration-300 group ${
-                focusedField === 'login' 
-                  ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' 
-                  : 'border-slate-600/50 hover:border-slate-500/50'
-              }`}>
-                <input
-                  type="text"
-                  value={login}
-                  onChange={(e) => setLogin(e.target.value)}
-                  onFocus={() => setFocusedField('login')}
-                  onBlur={() => setFocusedField(null)}
-                  placeholder="admin"
-                  className="w-full bg-transparent text-white outline-none text-sm font-medium placeholder-slate-400"
-                  required
-                />
-              </div>
+              <input
+                type="text"
+                value={login}
+                onChange={(e) => {
+                  setLogin(e.target.value);
+                  if (error) setError("");
+                }}
+                placeholder="Usuario"
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  borderRadius: 6,
+                  border: error ? "1px solid #ff4d4d" : "1px solid #222",
+                  background: "#121212",
+                  color: "#fff",
+                  fontSize: "14px",
+                  outline: "none",
+                  transition: "border-color 0.2s",
+                }}
+                required
+              />
             </div>
 
-            {/* Contraseña Input */}
-            <div className="space-y-3">
-              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
-                Contraseña
+            <div style={{ marginBottom: 5 }}>
+              <label
+                style={{
+                  color: "#666",
+                  fontSize: "11px",
+                  marginBottom: 6,
+                  display: "block",
+                  fontWeight: 600,
+                  letterSpacing: "0.8px",
+                }}
+              >
+                CONTRASEÑA
               </label>
-              <div className={`relative px-5 py-4 bg-slate-900/50 border-2 rounded-xl transition-all duration-300 flex items-center group ${
-                focusedField === 'password' 
-                  ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' 
-                  : 'border-slate-600/50 hover:border-slate-500/50'
-              }`}>
+              <div style={{ position: "relative" }}>
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onFocus={() => setFocusedField('password')}
-                  onBlur={() => setFocusedField(null)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (error) setError("");
+                  }}
                   placeholder="••••••••"
-                  className="flex-1 bg-transparent text-white outline-none text-sm font-medium placeholder-slate-400 tracking-widest"
+                  style={{
+                    width: "100%",
+                    padding: "10px 40px 10px 14px",
+                    borderRadius: 6,
+                    border: error ? "1px solid #ff4d4d" : "1px solid #222",
+                    background: "#121212",
+                    color: "#fff",
+                    fontSize: "14px",
+                    outline: "none",
+                    transition: "border-color 0.2s",
+                  }}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="ml-3 text-slate-500 hover:text-slate-300 transition-colors flex-shrink-0"
+                  style={{
+                    position: "absolute",
+                    right: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "#444",
+                  }}
                 >
                   {showPassword ? (
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                      <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                    <svg
+                      width="18"
+                      height="18"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" />
+                      <circle cx="12" cy="12" r="3" />
                     </svg>
                   ) : (
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
-                      <path d="M15.171 13.576l1.472-1.473a2.001 2.001 0 00-2.67-2.67l-.302.301m0 0a2 2 0 01-2.828 2.829m-5.54-5.64a9.964 9.964 0 012.531-.068c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-.52 0-1.031-.04-1.538-.118m5.335-13.372C13.194 2.567 11.659 2 10 2a9.958 9.958 0 00-4.512 1.074m0 0a1 1 0 001.414 1.415M6.488 4.488l-1.415-1.415" />
+                    <svg
+                      width="18"
+                      height="18"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                      <line x1="1" y1="1" x2="23" y2="23" />
                     </svg>
                   )}
                 </button>
               </div>
             </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="p-4 bg-red-500/15 border border-red-500/30 rounded-xl animate-slideDown">
-                <p className="text-red-300 text-xs font-bold flex items-center gap-2">
-                  <span>⚠️</span>
-                  {error}
-                </p>
-              </div>
-            )}
+            <div
+              style={{
+                minHeight: "45px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 5,
+              }}
+            >
+              {error && (
+                <span
+                  className="error-fade"
+                  style={{
+                    color: "#ff4d4d",
+                    fontSize: "13px",
+                    textAlign: "center",
+                    fontWeight: 500,
+                    display: "block",
+                    background: "rgba(255, 77, 77, 0.1)",
+                    padding: "8px 12px",
+                    borderRadius: "4px",
+                    width: "100%",
+                  }}
+                >
+                  ⚠️ {error}
+                </span>
+              )}
+            </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
+              className="login-button"
               disabled={loading}
-              className="w-full py-4 mt-8 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300 active:scale-95 uppercase tracking-wider text-sm"
+              style={{
+                width: "100%",
+                padding: "12px",
+                background: "#fff",
+                color: "#000",
+                fontWeight: 700,
+                border: "none",
+                borderRadius: 6,
+                fontSize: "13px",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
             >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Procesando...
-                </span>
-              ) : (
-                'Acceder al Sistema'
-              )}
+              {loading ? "PROCESANDO..." : "ENTRAR"}
             </button>
           </form>
-        </div>
 
-        {/* Footer */}
-        <div className="text-center mt-10">
-          <p className="text-slate-500 text-xs">
-            © {new Date().getFullYear()} Hantonio Jaramillo
-          </p>
-          <p className="text-slate-600 text-xs mt-1 italic">
-            Sastrería • Gestión • Profesionalismo
-          </p>
+          <footer
+            style={{
+              marginTop: 40,
+              color: "#222",
+              fontSize: "9px",
+              letterSpacing: "1px",
+            }}
+          >
+            © {new Date().getFullYear()} HANTONIO JARAMILLO
+          </footer>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

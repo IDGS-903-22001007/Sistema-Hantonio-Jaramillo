@@ -1,127 +1,123 @@
-import React, { useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-
-const navItems = [
-  { name: 'Dashboard', to: '/', icon: '🏠' },
-  { name: 'Clientes', to: '/clientes', icon: '👥' },
-  { name: 'Órdenes', to: '/ordenes', icon: '📋' },
-  { name: 'Catálogos', to: '/catalogos', icon: '📚' },
-  { name: 'Usuarios', to: '/usuarios', icon: '👤' },
-  { name: 'Roles', to: '/roles', icon: '🔐' },
-  { name: 'Sucursales', to: '/sucursales', icon: '🏢' },
-];
+import React from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import logoNegro from "../assets/logo-negro.png";
 
 const Layout = () => {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
-  const getUserInitial = () => {
-    if (user?.nombreCompleto) {
-      return user.nombreCompleto.charAt(0).toUpperCase();
-    }
-    if (user?.login) {
-      return user.login.charAt(0).toUpperCase();
-    }
-    return 'U';
-  };
+  const menuSections = [
+    {
+      title: "Principal",
+      items: [{ name: "Dashboard", to: "/" }],
+    },
+    {
+      title: "Operación",
+      items: [
+        { name: "Clientes", to: "/clientes" },
+        { name: "Órdenes", to: "/ordenes" },
+        { name: "Catálogos", to: "/catalogos" },
+      ],
+    },
+    {
+      title: "Administración",
+      requiresAdmin: true,
+      items: [
+        { name: "Usuarios", to: "/usuarios" },
+        { name: "Roles", to: "/roles" },
+        { name: "Sucursales", to: "/sucursales" },
+      ],
+    },
+  ];
+
+  const linkStyles = ({ isActive }) =>
+    `flex items-center px-8 py-3 transition-all duration-200 text-[11px] font-bold tracking-[1.5px] uppercase ${
+      isActive
+        ? "bg-[#0d0d0d] text-white border-r-4 border-white"
+        : "text-[#555] hover:text-[#bbb] hover:bg-[#050505]"
+    }`;
+
+  const sectionTitleStyles =
+    "px-8 pt-6 pb-2 text-[9px] font-extrabold text-[#333] uppercase tracking-[2px]";
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
-      {/* Sidebar */}
-      <aside className={`${collapsed ? 'w-20' : 'w-72'} bg-black flex flex-col transition-all duration-300 shadow-xl flex-shrink-0`}>
-        {/* Header */}
-        <div className="p-6 border-b border-gray-800">
-          <div className="flex items-center justify-between">
-            {!collapsed && (
-              <div>
-                <h1 className="text-2xl font-bold text-white">
-                  Hantonio J.
-                </h1>
-                <p className="text-xs text-gray-400 mt-1">Sistema de Gestión</p>
-              </div>
-            )}
-            <button 
-              onClick={() => setCollapsed(!collapsed)}
-              className="p-2 rounded-lg hover:bg-gray-800 text-gray-300 transition-colors"
-            >
-              {collapsed ? '→' : '←'}
-            </button>
-          </div>
+    <div
+      className="flex h-screen bg-black overflow-hidden"
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
+      <aside className="w-64 bg-black flex flex-col flex-shrink-0 border-r border-[#1a1a1a]">
+        <div className="pt-10 pb-8 px-6 flex flex-col items-center border-b border-[#111]">
+          <img
+            src={logoNegro}
+            alt="Logo"
+            className="w-48 h-auto object-contain mb-4"
+          />
+          <p className="text-[9px] text-[#333] tracking-[4px] font-bold uppercase">
+            Gestión Integral
+          </p>
         </div>
-        
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end
-              className={({ isActive }) =>
-                `flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
-                  isActive
-                    ? 'bg-gray-800 text-white'
-                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                }`
-              }
-            >
-              <span className="text-xl">{item.icon}</span>
-              {!collapsed && <span className="ml-4 font-medium">{item.name}</span>}
-            </NavLink>
-          ))}
+
+        <nav className="flex-1 py-4 overflow-y-auto">
+          {menuSections.map((section, index) => {
+            if (section.requiresAdmin) {
+              const rol = user?.rol || user?.nombreRol || "";
+              if (!rol.toLowerCase().includes("admin")) return null;
+            }
+
+            return (
+              <div key={index} className="mb-2">
+                <p className={sectionTitleStyles}>{section.title}</p>
+                {section.items.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === "/"}
+                    className={linkStyles}
+                  >
+                    {item.name}
+                  </NavLink>
+                ))}
+              </div>
+            );
+          })}
         </nav>
 
-        {/* User info & Logout */}
-        <div className="p-4 border-t border-gray-800">
-          {!collapsed && user && (
-            <div className="mb-4 px-2">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
-                  {getUserInitial()}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-white truncate">
-                    {user.nombreCompleto || user.nombre || 'Usuario'}
-                  </p>
-                  <p className="text-xs text-gray-400 truncate">
-                    @{user.login || 'usuario'}
-                  </p>
-                  <p className="text-xs text-amber-500 truncate mt-0.5 font-medium">
-                    {user.rol || 'Sin rol'}
-                  </p>
-                </div>
-              </div>
+        <div className="p-6 border-t border-[#111] bg-black">
+          {user && (
+            <div className="mb-6 text-center">
+              <p className="text-[11px] font-bold text-white uppercase tracking-[1px]">
+                {user.nombreCompleto || user.login}
+              </p>
+              <span className="inline-block mt-2 px-2 py-0.5 rounded bg-[#1a1a1a] border border-[#222] text-[8px] text-[#666] uppercase tracking-[1px] font-medium">
+                {user.rol || "Usuario"}
+              </span>
             </div>
           )}
-          
-          {collapsed && user && (
-            <div className="mb-4 flex justify-center">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
-                {getUserInitial()}
-              </div>
-            </div>
-          )}
-          
+
           <button
             onClick={handleLogout}
-            className={`flex items-center w-full px-4 py-3 rounded-lg text-gray-400 hover:bg-red-800 hover:text-white transition-all duration-200 font-medium ${collapsed ? 'justify-center' : ''}`}
+            className="w-full py-3 text-[10px] font-bold tracking-[2px] uppercase border border-[#222] text-[#666] hover:text-[#ff4d4d] hover:border-[#ff4d4d] hover:bg-[#ff4d4d10] transition-all duration-300 rounded-sm"
           >
-            <span className="text-xl">🚪</span>
-            {!collapsed && <span className="ml-4">Cerrar Sesión</span>}
+            Cerrar Sesión
           </button>
+
+          <p className="text-[8px] text-[#222] text-center mt-6 tracking-[1px]">
+            © {new Date().getFullYear()} HANTONIO JARAMILLO
+          </p>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100 flex items-center justify-center p-6">
-        <div className="w-full h-full max-w-6xl bg-white rounded-2xl shadow-lg border border-slate-200 overflow-y-auto">
-          <Outlet />
+      <main className="flex-1 overflow-hidden bg-black p-4">
+        <div className="w-full h-full bg-[#0d0d0d] rounded-xl border border-[#1a1a1a] shadow-2xl overflow-y-auto relative">
+          <div className="p-8 md:p-12 text-white min-h-full">
+            <Outlet />
+          </div>
         </div>
       </main>
     </div>
