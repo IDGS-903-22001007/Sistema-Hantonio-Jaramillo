@@ -1,29 +1,72 @@
-import apiClient from './axiosConfig';
+import apiClient from "./axiosConfig";
 
-export const getOrdenes = () => apiClient.get('/Ordenes');
-export const getOrden = (id) => apiClient.get(`/Ordenes/${id}`);
-export const createOrden = (data) => apiClient.post('/Ordenes', {
-  idCliente: data.clienteId ? parseInt(data.clienteId) : null,
-  idUsuarioCreador: data.idUsuarioCreador || null,
-  idSucursal: data.sucursalId ? parseInt(data.sucursalId) : null,
-  idTipoTraje: data.idTipoTraje || null,
-  idEstatus: data.idEstatus || null,
-  fechaCitaMedidas: data.fecha || null,
-  fechaEventoEntrega: data.fechaEventoEntrega || null,
-  costoTotal: data.costoTotal || 0,
-  montoAbonado: data.montoAbonado || 0,
-  incluyeCamisa: data.incluyeCamisa || false
-});
-export const updateOrden = (id, data) => apiClient.put(`/Ordenes/${id}`, {
-  idCliente: data.clienteId ? parseInt(data.clienteId) : null,
-  idUsuarioCreador: data.idUsuarioCreador || null,
-  idSucursal: data.sucursalId ? parseInt(data.sucursalId) : null,
-  idTipoTraje: data.idTipoTraje || null,
-  idEstatus: data.idEstatus || null,
-  fechaCitaMedidas: data.fecha || null,
-  fechaEventoEntrega: data.fechaEventoEntrega || null,
-  costoTotal: data.costoTotal || 0,
-  montoAbonado: data.montoAbonado || 0,
-  incluyeCamisa: data.incluyeCamisa || false
-});
-export const deleteOrden = (id) => apiClient.delete(`/Ordenes/${id}`);
+export const ordenesService = {
+  /**
+   * Obtiene la lista de todas las órdenes.
+   * Útil para administradores o vistas generales.
+   */
+  listar: async () => {
+    const response = await apiClient.get("/Orden");
+    return response.data;
+  },
+
+  /**
+   * Obtiene las órdenes filtradas por sucursal.
+   */
+  listarPorSucursal: async (idSucursal) => {
+    const response = await apiClient.get(`/Orden/sucursal/${idSucursal}`);
+    return response.data;
+  },
+
+  /**
+   * Obtiene el catálogo de estatus disponibles (Pendiente, Medidas, etc.).
+   * Se usa para poblar el select de estatus.
+   */
+  obtenerCatEstatus: async () => {
+    // Asumiendo que tienes un endpoint para esto, o si es un Enum en backend
+    const response = await apiClient.get("/Orden/estatus");
+    return response.data;
+  },
+
+  /**
+   * CREAR COMPLETA: Registra Orden + Detalles + Medidas en una sola petición.
+   */
+  crearCompleta: async (datosOrdenMaster) => {
+    const response = await apiClient.post(
+      "/Orden/crear-completa",
+      datosOrdenMaster,
+    );
+    return response.data;
+  },
+
+  /**
+   * Actualiza una orden existente.
+   */
+  actualizar: async (id, datosOrden) => {
+    const response = await apiClient.put(`/Orden/${id}`, datosOrden);
+    return response.data;
+  },
+
+  /**
+   * Elimina una orden (Solo Admin).
+   */
+  eliminar: async (id) => {
+    const response = await apiClient.delete(`/Orden/${id}`);
+    return response.data;
+  },
+
+  /**
+   * Cambia solo el estatus de la orden (ej. de Pendiente a Entregado).
+   * Sigue el patrón de tus otros servicios con header JSON explícito.
+   */
+  cambiarEstatus: async (id, nuevoEstatusId) => {
+    const response = await apiClient.patch(
+      `/Orden/${id}/estatus`,
+      nuevoEstatusId,
+      {
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+    return response.data;
+  },
+};

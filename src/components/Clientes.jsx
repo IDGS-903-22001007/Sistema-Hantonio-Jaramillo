@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  getClientes,
-  createCliente,
-  updateCliente,
-  deleteCliente,
-  toggleClienteActivo,
-} from "../api/clientes";
+// Importamos el objeto maestro del servicio
+import { clientesService } from "../api/clientes";
 import Alert from "./Alert";
 import ConfirmDialog from "./ConfirmDialog";
 
@@ -2513,32 +2508,30 @@ const Clientes = () => {
   const [clientes, setClientes] = useState([]);
   const [formData, setFormData] = useState({
     nombreCompleto: "",
+    fechaNacimiento: "",
     telefono: "",
     email: "",
     ciudad: "",
     estado: "",
-    activo: true,
+    estatus: true,
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingCliente, setEditingCliente] = useState(null);
+  const [isReadOnly, setIsReadOnly] = useState(false); // Nuevo estado para solo lectura
   const [showForm, setShowForm] = useState(false);
   const [alert, setAlert] = useState({ type: "", message: "" });
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     clienteId: null,
   });
-  // --- NUEVO ESTADO PARA EL BUSCADOR ---
   const [searchTerm, setSearchTerm] = useState("");
 
-  // --- LÓGICA DE FILTRADO ---
-  // Filtramos 'clientes' para crear una nueva lista 'clientesFiltrados'
   const clientesFiltrados = clientes.filter((c) =>
-    c.nombreCompleto?.toLowerCase().includes(searchTerm.toLowerCase())
+    c.nombreCompleto?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  // Estado derivado: Calcula ciudades según el estado seleccionado
   const ciudadesDisponibles = formData.estado
     ? mexicoData[formData.estado] || []
     : [];
@@ -2550,10 +2543,11 @@ const Clientes = () => {
   const fetchClientes = async () => {
     try {
       setLoading(true);
-      const { data } = await getClientes();
+      const data = await clientesService.listar("", false);
       setClientes(data);
     } catch (err) {
-      setError("Error al cargar clientes");
+      console.error(err);
+      setError("Error al conectar con el servidor de León.");
     } finally {
       setLoading(false);
     }
@@ -2561,49 +2555,47 @@ const Clientes = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isReadOnly) return; // Seguridad adicional
+
     setIsSubmitting(true);
     try {
       if (editingCliente) {
-        await updateCliente(editingCliente.idCliente, formData);
-        await fetchClientes();
+        await clientesService.actualizar(editingCliente.idCliente, {
+          ...formData,
+          idCliente: editingCliente.idCliente,
+        });
         setAlert({
           type: "success",
           message: "Cliente actualizado correctamente",
         });
       } else {
-        const { data } = await createCliente(formData);
+        const data = await clientesService.crear(formData);
         setClientes([data, ...clientes]);
-        setAlert({ type: "success", message: "Cliente creado correctamente" });
+        setAlert({
+          type: "success",
+          message: "Cliente registrado en la base de datos",
+        });
       }
+      fetchClientes();
       resetForm();
     } catch (err) {
-      setAlert({ type: "error", message: "Error al guardar cliente" });
-      setError("Error al guardar");
+      console.error(err);
+      setAlert({
+        type: "error",
+        message: "No se pudo guardar la información.",
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleToggleActivo = async (id, estatusActual) => {
     try {
-      await deleteCliente(id);
-      setClientes(clientes.filter((c) => c.idCliente !== id));
-      setAlert({ type: "success", message: "Cliente eliminado correctamente" });
-    } catch (err) {
-      setAlert({ type: "error", message: "Error al eliminar cliente" });
-      setError("Error al eliminar");
-    }
-  };
-
-  const handleToggleActivo = async (id, activo) => {
-    try {
-      await toggleClienteActivo(id, !activo);
+      await clientesService.cambiarEstatus(id, !estatusActual);
       await fetchClientes();
       setAlert({
         type: "success",
-        message: `Cliente ${
-          !activo ? "activado" : "desactivado"
-        } correctamente`,
+        message: `Cliente ${!estatusActual ? "activado" : "desactivado"} correctamente`,
       });
     } catch (err) {
       console.error("Error al cambiar estado:", err);
@@ -2617,36 +2609,56 @@ const Clientes = () => {
   const resetForm = () => {
     setFormData({
       nombreCompleto: "",
+      fechaNacimiento: "",
       telefono: "",
       email: "",
       ciudad: "",
       estado: "",
-      activo: true,
+      estatus: true,
     });
     setEditingCliente(null);
+    setIsReadOnly(false);
     setShowForm(false);
   };
 
   const openEdit = (cliente) => {
     setFormData({
       nombreCompleto: cliente.nombreCompleto || "",
+      fechaNacimiento: cliente.fechaNacimiento || "",
       telefono: cliente.telefono || "",
       email: cliente.email || "",
       ciudad: cliente.ciudad || "",
       estado: cliente.estado || "",
-      activo: cliente.activo !== undefined ? cliente.activo : true,
+      estatus: cliente.estatus ?? true,
     });
     setEditingCliente(cliente);
+    setIsReadOnly(false);
     setShowForm(true);
   };
 
-  // --- 2. MANEJO ESPECIAL PARA CAMBIO DE ESTADO ---
+  // Nueva función para solo observar
+  const openView = (cliente) => {
+    setFormData({
+      nombreCompleto: cliente.nombreCompleto || "",
+      fechaNacimiento: cliente.fechaNacimiento || "",
+      telefono: cliente.telefono || "",
+      email: cliente.email || "",
+      ciudad: cliente.ciudad || "",
+      estado: cliente.estado || "",
+      estatus: cliente.estatus ?? true,
+    });
+    setEditingCliente(cliente);
+    setIsReadOnly(true);
+    setShowForm(true);
+  };
+
   const handleEstadoChange = (e) => {
+    if (isReadOnly) return;
     const nuevoEstado = e.target.value;
     setFormData({
       ...formData,
       estado: nuevoEstado,
-      ciudad: "", // Limpiamos ciudad al cambiar estado
+      ciudad: "",
     });
   };
 
@@ -2658,14 +2670,6 @@ const Clientes = () => {
         onClose={() => setAlert({ type: "", message: "" })}
       />
 
-      <ConfirmDialog
-        isOpen={confirmDialog.isOpen}
-        onClose={() => setConfirmDialog({ isOpen: false, clienteId: null })}
-        onConfirm={() => handleDelete(confirmDialog.clienteId)}
-        title="¿Eliminar cliente?"
-        message="Esta acción no se puede deshacer. El cliente será eliminado permanentemente del sistema."
-      />
-
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white">Clientes</h1>
@@ -2675,179 +2679,113 @@ const Clientes = () => {
             clientes.
           </p>
         </div>
-        <button
-          onClick={() => {
-            resetForm();
-            setShowForm(true);
-          }}
-          className="px-5 py-2 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-all text-sm"
-        >
-          + Nuevo Cliente
-        </button>
-        <input
-          type="text"
-          placeholder="Buscar cliente por nombre..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="px-5 py-2 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-all text-sm"
-        />
+        <div className="flex gap-4">
+          <input
+            type="text"
+            placeholder="Buscar por nombre..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-5 py-2 bg-black text-white rounded-lg border border-gray-800 focus:border-white transition-all text-sm outline-none"
+          />
+          <button
+            onClick={() => {
+              resetForm();
+              setShowForm(true);
+            }}
+            className="px-5 py-2 bg-white text-black rounded-lg font-bold hover:bg-gray-200 transition-all text-sm"
+          >
+            + Nuevo Cliente
+          </button>
+        </div>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 text-red-800 border border-red-200 rounded-lg">
-          <p className="font-medium">{error}</p>
+        <div className="mb-6 p-4 bg-red-900/20 text-red-400 border border-red-900/50 rounded-lg">
+          <p className="font-medium">⚠️ {error}</p>
         </div>
       )}
 
-      {/* Tabla Original */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+      <div className="bg-[#0d0d0d] rounded-xl border border-gray-800 overflow-hidden shadow-2xl">
         {loading ? (
-          /* --- 1. ESTADO DE CARGA --- */
           <div className="p-16 text-center">
-            <div className="inline-block animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-black"></div>
-            <p className="text-gray-500 mt-4 text-sm font-medium">
-              Cargando base de datos de clientes...
+            <div className="inline-block animate-spin rounded-full h-10 w-10 border-2 border-gray-800 border-t-white"></div>
+            <p className="text-gray-500 mt-4 text-sm">
+              Sincronizando base de datos...
             </p>
-          </div>
-        ) : clientes.length === 0 ? (
-          /* --- 2. NO HAY CLIENTES EN LA BASE DE DATOS --- */
-          <div className="p-16 text-center">
-            <span className="text-5xl mb-4 block text-gray-300">👥</span>
-            <p className="text-gray-600 font-bold text-lg mb-1">
-              No hay clientes registrados
-            </p>
-            <p className="text-gray-500 text-sm mb-6">
-              Empieza por añadir tu primer cliente para verlo aquí.
-            </p>
-            <button
-              onClick={() => setShowForm(true)}
-              className="px-4 py-2 bg-black text-white rounded-lg text-sm font-semibold hover:bg-gray-800 transition-all"
-            >
-              Crear mi primer cliente
-            </button>
           </div>
         ) : clientesFiltrados.length === 0 ? (
-          /* --- 3. EL BUSCADOR NO ENCONTRÓ NADA --- */
-          <div className="p-16 text-center">
-            <span className="text-5xl mb-4 block animate-pulse">🔎</span>
-            <p className="text-gray-600 font-bold text-lg mb-1">
-              Sin resultados para "{searchTerm}"
-            </p>
-            <p className="text-gray-500 text-sm mb-4">
-              Prueba con otro nombre o revisa la ortografía.
-            </p>
-            <button
-              onClick={() => setSearchTerm("")}
-              className="px-4 py-2 bg-black text-white rounded-lg text-sm font-semibold hover:bg-gray-800 transition-all"
-            >
-              Limpiar búsqueda
-            </button>
+          <div className="p-16 text-center text-gray-500">
+            <p className="text-lg font-bold">Sin resultados</p>
           </div>
         ) : (
-          /* --- 4. TABLA CON RESULTADOS --- */
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                    Cliente
-                  </th>
-                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                    Contacto
-                  </th>
-                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                    Ubicación
-                  </th>
-                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                    Estado
-                  </th>
-                  <th className="text-right p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                    Acciones
-                  </th>
+                <tr className="border-b border-gray-800 bg-black/50 text-gray-500 text-xs uppercase font-bold tracking-widest">
+                  <th className="p-4">Cliente</th>
+                  <th className="p-4">Contacto</th>
+                  <th className="p-4">Ubicación</th>
+                  <th className="p-4">Estatus</th>
+                  <th className="p-4 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y">
                 {clientesFiltrados.map((c) => (
                   <tr
                     key={c.idCliente}
-                    className="hover:bg-gray-50/80 transition-colors group"
+                    className="hover:bg-white/[0.02] transition-colors"
                   >
-                    {/* Celda: Cliente con Avatar y Tipo */}
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-bold text-xs shadow-sm group-hover:scale-105 transition-transform">
-                          {c.nombreCompleto?.charAt(0)?.toUpperCase()}
+                        <div className="w-9 h-9 bg-white text-black rounded-full flex items-center justify-center font-black text-xs">
+                          {c.nombreCompleto?.charAt(0)}
                         </div>
-                        <div>
-                          <p className="font-bold text-gray-900 text-sm leading-none mb-1">
-                            {c.nombreCompleto}
-                          </p>
-                          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">
-                            {c.tipoCliente || "CLIENTE GENERAL"}
-                          </span>
-                        </div>
+                        <span className="font-bold text-white text-sm">
+                          {c.nombreCompleto}
+                        </span>
                       </div>
                     </td>
-
-                    {/* Celda: Contacto */}
-                    <td className="p-4 hidden md:table-cell">
-                      <p className="text-sm text-gray-700">
-                        {c.email || "Sin correo"}
+                    <td className="p-4">
+                      <p className="text-sm text-gray-300">
+                        {c.email || "N/A"}
                       </p>
-                      <p className="text-xs text-gray-400">
-                        {c.telefono || "-"}
-                      </p>
+                      <p className="text-xs text-gray-500">{c.telefono}</p>
                     </td>
-
-                    {/* Celda: Ubicación */}
-                    <td className="p-4 hidden lg:table-cell">
-                      <p className="text-sm text-gray-600 italic">
-                        {c.ciudad && c.estado
-                          ? `${c.ciudad}, ${c.estado}`
-                          : "No definida"}
-                      </p>
+                    <td className="p-4 text-sm text-gray-500 italic">
+                      {c.ciudad}, {c.estado}
                     </td>
-
-                    {/* Celda: Estado (Badge) */}
                     <td className="p-4">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold border ${
-                          c.activo
-                            ? "bg-green-50 text-green-700 border-green-100"
-                            : "bg-gray-100 text-gray-500 border-gray-200"
-                        }`}
+                        className={`px-2 py-1 rounded-md text-[10px] font-black tracking-tighter ${c.estatus ? "bg-green-900/20 text-green-400" : "bg-red-900/20 text-red-400"}`}
                       >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            c.activo ? "bg-green-500" : "bg-gray-400"
-                          }`}
-                        ></span>
-                        {c.activo ? "ACTIVO" : "INACTIVO"}
+                        {c.estatus ? "ACTIVO" : "INACTIVO"}
                       </span>
                     </td>
-
-                    {/* Celda: Acciones */}
                     <td className="p-4 text-right">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-3">
+                        {/* Botón Observar */}
+                        <button
+                          onClick={() => openView(c)}
+                          title="Observar datos"
+                          className="text-gray-400 hover:text-white transition-colors"
+                        >
+                          👁️
+                        </button>
                         <button
                           onClick={() => openEdit(c)}
-                          className="p-2 text-amber-600 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors"
-                          title="Editar cliente"
+                          title="Editar"
+                          className="text-gray-400 hover:text-white transition-colors"
                         >
                           ✏️
                         </button>
                         <button
                           onClick={() =>
-                            handleToggleActivo(c.idCliente, c.activo)
+                            handleToggleActivo(c.idCliente, c.estatus)
                           }
-                          className={`p-2 rounded-lg transition-colors ${
-                            c.activo
-                              ? "text-red-600 bg-red-50 hover:bg-red-100"
-                              : "text-green-600 bg-green-50 hover:bg-green-100"
-                          }`}
-                          title={c.activo ? "Desactivar" : "Activar"}
+                          title={c.estatus ? "Desactivar" : "Activar"}
+                          className="text-gray-400 hover:text-white transition-colors"
                         >
-                          {c.activo ? "🚫" : "✅"}
+                          {c.estatus ? "🚫" : "✅"}
                         </button>
                       </div>
                     </td>
@@ -2859,129 +2797,162 @@ const Clientes = () => {
         )}
       </div>
 
-      {/* Modal / Formulario */}
+      {/* MODAL DARK CON ANIMACIÓN */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fadeIn">
-          <div className="bg-white rounded-xl w-full max-w-lg shadow-xl animate-slideUp">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-black">
-                {editingCliente ? "Editar Cliente" : "Nuevo Cliente"}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* 1. Backdrop con fade-in */}
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-fadeIn"
+            onClick={resetForm}
+          ></div>
+
+          {/* 2. Contenedor del Formulario con slide-up */}
+          <div className="bg-[#0d0d0d] border border-gray-800 rounded-2xl w-full max-w-lg shadow-2xl z-10 animate-slideUp">
+            <div className="p-6 border-b border-gray-800 flex justify-between items-center">
+              <h2 className="text-xl font-black text-white uppercase tracking-tight">
+                {isReadOnly
+                  ? "Datos del Cliente"
+                  : editingCliente
+                    ? "Editar Cliente"
+                    : "Nuevo Cliente"}
               </h2>
+              <button
+                onClick={resetForm}
+                className="text-gray-500 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
             </div>
-            <form onSubmit={handleSubmit}>
-              <div className="p-6 space-y-4">
-                {/* Nombre */}
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              <div>
+                <label className="text-[10px] font-black text-gray-500 uppercase mb-2 block tracking-widest">
+                  Nombre Completo
+                </label>
+                <input
+                  value={formData.nombreCompleto}
+                  readOnly={isReadOnly}
+                  onChange={(e) =>
+                    setFormData({ ...formData, nombreCompleto: e.target.value })
+                  }
+                  className={`w-full bg-black border border-gray-800 p-3 rounded-lg text-white outline-none focus:border-white transition-all ${isReadOnly ? "cursor-default opacity-70" : "placeholder-gray-600"}`}
+                  placeholder="Ej. Juan Pérez"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-black text-gray-500 uppercase mb-2 block tracking-widest">
+                  Fecha de Nacimiento
+                </label>
+                <input
+                  type="date"
+                  value={
+                    formData.fechaNacimiento
+                      ? formData.fechaNacimiento.split("T")[0]
+                      : ""
+                  }
+                  readOnly={isReadOnly}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      fechaNacimiento: e.target.value,
+                    })
+                  }
+                  className={`w-full bg-black border border-gray-800 p-3 rounded-lg text-white outline-none focus:border-white transition-all [color-scheme:dark] ${isReadOnly ? "cursor-default opacity-70" : "placeholder-gray-600"}`}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nombre Completo *
+                  <label className="text-[10px] font-black text-gray-500 uppercase mb-2 block tracking-widest">
+                    Email
                   </label>
                   <input
-                    value={formData.nombreCompleto}
+                    type="email"
+                    value={formData.email}
+                    readOnly={isReadOnly}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        nombreCompleto: e.target.value,
-                      })
+                      setFormData({ ...formData, email: e.target.value })
                     }
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-black focus:border-black transition-all text-black bg-white placeholder-gray-400"
-                    placeholder="Ej. Juan Pérez"
-                    required
+                    className={`w-full bg-black border border-gray-800 p-3 rounded-lg text-white outline-none focus:border-white transition-all ${isReadOnly ? "cursor-default opacity-70" : "placeholder-gray-600"}`}
+                    placeholder="correo@ejemplo.com"
                   />
                 </div>
-
-                {/* Email y Teléfono */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-black focus:border-black transition-all text-black bg-white placeholder-gray-400"
-                      placeholder="ejemplo@correo.com"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Teléfono
-                    </label>
-                    <input
-                      value={formData.telefono}
-                      onChange={(e) =>
-                        setFormData({ ...formData, telefono: e.target.value })
-                      }
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-black focus:border-black transition-all text-black bg-white placeholder-gray-400"
-                      placeholder="555-1234"
-                    />
-                  </div>
-                </div>
-
-                {/* --- SECCIÓN DE ESTADO Y CIUDAD (CON TUS ESTILOS) --- */}
-                <div className="grid grid-cols-2 gap-4">
-                  {/* ESTADO */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Estado
-                    </label>
-                    <input
-                      list="estados-list"
-                      value={formData.estado}
-                      onChange={handleEstadoChange}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-black focus:border-black transition-all text-black bg-white placeholder-gray-400"
-                      placeholder="Buscar estado..."
-                    />
-                    <datalist id="estados-list">
-                      {Object.keys(mexicoData).map((estado) => (
-                        <option key={estado} value={estado} />
-                      ))}
-                    </datalist>
-                  </div>
-
-                  {/* CIUDAD */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Ciudad
-                    </label>
-                    <input
-                      list="ciudades-list"
-                      value={formData.ciudad}
-                      onChange={(e) =>
-                        setFormData({ ...formData, ciudad: e.target.value })
-                      }
-                      disabled={!formData.estado}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-black focus:border-black transition-all text-black bg-white placeholder-gray-400 disabled:bg-gray-100 disabled:text-gray-400"
-                      placeholder={
-                        formData.estado ? "Buscar ciudad..." : "Elige estado"
-                      }
-                    />
-                    <datalist id="ciudades-list">
-                      {ciudadesDisponibles.map((ciudad) => (
-                        <option key={ciudad} value={ciudad} />
-                      ))}
-                    </datalist>
-                  </div>
+                <div>
+                  <label className="text-[10px] font-black text-gray-500 uppercase mb-2 block tracking-widest">
+                    Teléfono
+                  </label>
+                  <input
+                    value={formData.telefono}
+                    readOnly={isReadOnly}
+                    onChange={(e) =>
+                      setFormData({ ...formData, telefono: e.target.value })
+                    }
+                    className={`w-full bg-black border border-gray-800 p-3 rounded-lg text-white outline-none focus:border-white transition-all ${isReadOnly ? "cursor-default opacity-70" : "placeholder-gray-600"}`}
+                    placeholder="477..."
+                  />
                 </div>
               </div>
 
-              <div className="flex gap-3 justify-end p-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-black text-gray-500 uppercase mb-2 block tracking-widest">
+                    Estado
+                  </label>
+                  <select
+                    value={formData.estado}
+                    disabled={isReadOnly}
+                    onChange={handleEstadoChange}
+                    className={`w-full bg-black border border-gray-800 p-3 rounded-lg text-white outline-none focus:border-white transition-all ${isReadOnly ? "cursor-default opacity-70 appearance-none" : ""}`}
+                  >
+                    <option value="">Seleccionar...</option>
+                    {Object.keys(mexicoData).map((e) => (
+                      <option key={e} value={e}>
+                        {e}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-gray-500 uppercase mb-2 block tracking-widest">
+                    Ciudad
+                  </label>
+                  <select
+                    value={formData.ciudad}
+                    disabled={isReadOnly || !formData.estado}
+                    onChange={(e) =>
+                      setFormData({ ...formData, ciudad: e.target.value })
+                    }
+                    className={`w-full bg-black border border-gray-800 p-3 rounded-lg text-white outline-none focus:border-white transition-all disabled:opacity-30 ${isReadOnly ? "cursor-default opacity-70 appearance-none" : ""}`}
+                  >
+                    <option value="">Seleccionar...</option>
+                    {ciudadesDisponibles.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-4 flex gap-3">
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-4 py-2 border border-gray-300 text-black rounded-lg hover:bg-gray-100 font-semibold text-sm transition-colors"
+                  className="flex-1 p-3 border border-gray-800 rounded-lg text-gray-500 font-bold hover:text-white transition-all"
                 >
-                  Cancelar
+                  {isReadOnly ? "CERRAR" : "CANCELAR"}
                 </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 font-semibold text-sm transition-all"
-                >
-                  {isSubmitting ? "Guardando..." : "Guardar Cliente"}
-                </button>
+
+                {!isReadOnly && (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-1 p-3 bg-white text-black rounded-lg font-black hover:bg-gray-200 transition-all"
+                  >
+                    {isSubmitting ? "GUARDANDO..." : "GUARDAR"}
+                  </button>
+                )}
               </div>
             </form>
           </div>

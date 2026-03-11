@@ -1,48 +1,37 @@
-import apiClient from './axiosConfig';
+import apiClient from "./axiosConfig";
 
-export const getUsuarios = () => apiClient.get('/Usuarios');
-export const getUsuario = (id) => apiClient.get(`/Usuarios/${id}`);
+export const usuariosService = {
+  // Obtener lista
+  listar: async () => {
+    const response = await apiClient.get("/Usuario");
+    return response.data;
+  },
 
-export const createUsuario = (data) => {
-  console.log('📨 API createUsuario recibió:', data);
-  
-  return apiClient.post('/Usuarios', {
-    login: data.login,
-    password: data.password,
-    nombreCompleto: data.nombreCompleto || data.nombre,
-    idRol: data.idRol ? parseInt(data.idRol) : null,
-    idSucursal: data.idSucursal ? parseInt(data.idSucursal) : null
-  });
-};
+  // Registrar
+  registrar: async (datosUsuario) => {
+    // CORRECCIÓN: Agregamos "/registrar" para coincidir con [HttpPost("registrar")] del backend
+    const response = await apiClient.post("/Usuario/registrar", datosUsuario);
+    return response.data;
+  },
 
-export const updateUsuario = (id, data) => apiClient.put(`/Usuarios/${id}`, {
-  idUsuario: parseInt(id),
-  idRol: data.idRol ? parseInt(data.idRol) : null,
-  idSucursal: data.idSucursal ? parseInt(data.idSucursal) : null,
-  nombreCompleto: data.nombreCompleto,
-  activo: data.activo !== undefined ? data.activo : true
-});
+  // Crear (alias que usa el componente)
+  crear: async (datosUsuario) => {
+    // CORRECCIÓN: Aquí también agregamos "/registrar"
+    const response = await apiClient.post("/Usuario/registrar", datosUsuario);
+    return response.data;
+  },
 
-// Intenta primero con PATCH /estado, si falla usa PUT con todo el usuario
-export const toggleUsuarioActivo = async (id, nuevoEstado) => {
-  try {
-    return await apiClient.patch(`/Usuarios/${id}/estado`, {
-      activo: nuevoEstado
+  // Actualizar
+  actualizar: async (id, datosActualizados) => {
+    const response = await apiClient.put(`/Usuario/${id}`, datosActualizados);
+    return response.data;
+  },
+
+  // Cambio de Estatus
+  cambiarEstatus: async (id, nuevoEstatus) => {
+    const response = await apiClient.patch(`/Usuario/${id}/estatus`, {
+      estatus: nuevoEstatus,
     });
-  } catch (error) {
-    if (error.response?.status === 404) {
-      console.warn('Endpoint /estado no encontrado, usando PUT completo');
-      const usuario = await apiClient.get(`/Usuarios/${id}`);
-      return await apiClient.put(`/Usuarios/${id}`, {
-        ...usuario.data,
-        activo: nuevoEstado
-      });
-    }
-    throw error;
-  }
+    return response.data;
+  },
 };
-
-export const cambiarPassword = (id, newPassword) => apiClient.patch(`/Usuarios/${id}/password`, {
-  newPassword
-});
-export const deleteUsuario = (id) => apiClient.delete(`/Usuarios/${id}`);

@@ -22,7 +22,6 @@ const Layout = () => {
       items: [
         { name: "Clientes", to: "/clientes" },
         { name: "Órdenes", to: "/ordenes" },
-        { name: "Catálogos", to: "/catalogos" },
       ],
     },
     {
@@ -30,7 +29,6 @@ const Layout = () => {
       requiresAdmin: true,
       items: [
         { name: "Usuarios", to: "/usuarios" },
-        { name: "Roles", to: "/roles" },
         { name: "Sucursales", to: "/sucursales" },
       ],
     },

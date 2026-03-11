@@ -1,56 +1,72 @@
-import React, { useState, useEffect } from 'react';
-import { getSucursales, createSucursal, updateSucursal, deleteSucursal, toggleSucursalActiva } from '../api/sucursales';
-import Alert from './Alert';
-import ConfirmDialog from './ConfirmDialog';
+import React, { useState, useEffect } from "react";
+import { sucursalesService } from "../api/sucursales";
+import { usuariosService } from "../api/usuarios";
+import { rolesService } from "../api/roles";
+import Alert from "../components/Alert";
 
 const Sucursales = () => {
   const [sucursales, setSucursales] = useState([]);
-  const [formData, setFormData] = useState({ 
-    nombre: '', 
-    direccion: '',
-    telefono: '',
-    encargado: '',
-    activa: true
+  const [usuarios, setUsuarios] = useState([]);
+  const [roles, setRoles] = useState([]);
+
+  // Estado del formulario
+  const [formData, setFormData] = useState({
+    nombre: "",
+    direccion: "",
+    telefono: "",
+    idUsuario: "",
+    estatus: true,
   });
+
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
-  const [selectedSucursal, setSelectedSucursal] = useState(null);
-  const [editing, setEditing] = useState(null);
-  const [error, setError] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [alert, setAlert] = useState({ type: '', message: '' });
-  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, sucursalId: null });
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isReadOnly, setIsReadOnly] = useState(false); // Modo observación
+  const [editingSucursal, setEditingSucursal] = useState(null);
+  const [alert, setAlert] = useState({ type: "", message: "" });
 
-  useEffect(() => {
-    fetchSucursales();
-    // Verificar si el usuario es admin
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    setIsAdmin(user.rol === 'ADMIN');
-  }, []);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const clearApiCache = async () => {
-    if ('caches' in window) {
-      const cacheNames = await caches.keys();
-      await Promise.all(
-        cacheNames
-          .filter(name => name.includes('api-cache') || name.includes('workbox'))
-          .map(name => caches.delete(name))
-      );
-      console.log('✅ Caché limpiado');
-    }
+  // Helper para obtener nombre
+  const getNombreEncargado = (id) => {
+    if (!id) return null;
+    const usuario = usuarios.find((u) => u.idUsuario === id);
+    return usuario ? usuario.nombreCompleto : "Usuario no encontrado";
   };
 
-  const fetchSucursales = async () => {
+  const sucursalesFiltradas = sucursales.filter((s) => {
+    const nombreEncargado = getNombreEncargado(s.idUsuario) || "";
+    return (
+      s.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      nombreEncargado.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+
+  const encargadosDisponibles = usuarios.filter((u) => {
+    if (!u.estatus) return false;
+    const rolUsuario = roles.find((r) => r.idRol === u.idRol);
+    return rolUsuario?.nombre?.toLowerCase().includes("admin");
+  });
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
     try {
-      // Agregar timestamp para forzar nueva petición
-      const timestamp = new Date().getTime();
-      const { data } = await getSucursales();
-      setSucursales(data);
-      console.log('📦 Sucursales cargadas:', data);
+      setLoading(true);
+      const [sucursalesData, usuariosData, rolesData] = await Promise.all([
+        sucursalesService.listar(),
+        usuariosService.listar(),
+        rolesService.listar(),
+      ]);
+
+      setSucursales(sucursalesData);
+      setUsuarios(usuariosData);
+      setRoles(rolesData);
     } catch (err) {
-      setError('Error al cargar sucursales');
+      console.error(err);
+      setAlert({ type: "error", message: "Error al cargar datos" });
     } finally {
       setLoading(false);
     }
@@ -58,266 +74,220 @@ const Sucursales = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSubmitting(true);
+    if (isReadOnly) return;
+
+    setIsSubmitting(true);
+    setAlert({ type: "", message: "" });
+
     try {
-      if (editing) {
-        await updateSucursal(editing.idSucursal, {
-          nombre: formData.nombre.trim(),
-          direccion: formData.direccion.trim(),
-          telefono: formData.telefono.trim(),
-          encargado: formData.encargado.trim(),
-          activa: formData.activa
+      const payload = {
+        nombre: formData.nombre.trim(),
+        direccion: formData.direccion.trim(),
+        telefono: formData.telefono.trim(),
+        idUsuario: formData.idUsuario ? parseInt(formData.idUsuario) : null,
+      };
+
+      if (editingSucursal) {
+        await sucursalesService.actualizar(editingSucursal.idSucursal, {
+          ...payload,
+          idSucursal: editingSucursal.idSucursal,
+          estatus: editingSucursal.estatus,
         });
-        
-        // Invalidar caché del Service Worker
-        if ('caches' in window) {
-          caches.keys().then(names => {
-            names.forEach(name => {
-              if (name.includes('api-cache')) {
-                caches.delete(name);
-              }
-            });
-          });
-        }
-        
-        // Recargar con delay para asegurar que el caché se limpió
-        setTimeout(async () => {
-          await fetchSucursales();
-        }, 100);
-        
-        setShowDetails(false);
-        setSelectedSucursal(null);
-        setAlert({ type: 'success', message: 'Sucursal actualizada correctamente' });
+        setAlert({
+          type: "success",
+          message: "Sucursal actualizada correctamente",
+        });
       } else {
-        const { data } = await createSucursal({
-          nombre: formData.nombre.trim(),
-          direccion: formData.direccion.trim(),
-          telefono: formData.telefono.trim(),
-          encargado: formData.encargado.trim(),
-          activa: formData.activa
-        });
-        setSucursales([...sucursales, data]);
-        setAlert({ type: 'success', message: 'Sucursal creada correctamente' });
+        await sucursalesService.crear(payload);
+        setAlert({ type: "success", message: "Sucursal creada correctamente" });
       }
+
+      await fetchData();
       resetForm();
     } catch (err) {
-      console.error('Error:', err.response?.data || err.message);
-      
-      if (err.response?.status === 403 || err.isForbidden) {
-        setAlert({ 
-          type: 'error', 
-          message: 'Solo los administradores pueden modificar sucursales.' 
-        });
-      } else {
-        setAlert({ type: 'error', message: 'Error al guardar sucursal' });
-      }
-      
-      setError(err.message || 'Error al guardar sucursal');
+      const errorMsg =
+        err.response?.data?.message || "Error al guardar la sucursal";
+      setAlert({ type: "error", message: errorMsg });
     } finally {
-      setSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 
-  const handleToggleActiva = async (id, currentState) => {
+  const handleToggleEstatus = async (id, estatusActual) => {
     try {
-      const sucursal = sucursales.find(s => s.idSucursal === id);
-      if (!sucursal) {
-        setAlert({ type: 'error', message: 'Sucursal no encontrada' });
-        return;
-      }
-      
-      await toggleSucursalActiva(sucursal, !currentState);
-      
-      // Limpiar caché ANTES de recargar
-      await clearApiCache();
-      
-      // Pequeño delay para asegurar limpieza
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Recargar lista
-      await fetchSucursales();
-      
-      setAlert({ 
-        type: 'success', 
-        message: `Sucursal ${!currentState ? 'activada' : 'desactivada'} correctamente` 
+      await sucursalesService.cambiarEstatus(id, !estatusActual);
+      await fetchData();
+      setAlert({
+        type: "success",
+        message: `Sucursal ${!estatusActual ? "activada" : "desactivada"} correctamente`,
       });
     } catch (err) {
-      console.error('Error al cambiar estado:', err);
-      setAlert({ type: 'error', message: 'Error al cambiar estado de la sucursal' });
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      const sucursal = sucursales.find(s => s.idSucursal === id);
-      if (!sucursal) {
-        setAlert({ type: 'error', message: 'Sucursal no encontrada' });
-        return;
-      }
-      
-      await deleteSucursal(sucursal);
-      
-      // Limpiar caché ANTES de recargar
-      await clearApiCache();
-      
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      await fetchSucursales();
-      
-      if (showDetails && selectedSucursal?.idSucursal === id) {
-        setShowDetails(false);
-        setSelectedSucursal(null);
-      }
-      
-      setAlert({ type: 'success', message: 'Sucursal desactivada correctamente' });
-    } catch (err) {
-      console.error('Error al desactivar:', err);
-      setAlert({ type: 'error', message: 'Error al desactivar sucursal' });
+      setAlert({ type: "error", message: "No se pudo cambiar el estatus" });
     }
   };
 
   const resetForm = () => {
-    setFormData({ nombre: '', direccion: '', telefono: '', encargado: '', activa: true });
-    setEditing(null);
+    setFormData({
+      nombre: "",
+      direccion: "",
+      telefono: "",
+      idUsuario: "",
+      estatus: true,
+    });
     setShowForm(false);
+    setIsReadOnly(false);
+    setEditingSucursal(null);
   };
 
-  const openEdit = (s) => {
-    setFormData({ 
-      nombre: s.nombre, 
-      direccion: s.direccion,
-      telefono: s.telefono || '',
-      encargado: s.encargado || '',
-      activa: s.activa !== undefined ? s.activa : true
+  const openEditForm = (sucursal) => {
+    setFormData({
+      nombre: sucursal.nombre || "",
+      direccion: sucursal.direccion || "",
+      telefono: sucursal.telefono || "",
+      idUsuario: sucursal.idUsuario || "",
+      estatus: sucursal.estatus ?? true,
     });
-    setEditing(s);
-    setShowDetails(false);
+    setEditingSucursal(sucursal);
+    setIsReadOnly(false);
     setShowForm(true);
   };
 
-  const openDetails = (s) => {
-    setSelectedSucursal(s);
-    setShowDetails(true);
+  const openViewForm = (sucursal) => {
+    openEditForm(sucursal);
+    setIsReadOnly(true);
   };
 
   return (
     <div className="p-6 lg:p-8">
-      <Alert 
-        type={alert.type} 
-        message={alert.message} 
-        onClose={() => setAlert({ type: '', message: '' })}
+      <Alert
+        type={alert.type}
+        message={alert.message}
+        onClose={() => setAlert({ type: "", message: "" })}
       />
 
-      <ConfirmDialog
-        isOpen={confirmDialog.isOpen}
-        onClose={() => setConfirmDialog({ isOpen: false, sucursalId: null })}
-        onConfirm={() => handleDelete(confirmDialog.sucursalId)}
-        title="¿Desactivar esta sucursal?"
-        message="La sucursal será marcada como inactiva pero no se eliminará del sistema."
-      />
-
-      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-black">Sucursales</h1>
+          <h1 className="text-3xl font-bold text-white">Sucursales</h1>
           <p className="text-gray-500 mt-1">
-            Administra las <span className="font-semibold text-black">{sucursales.length}</span> sucursales de tu negocio.
+            Administra las{" "}
+            <span className="font-semibold text-white">
+              {sucursales.length}
+            </span>{" "}
+            sucursales.
           </p>
         </div>
-        <button
-          onClick={() => {
-            resetForm();
-            setShowForm(true);
-          }}
-          className="px-5 py-2 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-all text-sm"
-        >
-          + Nueva Sucursal
-        </button>
+        <div className="flex gap-4">
+          <input
+            type="text"
+            placeholder="Buscar sucursal..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-5 py-2 bg-black text-white rounded-lg border border-gray-800 focus:border-white transition-all text-sm outline-none w-64"
+          />
+          <button
+            onClick={() => {
+              resetForm();
+              setShowForm(true);
+            }}
+            className="px-5 py-2 bg-white text-black rounded-lg font-bold hover:bg-gray-200 transition-all text-sm"
+          >
+            + Nueva Sucursal
+          </button>
+        </div>
       </div>
 
-      {/* Error Message */}
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 text-red-800 border border-red-200 rounded-lg">
-          <p className="font-medium">{error}</p>
-        </div>
-      )}
-
-      {/* Tabla */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-[#0d0d0d] rounded-xl border border-gray-800 overflow-hidden shadow-2xl">
         {loading ? (
-          <div className="p-12 text-center">
-            <div className="inline-block animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-black"></div>
-            <p className="text-gray-500 mt-4 text-sm">Cargando sucursales...</p>
+          <div className="p-16 text-center">
+            <div className="inline-block animate-spin rounded-full h-10 w-10 border-2 border-gray-800 border-t-white"></div>
+            <p className="text-gray-500 mt-4 text-sm font-medium">
+              Cargando datos...
+            </p>
           </div>
-        ) : sucursales.length === 0 ? (
-          <div className="p-12 text-center">
-            <span className="text-5xl mb-4 block text-gray-400">🏢</span>
-            <p className="text-gray-600 font-semibold text-lg mb-2">No se encontraron sucursales</p>
-            <p className="text-gray-500 text-sm mb-4">Añade tu primera sucursal para verla en la lista.</p>
+        ) : sucursalesFiltradas.length === 0 ? (
+          <div className="p-16 text-center text-gray-500">
+            <p className="text-lg font-bold">No se encontraron sucursales</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="p-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Sucursal</th>
-                  <th className="p-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">Teléfono</th>
-                  <th className="p-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden lg:table-cell">Encargado</th>
-                  <th className="p-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estado</th>
-                  <th className="p-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
+                <tr className="border-b border-gray-800 bg-black/50 text-gray-500 text-xs uppercase font-bold tracking-widest">
+                  <th className="p-4">Sucursal</th>
+                  <th className="p-4 hidden md:table-cell">Contacto</th>
+                  <th className="p-4 lg:table-cell">Encargado</th>
+                  <th className="p-4">Estatus</th>
+                  <th className="p-4 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody>
-                {sucursales.map((s) => (
-                  <tr key={s.idSucursal} className="border-b border-gray-100 hover:bg-gray-50">
+              <tbody className="divide-y">
+                {sucursalesFiltradas.map((s) => (
+                  <tr
+                    key={s.idSucursal}
+                    className="hover:bg-white/[0.02] transition-colors"
+                  >
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-black text-white rounded-lg flex items-center justify-center font-bold text-lg">
+                        <div className="w-9 h-9 bg-white text-black rounded-full flex items-center justify-center font-bold text-lg">
                           🏢
                         </div>
                         <div>
-                          <p className="font-semibold text-black text-sm">{s.nombre}</p>
-                          <p className="text-xs text-gray-500 md:hidden">{s.direccion}</p>
+                          <p className="font-bold text-white text-sm leading-none mb-1">
+                            {s.nombre}
+                          </p>
+                          <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tight line-clamp-1 max-w-[150px]">
+                            {s.direccion || "Sin dirección"}
+                          </span>
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 text-sm text-gray-600 hidden md:table-cell">{s.telefono || '-'}</td>
-                    <td className="p-4 text-sm text-gray-600 hidden lg:table-cell">{s.encargado || '-'}</td>
+                    <td className="p-4 hidden md:table-cell text-sm text-gray-300 font-medium">
+                      {s.telefono || "-"}
+                    </td>
+                    <td className="p-4 lg:table-cell">
+                      {getNombreEncargado(s.idUsuario) ? (
+                        <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-blue-900/20 text-blue-400 rounded-md text-sm font-bold border border-blue-900/30">
+                          🛡️ {getNombreEncargado(s.idUsuario)}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-600 italic">
+                          No asignado
+                        </span>
+                      )}
+                    </td>
                     <td className="p-4">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${s.activa ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${s.activa ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-                        {s.activa ? 'Activo' : 'Inactivo'}
+                      <span
+                        className={`px-2 py-1 rounded-md text-[10px] font-black tracking-tighter ${s.estatus ? "bg-green-900/20 text-green-400" : "bg-red-900/20 text-red-400"}`}
+                      >
+                        {s.estatus ? "ACTIVA" : "INACTIVA"}
                       </span>
                     </td>
-                    <td className="p-4 text-right space-x-2">
-                      <button 
-                        onClick={() => openDetails(s)} 
-                        className="px-3 py-1 text-sm font-semibold text-blue-600 bg-white border border-blue-300 rounded-md hover:bg-blue-50 transition-colors"
-                      >
-                        Detalles
-                      </button>
-                      
-                      {isAdmin && (
-                        <>
-                          <button 
-                            onClick={() => openEdit(s)} 
-                            className="px-3 py-1 text-sm font-semibold text-amber-600 bg-white border border-amber-300 rounded-md hover:bg-amber-50 transition-colors"
-                          >
-                            Editar
-                          </button>
-                          <button 
-                            onClick={() => handleToggleActiva(s.idSucursal, s.activa)} 
-                            className={`px-3 py-1 text-sm font-semibold rounded-md transition-colors ${
-                              s.activa 
-                                ? 'text-red-600 bg-white border border-red-300 hover:bg-red-50' 
-                                : 'text-green-600 bg-white border border-green-300 hover:bg-green-50'
-                            }`}
-                          >
-                            {s.activa ? 'Desactivar' : 'Activar'}
-                          </button>
-                        </>
-                      )}
+                    <td className="p-4 text-right">
+                      <div className="flex justify-end gap-3">
+                        <button
+                          onClick={() => openViewForm(s)}
+                          className="text-gray-400 hover:text-white transition-colors"
+                          title="Ver"
+                        >
+                          👁️
+                        </button>
+                        <button
+                          onClick={() => openEditForm(s)}
+                          className="text-gray-400 hover:text-white transition-colors"
+                          title="Editar"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleToggleEstatus(s.idSucursal, s.estatus)
+                          }
+                          className="text-gray-400 hover:text-white transition-colors"
+                          title={s.estatus ? "Desactivar" : "Activar"}
+                        >
+                          {s.estatus ? "🚫" : "✅"}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -327,155 +297,118 @@ const Sucursales = () => {
         )}
       </div>
 
-      {/* Modal - Formulario */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fadeIn">
-          <div className="bg-white rounded-xl w-full max-w-2xl shadow-xl animate-slideUp max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200 sticky top-0 bg-white">
-              <h2 className="text-xl font-bold text-black">{editing ? 'Editar Sucursal' : 'Nueva Sucursal'}</h2>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-[#0d0d0d] border border-gray-800 rounded-2xl w-full max-w-lg shadow-2xl animate-slideUp">
+            <div className="p-6 border-b border-gray-800 flex justify-between items-center">
+              <h2 className="text-xl font-black text-white uppercase tracking-tight">
+                {isReadOnly
+                  ? "Detalles de Sucursal"
+                  : editingSucursal
+                    ? "Editar Sucursal"
+                    : "Nueva Sucursal"}
+              </h2>
+              <button
+                onClick={resetForm}
+                className="text-gray-500 hover:text-white"
+              >
+                ✕
+              </button>
             </div>
-            <form onSubmit={handleSubmit}>
-              <div className="p-6 space-y-4">
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              <div>
+                <label className="text-[10px] font-black text-gray-500 uppercase mb-2 block tracking-widest">
+                  Nombre *
+                </label>
+                <input
+                  value={formData.nombre}
+                  readOnly={isReadOnly}
+                  onChange={(e) =>
+                    setFormData({ ...formData, nombre: e.target.value })
+                  }
+                  className={`w-full bg-black border border-gray-800 p-3 rounded-lg text-white outline-none focus:border-white transition-all ${isReadOnly ? "opacity-50 cursor-default" : "placeholder-gray-600"}`}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-black text-gray-500 uppercase mb-2 block tracking-widest">
+                  Dirección *
+                </label>
+                <textarea
+                  value={formData.direccion}
+                  readOnly={isReadOnly}
+                  onChange={(e) =>
+                    setFormData({ ...formData, direccion: e.target.value })
+                  }
+                  className={`w-full bg-black border border-gray-800 p-3 rounded-lg text-white outline-none focus:border-white transition-all ${isReadOnly ? "opacity-50 cursor-default" : "placeholder-gray-600"} resize-none`}
+                  rows="2"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
-                  <input 
-                    type="text"
-                    value={formData.nombre} 
-                    onChange={(e) => setFormData({...formData, nombre: e.target.value})} 
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none text-black bg-white placeholder-gray-400" 
-                    placeholder="Nombre de la sucursal"
-                    required 
-                    disabled={submitting}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Dirección *</label>
-                  <textarea 
-                    value={formData.direccion} 
-                    onChange={(e) => setFormData({...formData, direccion: e.target.value})} 
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none text-black bg-white placeholder-gray-400 resize-none"
-                    placeholder="Dirección completa"
-                    rows="3"
-                    required 
-                    disabled={submitting}
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-                    <input 
-                      type="tel"
-                      value={formData.telefono} 
-                      onChange={(e) => setFormData({...formData, telefono: e.target.value})} 
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none text-black bg-white placeholder-gray-400" 
-                      placeholder="+1 (555) 000-0000"
-                      disabled={submitting}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Encargado</label>
-                    <input 
-                      type="text"
-                      value={formData.encargado} 
-                      onChange={(e) => setFormData({...formData, encargado: e.target.value})} 
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none text-black bg-white placeholder-gray-400" 
-                      placeholder="Nombre del encargado"
-                      disabled={submitting}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input 
-                      type="checkbox"
-                      checked={formData.activa}
-                      onChange={(e) => setFormData({...formData, activa: e.target.checked})}
-                      disabled={submitting}
-                      className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
-                    />
-                    <span className="text-sm font-medium text-gray-700">Sucursal Activa</span>
+                  <label className="text-[10px] font-black text-gray-500 uppercase mb-2 block tracking-widest">
+                    Teléfono
                   </label>
+                  <input
+                    type="tel"
+                    value={formData.telefono}
+                    readOnly={isReadOnly}
+                    onChange={(e) =>
+                      setFormData({ ...formData, telefono: e.target.value })
+                    }
+                    className={`w-full bg-black border border-gray-800 p-3 rounded-lg text-white outline-none focus:border-white transition-all ${isReadOnly ? "opacity-50 cursor-default" : "placeholder-gray-600"}`}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-black text-gray-500 uppercase mb-2 block tracking-widest">
+                    Encargado (Admin)
+                  </label>
+                  <select
+                    value={formData.idUsuario}
+                    disabled={isReadOnly}
+                    onChange={(e) =>
+                      setFormData({ ...formData, idUsuario: e.target.value })
+                    }
+                    className={`w-full bg-black border border-gray-800 p-3 rounded-lg text-white outline-none focus:border-white transition-all ${isReadOnly ? "opacity-50 cursor-default appearance-none" : ""}`}
+                  >
+                    <option value="">-- Seleccionar --</option>
+                    {encargadosDisponibles.map((u) => (
+                      <option key={u.idUsuario} value={u.idUsuario}>
+                        {u.nombreCompleto}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
-              <div className="flex gap-3 justify-end p-4 bg-gray-50 border-t border-gray-200 rounded-b-xl sticky bottom-0">
-                <button type="button" onClick={resetForm} disabled={submitting} className="px-4 py-2 border border-gray-300 text-black rounded-lg hover:bg-gray-100 font-semibold text-sm transition-colors disabled:opacity-50">Cancelar</button>
-                <button type="submit" disabled={submitting} className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 font-semibold text-sm transition-all disabled:opacity-50">
-                  {submitting ? 'Guardando...' : 'Guardar'}
+
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="flex-1 p-3 border border-gray-800 rounded-lg text-gray-500 font-bold hover:text-white transition-all"
+                >
+                  {isReadOnly ? "CERRAR" : "CANCELAR"}
                 </button>
+                {!isReadOnly && (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-1 p-3 bg-white text-black rounded-lg font-black hover:bg-gray-200 transition-all"
+                  >
+                    {isSubmitting
+                      ? "GUARDANDO..."
+                      : editingSucursal
+                        ? "ACTUALIZAR"
+                        : "GUARDAR"}
+                  </button>
+                )}
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modal - Detalles */}
-      {showDetails && selectedSucursal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fadeIn">
-          <div className="bg-white rounded-xl w-full max-w-lg shadow-xl animate-slideUp">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-black">Detalles de Sucursal</h2>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                <p className="text-black font-semibold">{selectedSucursal.nombre}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
-                <p className="text-black whitespace-pre-wrap">{selectedSucursal.direccion}</p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-                  <p className="text-black font-semibold">{selectedSucursal.telefono || '-'}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Encargado</label>
-                  <p className="text-black font-semibold">{selectedSucursal.encargado || '-'}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold border ${selectedSucursal.activa ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${selectedSucursal.activa ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-                    {selectedSucursal.activa ? 'Activo' : 'Inactivo'}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-3 justify-end p-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
-              <button 
-                type="button" 
-                onClick={() => setShowDetails(false)} 
-                className="px-4 py-2 border border-gray-300 text-black rounded-lg hover:bg-gray-100 font-semibold text-sm transition-colors"
-              >
-                Cerrar
-              </button>
-              
-              {isAdmin && (
-                <>
-                  <button 
-                    type="button" 
-                    onClick={() => {
-                      openEdit(selectedSucursal);
-                      setShowDetails(false);
-                    }} 
-                    className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 font-semibold text-sm transition-all"
-                  >
-                    Editar
-                  </button>
-                  <button 
-                    type="button" 
-                    onClick={() => {
-                      setConfirmDialog({ isOpen: true, sucursalId: selectedSucursal.idSucursal });
-                      setShowDetails(false);
-                    }} 
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold text-sm transition-all"
-                  >
-                    Eliminar
-                  </button>
-                </>
-              )}
-            </div>
           </div>
         </div>
       )}
@@ -484,5 +417,3 @@ const Sucursales = () => {
 };
 
 export default Sucursales;
-
-
