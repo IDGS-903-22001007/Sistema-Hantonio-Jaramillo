@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { clientesService } from "../api/clientes";
 import Alert from "./Alert";
 import ConfirmDialog from "./ConfirmDialog";
+import { Eye, Edit, UserX, UserCheck } from "lucide-react";
 
 // --- 1. DATOS DE ESTADOS Y CIUDADES ---
 // Reemplaza tu const mexicoData anterior con esta más completa:
@@ -2527,10 +2528,25 @@ const Clientes = () => {
     clienteId: null,
   });
   const [searchTerm, setSearchTerm] = useState("");
+  const [filtroEstatus, setFiltroEstatus] = useState("");
 
-  const clientesFiltrados = clientes.filter((c) =>
-    c.nombreCompleto?.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const clientesFiltrados = clientes.filter((c) => {
+    // 1. Condición de búsqueda por texto
+    const coincideTexto =
+      c.nombreCompleto?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      false;
+
+    // 2. Condición de filtro por estatus booleano
+    let coincideEstatus = true;
+    if (filtroEstatus === "activo") {
+      coincideEstatus = c.estatus === true;
+    } else if (filtroEstatus === "inactivo") {
+      coincideEstatus = c.estatus === false;
+    } // Si es "", coincideEstatus se queda en true mostrando todos
+
+    // 3. Ambas condiciones deben cumplirse
+    return coincideTexto && coincideEstatus;
+  });
 
   const ciudadesDisponibles = formData.estado
     ? mexicoData[formData.estado] || []
@@ -2651,6 +2667,7 @@ const Clientes = () => {
     setIsReadOnly(true);
     setShowForm(true);
   };
+  // Filtro de estatus: "" (Todos), "activo" (true), o "inactivo" (false)
 
   const handleEstadoChange = (e) => {
     if (isReadOnly) return;
@@ -2663,7 +2680,7 @@ const Clientes = () => {
   };
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="p-6 lg:p-8 max-w-[1600px] mx-auto min-h-screen text-gray-200">
       <Alert
         type={alert.type}
         message={alert.message}
@@ -2682,11 +2699,20 @@ const Clientes = () => {
         <div className="flex gap-4">
           <input
             type="text"
-            placeholder="Buscar por nombre..."
+            placeholder="Buscar cliente..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-5 py-2 bg-black text-white rounded-lg border border-gray-800 focus:border-white transition-all text-sm outline-none"
+            className="px-5 py-2 bg-black text-white rounded-lg border border-gray-800 focus:border-white transition-all text-sm outline-none w-64"
           />
+          <select
+            value={filtroEstatus}
+            onChange={(e) => setFiltroEstatus(e.target.value)}
+            className="px-5 py-2 bg-black text-white rounded-lg border border-gray-800 focus:border-white transition-all text-sm outline-none w-64"
+          >
+            <option value="">Filtrar por estatus...</option>
+            <option value="activo">Activos</option>
+            <option value="inactivo">Inactivos</option>
+          </select>
           <button
             onClick={() => {
               resetForm();
@@ -2769,23 +2795,33 @@ const Clientes = () => {
                           title="Observar datos"
                           className="text-gray-400 hover:text-white transition-colors"
                         >
-                          👁️
+                          <Eye size={18} strokeWidth={2.5} />
                         </button>
                         <button
                           onClick={() => openEdit(c)}
                           title="Editar"
                           className="text-gray-400 hover:text-white transition-colors"
                         >
-                          ✏️
+                          <Edit size={18} strokeWidth={2.5} />
                         </button>
                         <button
                           onClick={() =>
                             handleToggleActivo(c.idCliente, c.estatus)
                           }
-                          title={c.estatus ? "Desactivar" : "Activar"}
-                          className="text-gray-400 hover:text-white transition-colors"
+                          title={
+                            c.estatus ? "Desactivar Cliente" : "Activar Cliente"
+                          }
+                          className={`transition-all p-2 rounded-md ${
+                            c.estatus
+                              ? "text-gray-400 hover:text-red-400 hover:bg-red-400/10"
+                              : "text-gray-400 hover:text-emerald-400 hover:bg-emerald-400/10"
+                          }`}
                         >
-                          {c.estatus ? "🚫" : "✅"}
+                          {c.estatus ? (
+                            <UserX size={18} strokeWidth={2.5} />
+                          ) : (
+                            <UserCheck size={18} strokeWidth={2.5} />
+                          )}
                         </button>
                       </div>
                     </td>

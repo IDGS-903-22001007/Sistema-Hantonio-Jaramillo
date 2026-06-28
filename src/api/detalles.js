@@ -22,4 +22,8 @@ export const detallesService = {
   obtenerCamisaPorOrden: (idOrden) =>
     apiClient.get(`/DetalleCamisa/orden/${idOrden}`),
   actualizarCamisa: (id, datos) => apiClient.put(`/DetalleCamisa/${id}`, datos),
+
+  obtenerZapatoPorOrden: (idOrden) =>
+    apiClient.get(`/DetalleZapato/orden/${idOrden}`),
+  actualizarZapato: (id, datos) => apiClient.put(`/DetalleZapato/${id}`, datos),
 };

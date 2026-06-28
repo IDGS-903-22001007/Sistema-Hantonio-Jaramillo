@@ -10,9 +10,12 @@ import {
   Layers,
   DollarSign,
   Info,
+  Edit,
+  Download,
+  Copy,
+  ClipboardPaste,
+  Trash2,
 } from "lucide-react";
-
-// --- IMPORTACIÓN DE SERVICIOS ---
 import { ordenesService } from "../api/ordenes";
 import { clientesService } from "../api/clientes";
 import { sucursalesService } from "../api/sucursales";
@@ -20,211 +23,1034 @@ import { estatusOrdenService } from "../api/estatusOrden";
 import { tipoTrajeService } from "../api/tipoTraje";
 import { detallesService } from "../api/detalles";
 import Alert from "../components/Alert";
+import SacoBoton1 from "../assets/ImagSaco/EstiloBotones/1 boton.png";
+import SacoBoton2 from "../assets/ImagSaco/EstiloBotones/2 boton.png";
+import SacoBoton3rolado1 from "../assets/ImagSaco/EstiloBotones/3 boton 1 rolado.png";
+import SacoBotonDoblePecho2en1 from "../assets/ImagSaco/EstiloBotones/doble pecho 2 en 1.png";
+import SacoBotonDoblePecho2en4 from "../assets/ImagSaco/EstiloBotones/doble pecho 2 en 4.png";
+import SacoBotonDoblePecho3en1 from "../assets/ImagSaco/EstiloBotones/doble pecho 3 en 1.png";
+import SacoBotonDoblePecho4en1 from "../assets/ImagSaco/EstiloBotones/doble pecho 4 en 1.png";
+import SacoBotonDoblePecho6en1 from "../assets/ImagSaco/EstiloBotones/doble pecho 6 en 1.png";
+import SacoBotonDoblePecho6en3 from "../assets/ImagSaco/EstiloBotones/doble pecho 6 en 3.png";
+import SacoBotonRana from "../assets/ImagSaco/EstiloBotones/1 boton rana.png";
+import SacoBotonRana2 from "../assets/ImagSaco/EstiloBotones/1 boton rana 2.png";
+import SacoBotonRana3 from "../assets/ImagSaco/EstiloBotones/1 boton rana 3.png";
+import SacoBotonRana4 from "../assets/ImagSaco/EstiloBotones/1 boton rana 4.png";
+import SacoBotonDoblePecho2Rana from "../assets/ImagSaco/EstiloBotones/doble pecho dos botenes de rana.png";
+import bpCurvo from "../assets/ImagSaco/EstiloBolsilloPecho/CURVO_1.jpg";
+import bpDobleRibete from "../assets/ImagSaco/EstiloBolsilloPecho/DOBLE RELIEBE_1.jpg";
+import bpDosDiamante from "../assets/ImagSaco/EstiloBolsilloPecho/BOLSILLOS DE PARCHE CON FLAP DIAMANTE_1.jpg";
+import bpParche from "../assets/ImagSaco/EstiloBolsilloPecho/PARCHE_1.jpg";
+import bpRecto from "../assets/ImagSaco/EstiloBolsilloPecho/RECTO_1.jpg";
+import bpUnRibete from "../assets/ImagSaco/EstiloBolsilloPecho/UN RIBETE 1.2CM_1.jpg";
+import BolsInferSinSolapa from "../assets/ImagSaco/EstiloBolsilloInferior/sin solapa.png";
+import BolsInferSinSolapa2Rectos from "../assets/ImagSaco/EstiloBolsilloInferior/sin solapa 2 rectos.png";
+import BolsInferSinBolsillos from "../assets/ImagSaco/EstiloBolsilloInferior/sin bolsillo.png";
+import BolsInferInclinConSolapa from "../assets/ImagSaco/EstiloBolsilloInferior/inclinados con solapa.png";
+import BolsInferParchePliegue from "../assets/ImagSaco/EstiloBolsilloInferior/bolsillos de parche con un pliegue.png";
+import BolsInferParcheSolapaCuadrada from "../assets/ImagSaco/EstiloBolsilloInferior/bolsillos de parche con solapa cuadrada.png";
+import BolsInfer2RectosRibeteados from "../assets/ImagSaco/EstiloBolsilloInferior/2 rectos ribeteados.png";
+import BolsInfer2InclinRibeteados from "../assets/ImagSaco/EstiloBolsilloInferior/2 inclinados ribeteados.png";
+import BolsInfer2ParcheSolapaDiamante from "../assets/ImagSaco/EstiloBolsilloInferior/2 de parche con solopa diamante.png";
+import BolsInfer2SolapaDiamante from "../assets/ImagSaco/EstiloBolsilloInferior/2 con solopa diamante.png";
+import BolsInfer2SolapaCuadrada from "../assets/ImagSaco/EstiloBolsilloInferior/2 con solopa cuadrada.png";
+import BolsInfer2BolsillosParche from "../assets/ImagSaco/EstiloBolsilloInferior/2 bolsillos de parche.png";
+import solapaSinSolapa from "../assets/ImagSaco/EstiloSolapa/sin solapa.png";
+import solapaMuesca from "../assets/ImagSaco/EstiloSolapa/muesca.png";
+import solapaMuescaRedonda from "../assets/ImagSaco/EstiloSolapa/muesca redonda.png";
+import solapaPuntaLanza from "../assets/ImagSaco/EstiloSolapa/punta de lanza.png";
+import solapaPuntaLanzaCurva from "../assets/ImagSaco/EstiloSolapa/punta de lanza curva.png";
+import solapaChal from "../assets/ImagSaco/EstiloSolapa/chal.png";
+import solapaChal68cm from "../assets/ImagSaco/EstiloSolapa/chal 6-8 cm.png";
+import solapaDoblePechoRecto from "../assets/ImagSaco/EstiloSolapa/doble pecho recto.png";
+import solapaChalDoblePechoOp from "../assets/ImagSaco/EstiloSolapa/chal doble pecho op.png";
+import sinPretina from "../assets/ImagPantalon/EstiloPretina/sin pretina.png";
+import estiloItaliano1 from "../assets/ImagPantalon/EstiloPretina/estilo italiano 1.png";
+import estiloItaliano2Redondas from "../assets/ImagPantalon/EstiloPretina/estilo italiano 2 redondas.png";
+import estiloItaliano3 from "../assets/ImagPantalon/EstiloPretina/estilo italiano 3.png";
+import estiloItaliano4 from "../assets/ImagPantalon/EstiloPretina/estilo italiano 4.png";
+import estiloItaliano5 from "../assets/ImagPantalon/EstiloPretina/estilo italiano 5.png";
+import estiloItaliano5Puntas from "../assets/ImagPantalon/EstiloPretina/estilo italiano 5 puntas.png";
+import estiloItalianoA from "../assets/ImagPantalon/EstiloPretina/estilo italiano A.png";
+import extendidaPunta from "../assets/ImagPantalon/EstiloPretina/pretina extentida de punta.png";
+import extendidaRecta from "../assets/ImagPantalon/EstiloPretina/pretina extentida recta.png";
+import extendidaRedonda from "../assets/ImagPantalon/EstiloPretina/pretina extentida redonda.png";
+import extendidaLargaPunta from "../assets/ImagPantalon/EstiloPretina/pretina extentida larga de punta.png";
+import extendidaLargaRecta from "../assets/ImagPantalon/EstiloPretina/pretina extentida larga recta.png";
+import extendidaLargaRedonda from "../assets/ImagPantalon/EstiloPretina/pretina extentida larga redonda.png";
+import chalecoPechoSin from "../assets/ImagChaleco/EstiloBolsilloPecho/sin.png";
+import chalecoPechoRecto from "../assets/ImagChaleco/EstiloBolsilloPecho/recto.png";
+import chalecoPechoRegular from "../assets/ImagChaleco/EstiloBolsilloPecho/regular.png";
+import chalecoPechoDobleRibete from "../assets/ImagChaleco/EstiloBolsilloPecho/doble ribete.png";
+import chalecoPechoIzqDerDobleRibete from "../assets/ImagChaleco/EstiloBolsilloPecho/izq. dere. doble ribete.png";
+import chalecoPechoIzqDer from "../assets/ImagChaleco/EstiloBolsilloPecho/izq. dere.png";
+import bolsillosSin from "../assets/ImagChaleco/EstiloBolsillos/sinbolsillo.png";
+import bolsillosRectos2Ribetes from "../assets/ImagChaleco/EstiloBolsillos/dos ribetes rectos.png";
+import bolsillosRectosCRibete from "../assets/ImagChaleco/EstiloBolsillos/1 ribete recto.png";
+import bolsillosInc2Ribetes from "../assets/ImagChaleco/EstiloBolsillos/dos ribetes inclinados.png";
+import bolsillosInc1Ribete from "../assets/ImagChaleco/EstiloBolsillos/1 ribete inclinado.png";
+import bolsillosParche from "../assets/ImagChaleco/EstiloBolsillos/parche.png";
+import bolsillosDiamante from "../assets/ImagChaleco/EstiloBolsillos/diamante.png";
+import bolsillosSolapaInclinada from "../assets/ImagChaleco/EstiloBolsillos/solapa inclinado.png";
+import bolsillosSolapaRecta from "../assets/ImagChaleco/EstiloBolsillos/solapa recto.png";
+import boton3 from "../assets/ImagChaleco/EstiloBotones/3.png";
+import boton4 from "../assets/ImagChaleco/EstiloBotones/4.png";
+import boton5 from "../assets/ImagChaleco/EstiloBotones/5.png";
+import boton6 from "../assets/ImagChaleco/EstiloBotones/6.png";
+import boton6Especial from "../assets/ImagChaleco/EstiloBotones/ESPECIAL DOBLE 6.png";
+import boton8 from "../assets/ImagChaleco/EstiloBotones/DOBLE 8.png";
+import doblePecho4 from "../assets/ImagChaleco/EstiloBotones/DOBLE 4.png";
+import doblePecho6 from "../assets/ImagChaleco/EstiloBotones/DOBLE 6.png";
+import doblePecho8 from "../assets/ImagChaleco/EstiloBotones/DOBLE 8.png";
+import doblePecho8Especial from "../assets/ImagChaleco/EstiloBotones/ESPECIAL DOBLE 8.png";
+import doblePecho10 from "../assets/ImagChaleco/EstiloBotones/DOBLE 10.png";
+import doblePechoV5 from "../assets/ImagChaleco/EstiloBotones/ESPECIAL DOBLE V5.png";
+import cuelloFormaU from "../assets/ImagChaleco/EstiloCuello/forma u.png";
+import cuelloFormaV from "../assets/ImagChaleco/EstiloCuello/forma v.png";
+import cuelloSolapaChal from "../assets/ImagChaleco/EstiloCuello/chal.png";
+import cuelloSolapaChalU from "../assets/ImagChaleco/EstiloCuello/chal u.png";
+import cuelloSolapaMuesca from "../assets/ImagChaleco/EstiloCuello/muesca.png";
+import cuelloSolapaLanza from "../assets/ImagChaleco/EstiloCuello/punta de lanza.png";
+import cuelloSolapaLanzaCurva from "../assets/ImagChaleco/EstiloCuello/punta de lanza curva.png";
+import inferiorPuntas from "../assets/ImagChaleco/EstiloInferior/puntas.png";
+import inferiorRecto from "../assets/ImagChaleco/EstiloInferior/recto.png";
+import inferiorRedondo from "../assets/ImagChaleco/EstiloInferior/redondo.png";
+import buttonAngle1 from "../assets/ImagCamisa/BotonManga/1 button angle.png";
+import buttonAround1 from "../assets/ImagCamisa/BotonManga/1 button around.png";
+import buttonSquare1 from "../assets/ImagCamisa/BotonManga/1 button square.png";
+import buttonAngle2 from "../assets/ImagCamisa/BotonManga/2 button angle.png";
+import buttonAround2 from "../assets/ImagCamisa/BotonManga/2 button around.png";
+import buttonSquare2 from "../assets/ImagCamisa/BotonManga/2 button square.png";
+import angleConvertible from "../assets/ImagCamisa/BotonManga/angle convertible.png";
+import cocktail from "../assets/ImagCamisa/BotonManga/cocktail.png";
+import frenchAngle from "../assets/ImagCamisa/BotonManga/french angle.png";
+import frenchRound from "../assets/ImagCamisa/BotonManga/french round.png";
+import frenchSquare from "../assets/ImagCamisa/BotonManga/french square.png";
+import neapolianCuff from "../assets/ImagCamisa/BotonManga/neapolian cuff.png";
+import quarterRound from "../assets/ImagCamisa/BotonManga/quarter round.png";
+import roundConvertible from "../assets/ImagCamisa/BotonManga/round convertible.png";
+import squareConvertible from "../assets/ImagCamisa/BotonManga/square convertible.png";
+import bandCollar from "../assets/ImagCamisa/Collars/band collar.png";
+import boatNeck from "../assets/ImagCamisa/Collars/boat neck.png";
+import classicCollar from "../assets/ImagCamisa/Collars/clasic collar.png";
+import clubCollar from "../assets/ImagCamisa/Collars/club collar.png";
+import cutaway from "../assets/ImagCamisa/Collars/cutaway.png";
+import italianSpread from "../assets/ImagCamisa/Collars/italian spread.png";
+import semiSpread from "../assets/ImagCamisa/Collars/semi spread.png";
+import spreadCollar from "../assets/ImagCamisa/Collars/spread collar.png";
+import windsorCollar from "../assets/ImagCamisa/Collars/windsor collar.png";
+import wingTip from "../assets/ImagCamisa/Collars/wing tip.png";
+import collarAndCollarBand from "../assets/ImagCamisa/ContrastPosition/collar & collar band.png";
+import collarAndCuffs from "../assets/ImagCamisa/ContrastPosition/collar & cuffs.png";
+import cuffs from "../assets/ImagCamisa/ContrastPosition/cuffs.png";
+import insideCollarAndCuffs from "../assets/ImagCamisa/ContrastPosition/inside collar nd cuffs.png";
+import insideCollarCuffsAndPlaket from "../assets/ImagCamisa/ContrastPosition/inside collar, cuffs and plaket.png";
+import insideCollar from "../assets/ImagCamisa/ContrastPosition/inside collar.png";
+import noContrast from "../assets/ImagCamisa/ContrastPosition/no.png";
+import yorkInside from "../assets/ImagCamisa/ContrastPosition/york inside.png";
+import yorkOutside from "../assets/ImagCamisa/ContrastPosition/york outside.png";
+import largePleats from "../assets/ImagCamisa/Estilo/large pleates.png";
+import largePleatsBottom from "../assets/ImagCamisa/Estilo/large pleats to the bottom.png";
+import mediumPleatsBottom from "../assets/ImagCamisa/Estilo/medium pleats to the bottom.png";
+import mediumPleats from "../assets/ImagCamisa/Estilo/medium pleats.png";
+import pleat from "../assets/ImagCamisa/Estilo/pleat.png";
+import smallPleatsBottom from "../assets/ImagCamisa/Estilo/small pleats to the bottom.png";
+import smallPleats from "../assets/ImagCamisa/Estilo/small pleats.png";
+import standard from "../assets/ImagCamisa/Estilo/standard.png";
+import uShapeLargePleats from "../assets/ImagCamisa/Estilo/U shape large pleats.png";
+import uShapeMediumPleats from "../assets/ImagCamisa/Estilo/U shape mediums pleats.png";
+import uShapeSmallPleats from "../assets/ImagCamisa/Estilo/U shape small pleats.png";
+import uShape from "../assets/ImagCamisa/Estilo/U shape.png";
+import concealedPlacket from "../assets/ImagCamisa/EstiloBotones/concealed placket.png";
+import convertiblePlacket2 from "../assets/ImagCamisa/EstiloBotones/convertible placket 2.png";
+import convertiblePlacket from "../assets/ImagCamisa/EstiloBotones/convertible placket.png";
+import noPlacket from "../assets/ImagCamisa/EstiloBotones/no placket.png";
+import poloPlacket from "../assets/ImagCamisa/EstiloBotones/polo placket.png";
+import standardPlacket from "../assets/ImagCamisa/EstiloBotones/standard placket.png";
+import tuxedoPlacket1 from "../assets/ImagCamisa/EstiloBotones/tuxedo placket 1.png";
+import tuxedoPlacket2 from "../assets/ImagCamisa/EstiloBotones/tuxedo placket 2.png";
+import hexagonPocket from "../assets/ImagCamisa/Pocket/hexagon pocket.png";
+import noPocket from "../assets/ImagCamisa/Pocket/no.png";
+import pointedPocket from "../assets/ImagCamisa/Pocket/pointed pocket.png";
+import roundPocket from "../assets/ImagCamisa/Pocket/round pocket.png";
+import squarePocket from "../assets/ImagCamisa/Pocket/square pocket.png";
+import solapaHexagon from "../assets/ImagCamisa/SolapaBolsillos/hexagon pocket flap.png";
+import solapaNo from "../assets/ImagCamisa/SolapaBolsillos/no.png";
+import solapaRound from "../assets/ImagCamisa/SolapaBolsillos/round pocket flap.png";
+import solapaSquare from "../assets/ImagCamisa/SolapaBolsillos/square pocket flap.png";
+import solapaTriangular from "../assets/ImagCamisa/SolapaBolsillos/triangular pocket flap.png";
+import BolsilloTicketParche from "../assets/ImagSaco/EstiloBolsilloTicket/bolsillo de parche.png";
+import BolsilloTicketInclinadoDobleSolapa from "../assets/ImagSaco/EstiloBolsilloTicket/bolsillo inclinado doble solapa.png";
+import BolsilloTicketInclinadoDobleRibete from "../assets/ImagSaco/EstiloBolsilloTicket/bolsillo inclinado doble ribete.png";
+import BolsilloTicketInclinadoSinSolapa from "../assets/ImagSaco/EstiloBolsilloTicket/bolsillo inclinado sin solapa.png";
+import BolsilloTicketRectoSolapa from "../assets/ImagSaco/EstiloBolsilloTicket/bolsillo recto con solapa.png";
+import BolsilloTicketRectoDobleRibete from "../assets/ImagSaco/EstiloBolsilloTicket/bolsillo recto doble ribete.png";
+import BolsilloTicketRectoSinSolapa from "../assets/ImagSaco/EstiloBolsilloTicket/bolsillo recto sin solapa.png";
 
-import btn1Rana from "../assets/ImagSaco/EstiloBotones/1 boton de rana.png";
-import btn1Normal from "../assets/ImagSaco/EstiloBotones/1 boton.png";
-import btn1Rolado from "../assets/ImagSaco/EstiloBotones/1 rolado.png";
-import btn2Botones from "../assets/ImagSaco/EstiloBotones/2 botones.png";
-import btnDoble2en1 from "../assets/ImagSaco/EstiloBotones/doble pecho 2 en 1.png";
-import btnDoble6en1 from "../assets/ImagSaco/EstiloBotones/doble pecho 6 en 1.png";
-import btnDoble6en2 from "../assets/ImagSaco/EstiloBotones/doble pecho 6 en 2.png";
-import btnDoble6en3 from "../assets/ImagSaco/EstiloBotones/doble pecho 6 en 3.png";
-import btnDoble2en4 from "../assets/ImagSaco/EstiloBotones/doblepecho 2 en 4.png";
+const opcionesSolapaBolsillos = [
+  {
+    value: "Sin Solapa",
+    label: "Sin Solapa",
+    img: solapaNo,
+  },
+  {
+    value: "Hexagonal",
+    label: "Hexagonal",
+    img: solapaHexagon,
+  },
+  {
+    value: "Redonda",
+    label: "Redonda",
+    img: solapaRound,
+  },
+  {
+    value: "Cuadrada",
+    label: "Cuadrada",
+    img: solapaSquare,
+  },
+  {
+    value: "Triangular",
+    label: "Triangular",
+    img: solapaTriangular,
+  },
+];
 
-import btRibeteDiamante from "../assets/ImagSaco/EstiloBolsilloTicket/Bolsillo ticket con ribete diamante.png";
-import btParche from "../assets/ImagSaco/EstiloBolsilloTicket/Bolsillo ticket de parche.png";
-import btInclinadoRibeteDiamante from "../assets/ImagSaco/EstiloBolsilloTicket/Bolsillo ticket inclinado con ribete diamante.png";
-import btInclinadoSolapa from "../assets/ImagSaco/EstiloBolsilloTicket/Bolsillo ticket inclinado con solapa.png";
-import btInclinadoSinSolapa from "../assets/ImagSaco/EstiloBolsilloTicket/Bolsillo ticket inclinado sin solapa.png";
-import btRectoSolapa from "../assets/ImagSaco/EstiloBolsilloTicket/Bolsillo ticket recto con solapa.png";
-import btSinSolapaDiamante from "../assets/ImagSaco/EstiloBolsilloTicket/Bolsillo ticket sin solapa diamante.png";
+const opcionesPocket = [
+  {
+    value: "Ninguno",
+    label: "Ninguno",
+    img: noPocket,
+  },
+  {
+    value: "Hexagon Pocket",
+    label: "Hexagon Pocket",
+    img: hexagonPocket,
+  },
+  {
+    value: "Pointed Pocket",
+    label: "Pointed Pocket",
+    img: pointedPocket,
+  },
+  {
+    value: "Round Pocket",
+    label: "Round Pocket",
+    img: roundPocket,
+  },
+  {
+    value: "Square Pocket",
+    label: "Square Pocket",
+    img: squarePocket,
+  },
+];
 
-import bpCurvo from "../assets/ImagSaco/EstiloBolsilloPecho/curvo.png";
-import bpDobleRibete from "../assets/ImagSaco/EstiloBolsilloPecho/doble ribete.png";
-import bpDosDiamante from "../assets/ImagSaco/EstiloBolsilloPecho/Dos bolsillos de parche con flap diamante.png";
-import bpParche from "../assets/ImagSaco/EstiloBolsilloPecho/parche.png";
-import bpRecto from "../assets/ImagSaco/EstiloBolsilloPecho/recto.png";
-import bpUnoDiamante from "../assets/ImagSaco/EstiloBolsilloPecho/un bolsillo de parche con flap diamante.png";
-import bpUnRibete from "../assets/ImagSaco/EstiloBolsilloPecho/un ribete 1.2 cm.png";
+const opcionesEstiloBotones = [
+  {
+    value: "No Placket",
+    label: "No Placket",
+    img: noPlacket,
+  },
+  {
+    value: "Standard Placket",
+    label: "Standard Placket",
+    img: standardPlacket,
+  },
+  {
+    value: "Concealed Placket",
+    label: "Concealed Placket",
+    img: concealedPlacket,
+  },
+  {
+    value: "Convertible Placket",
+    label: "Convertible Placket",
+    img: convertiblePlacket,
+  },
+  {
+    value: "Convertible Placket 2",
+    label: "Convertible Placket 2",
+    img: convertiblePlacket2,
+  },
+  {
+    value: "Polo Placket",
+    label: "Polo Placket",
+    img: poloPlacket,
+  },
+  {
+    value: "Tuxedo Placket 1",
+    label: "Tuxedo Placket 1",
+    img: tuxedoPlacket1,
+  },
+  {
+    value: "Tuxedo Placket 2",
+    label: "Tuxedo Placket 2",
+    img: tuxedoPlacket2,
+  },
+];
 
-import bolsilloConSolapaDiamante from "../assets/ImagSaco/EstiloBolsilloInferior/bolsillo con solapa diamante.png";
-import bolsillosDeParcheConSolapaCuadrada from "../assets/ImagSaco/EstiloBolsilloInferior/bolsillos de parche con solapa cuadrada.png";
-import bolsillosDeParcheConUnPliegue from "../assets/ImagSaco/EstiloBolsilloInferior/bolsillos de parche con un pliegue.png";
-import dosBolsillosDeParcheConSolapaDiamante from "../assets/ImagSaco/EstiloBolsilloInferior/dos bolsillos de parche con solapa diamante.png";
-import dosBolsillosDeParche from "../assets/ImagSaco/EstiloBolsilloInferior/dos bolsillos de parche.png";
-import dosInclinadosConSolapa from "../assets/ImagSaco/EstiloBolsilloInferior/dos inclinados con solapa.png";
-import dosInclinadosRibeteados from "../assets/ImagSaco/EstiloBolsilloInferior/dos inclinados ribeteados.png";
-import dosInclinadosSinSolapa from "../assets/ImagSaco/EstiloBolsilloInferior/dos inclinados sin solapa.png";
-import dosRectosConSolapa from "../assets/ImagSaco/EstiloBolsilloInferior/dos rectos con solapa.png";
-import dosRectosRibeteados from "../assets/ImagSaco/EstiloBolsilloInferior/dos rectos ribeteados.png";
-import dosRectosSinSolapa from "../assets/ImagSaco/EstiloBolsilloInferior/dos rectos sin solapa.png";
+const opcionesEstilo = [
+  {
+    value: "Estandar",
+    label: "Estandar",
+    img: standard,
+  },
+  {
+    value: "Pleat",
+    label: "Pleat",
+    img: pleat,
+  },
+  {
+    value: "Large Pleats",
+    label: "Large Pleats",
+    img: largePleats,
+  },
+  {
+    value: "Medium Pleats",
+    label: "Medium Pleats",
+    img: mediumPleats,
+  },
+  {
+    value: "Small Pleats",
+    label: "Small Pleats",
+    img: smallPleats,
+  },
+  {
+    value: "Large Pleats to the Bottom",
+    label: "Large Pleats to the Bottom",
+    img: largePleatsBottom,
+  },
+  {
+    value: "Medium Pleats to the Bottom",
+    label: "Medium Pleats to the Bottom",
+    img: mediumPleatsBottom,
+  },
+  {
+    value: "Small Pleats to the Bottom",
+    label: "Small Pleats to the Bottom",
+    img: smallPleatsBottom,
+  },
+  {
+    value: "U Shape",
+    label: "U Shape",
+    img: uShape,
+  },
+  {
+    value: "U Shape Large Pleats",
+    label: "U Shape Large Pleats",
+    img: uShapeLargePleats,
+  },
+  {
+    value: "U Shape Medium Pleats",
+    label: "U Shape Medium Pleats",
+    img: uShapeMediumPleats,
+  },
+  {
+    value: "U Shape Small Pleats",
+    label: "U Shape Small Pleats",
+    img: uShapeSmallPleats,
+  },
+];
 
+const opcionesContrastPosition = [
+  {
+    value: "Ninguno",
+    label: "Ninguno",
+    img: noContrast,
+  },
+  {
+    value: "Collar & Collar Band",
+    label: "Collar & Collar Band",
+    img: collarAndCollarBand,
+  },
+  {
+    value: "Collar & Cuffs",
+    label: "Collar & Cuffs",
+    img: collarAndCuffs,
+  },
+  {
+    value: "Cuffs",
+    label: "Cuffs",
+    img: cuffs,
+  },
+  {
+    value: "Inside Collar & Cuffs",
+    label: "Inside Collar & Cuffs",
+    img: insideCollarAndCuffs,
+  },
+  {
+    value: "Inside Collar, Cuffs and Placket",
+    label: "Inside Collar, Cuffs and Placket",
+    img: insideCollarCuffsAndPlaket,
+  },
+  {
+    value: "Inside Collar",
+    label: "Inside Collar",
+    img: insideCollar,
+  },
+  {
+    value: "York Inside",
+    label: "York Inside",
+    img: yorkInside,
+  },
+  {
+    value: "York Outside",
+    label: "York Outside",
+    img: yorkOutside,
+  },
+];
+
+const opcionesCollar = [
+  {
+    value: "Band Collar",
+    label: "Band Collar",
+    img: bandCollar,
+  },
+  {
+    value: "Boat Neck",
+    label: "Boat Neck",
+    img: boatNeck,
+  },
+  {
+    value: "Classic Collar",
+    label: "Classic Collar",
+    img: classicCollar,
+  },
+  {
+    value: "Club Collar",
+    label: "Club Collar",
+    img: clubCollar,
+  },
+  {
+    value: "Cutaway",
+    label: "Cutaway",
+    img: cutaway,
+  },
+  {
+    value: "Italian Spread",
+    label: "Italian Spread",
+    img: italianSpread,
+  },
+  {
+    value: "Semi Spread",
+    label: "Semi Spread",
+    img: semiSpread,
+  },
+  {
+    value: "Spread Collar",
+    label: "Spread Collar",
+    img: spreadCollar,
+  },
+  {
+    value: "Windsor Collar",
+    label: "Windsor Collar",
+    img: windsorCollar,
+  },
+  {
+    value: "Wing Tip",
+    label: "Wing Tip",
+    img: wingTip,
+  },
+];
+
+const opcionesBotonManga = [
+  {
+    value: "1_button_angle",
+    label: "1 Button Angle",
+    img: buttonAngle1,
+  },
+  {
+    value: "1_button_around",
+    label: "1 Button Around",
+    img: buttonAround1,
+  },
+  {
+    value: "1_button_square",
+    label: "1 Button Square",
+    img: buttonSquare1,
+  },
+
+  {
+    value: "2_button_angle",
+    label: "2 Button Angle",
+    img: buttonAngle2,
+  },
+  {
+    value: "2_button_around",
+    label: "2 Button Around",
+    img: buttonAround2,
+  },
+  {
+    value: "2_button_square",
+    label: "2 Button Square",
+    img: buttonSquare2,
+  },
+
+  {
+    value: "angle_convertible",
+    label: "Angle Convertible",
+    img: angleConvertible,
+  },
+  {
+    value: "cocktail",
+    label: "Cocktail",
+    img: cocktail,
+  },
+
+  {
+    value: "french_angle",
+    label: "French Angle",
+    img: frenchAngle,
+  },
+  {
+    value: "french_round",
+    label: "French Round",
+    img: frenchRound,
+  },
+  {
+    value: "french_square",
+    label: "French Square",
+    img: frenchSquare,
+  },
+
+  {
+    value: "neapolian_cuff",
+    label: "Neapolian Cuff",
+    img: neapolianCuff,
+  },
+
+  {
+    value: "quarter_round",
+    label: "Quarter Round",
+    img: quarterRound,
+  },
+
+  {
+    value: "round_convertible",
+    label: "Round Convertible",
+    img: roundConvertible,
+  },
+  {
+    value: "square_convertible",
+    label: "Square Convertible",
+    img: squareConvertible,
+  },
+];
+
+const opcionesEstiloInferior = [
+  {
+    value: "puntas",
+    label: "Puntas",
+    img: inferiorPuntas,
+  },
+  {
+    value: "recto",
+    label: "Recto",
+    img: inferiorRecto,
+  },
+  {
+    value: "redondo",
+    label: "Redondo",
+    img: inferiorRedondo,
+  },
+];
+const opcionesCuello = [
+  {
+    value: "forma V",
+    label: "Forma en V",
+    img: cuelloFormaV,
+  },
+  {
+    value: "forma U",
+    label: "Forma en U",
+    img: cuelloFormaU,
+  },
+  {
+    value: "solapa de muesca",
+    label: "Solapa de Muesca",
+    img: cuelloSolapaMuesca,
+  },
+  {
+    value: "solapa punta de lanza",
+    label: "Solapa Punta de Lanza",
+    img: cuelloSolapaLanza,
+  },
+  {
+    value: "solapa punta de lanza curva",
+    label: "Punta de Lanza Curva",
+    img: cuelloSolapaLanzaCurva,
+  },
+  {
+    value: "solapa de chal",
+    label: "Solapa de Chal",
+    img: cuelloSolapaChal,
+  },
+  {
+    value: "solapa de chal U",
+    label: "Solapa de Chal en U",
+    img: cuelloSolapaChalU,
+  },
+];
+
+const opcionesBotonesChaleco = [
+  {
+    value: "3 botones",
+    label: "3 Botones",
+    img: boton3,
+  },
+  {
+    value: "4 botones",
+    label: "4 Botones",
+    img: boton4,
+  },
+  {
+    value: "5 botones",
+    label: "5 Botones",
+    img: boton5,
+  },
+  {
+    value: "6 botones",
+    label: "6 Botones",
+    img: boton6,
+  },
+  {
+    value: "6 especial",
+    label: "6 Botones (Especial)",
+    img: boton6Especial,
+  },
+  {
+    value: "8 botones",
+    label: "8 Botones",
+    img: boton8,
+  },
+  {
+    value: "doble pecho 4",
+    label: "Doble Pecho (4 Botones)",
+    img: doblePecho4,
+  },
+  {
+    value: "doble pecho 6",
+    label: "Doble Pecho (6 Botones)",
+    img: doblePecho6,
+  },
+  {
+    value: "doble pecho 8",
+    label: "Doble Pecho (8 Botones)",
+    img: doblePecho8,
+  },
+  {
+    value: "doble pecho 8 especial",
+    label: "Doble Pecho 8 (Especial)",
+    img: doblePecho8Especial,
+  },
+  {
+    value: "doble pecho 10",
+    label: "Doble Pecho (10 Botones)",
+    img: doblePecho10,
+  },
+  {
+    value: "doble pecho v 5",
+    label: "Doble Pecho V (5 Botones)",
+    img: doblePechoV5,
+  },
+];
+
+const opcionesBolsillos = [
+  {
+    value: "Sin bolsillos",
+    label: "Sin bolsillos visuales",
+    img: bolsillosSin,
+  },
+  {
+    value: "Dos rectos c ribete",
+    label: "Rectos con 1 Ribete (A)",
+    img: bolsillosRectosCRibete,
+  },
+  {
+    value: "Rectos con doble ribete",
+    label: "Rectos con Doble Ribete",
+    img: bolsillosRectos2Ribetes,
+  },
+  {
+    value: "Inclinados con 1 ribete",
+    label: "Inclinados con 1 Ribete",
+    img: bolsillosInc1Ribete,
+  },
+  {
+    value: "Dos inclinados con 2 ribetes",
+    label: "Inclinados con 2 Ribetes",
+    img: bolsillosInc2Ribetes,
+  },
+  {
+    value: "Diamante",
+    label: "Diamante",
+    img: bolsillosDiamante,
+  },
+  {
+    value: "Solapa inclinada",
+    label: "Solapa Inclinada",
+    img: bolsillosSolapaInclinada,
+  },
+  {
+    value: "Solapa recta",
+    label: "Solapa Recta",
+    img: bolsillosSolapaRecta,
+  },
+  {
+    value: "Dos de parche",
+    label: "De Parche",
+    img: bolsillosParche,
+  },
+];
+
+const opcionesBolsilloPechoChaleco = [
+  {
+    value: "Sin bolsillo",
+    label: "Sin bolsillo",
+    img: chalecoPechoSin,
+  },
+  {
+    value: "Bolsillo regular",
+    label: "Regular",
+    img: chalecoPechoRegular,
+  },
+  {
+    value: "Recto",
+    label: "Recto",
+    img: chalecoPechoRecto,
+  },
+  {
+    value: "Izq y dere un ribete",
+    label: "Izquierdo y Derecho un Ribete",
+    img: chalecoPechoIzqDer,
+  },
+  {
+    value: "Bolsillo doble ribete",
+    label: "Doble Ribete",
+    img: chalecoPechoDobleRibete,
+  },
+  {
+    value: "Izq y dere doble ribete",
+    label: "Izquierdo y Derecho Doble Ribete",
+    img: chalecoPechoIzqDerDobleRibete,
+  },
+];
+
+const opcionesPretinas = [
+  // 1. SIN PRETINA
+  {
+    value: "Sin pretina",
+    label: "Sin Pretina",
+    img: sinPretina,
+  },
+
+  // 2. ESTILOS ITALIANOS
+  {
+    value: "Estilo italiano A",
+    label: "Italiano A",
+    img: estiloItalianoA,
+  },
+  {
+    value: "Estilo italiano 1",
+    label: "Italiano 1",
+    img: estiloItaliano1,
+  },
+  {
+    value: "Estilo italiano 2 redondas",
+    label: "Italiano 2 (Redondas)",
+    img: estiloItaliano2Redondas,
+  },
+  {
+    value: "Estilo italiano 3",
+    label: "Italiano 3",
+    img: estiloItaliano3,
+  },
+  {
+    value: "Estilo italiano 4",
+    label: "Italiano 4",
+    img: estiloItaliano4,
+  },
+  {
+    value: "Estilo italiano 5",
+    label: "Italiano 5",
+    img: estiloItaliano5,
+  },
+  {
+    value: "Estilo italiano 5 puntas",
+    label: "Italiano 5 (Puntas)",
+    img: estiloItaliano5Puntas,
+  },
+
+  // 3. PRETINAS EXTENDIDAS
+  {
+    value: "Pretina extendida recta",
+    label: "Extendida (Recta)",
+    img: extendidaRecta,
+  },
+  {
+    value: "Pretina extendida redonda",
+    label: "Extendida (Redonda)",
+    img: extendidaRedonda,
+  },
+  {
+    value: "Pretina extendida de punta",
+    label: "Extendida (Punta)",
+    img: extendidaPunta,
+  },
+
+  // 4. PRETINAS EXTENDIDAS LARGAS
+  {
+    value: "Pretina extendida larga recta",
+    label: "Extendida Larga (Recta)",
+    img: extendidaLargaRecta,
+  },
+  {
+    value: "Pretina extendida larga redonda",
+    label: "Extendida Larga (Redonda)",
+    img: extendidaLargaRedonda,
+  },
+  {
+    value: "Pretina extendida larga punta",
+    label: "Extendida Larga (Punta)",
+    img: extendidaLargaPunta,
+  },
+];
+
+const opcionesSolapa = [
+  {
+    value: "Sin solapa",
+    label: "Sin solapa",
+    img: solapaSinSolapa,
+  },
+  {
+    value: "Muesca",
+    label: "Muesca Estándar",
+    img: solapaMuesca,
+  },
+  {
+    value: "Muesca redonda",
+    label: "Muesca Redonda",
+    img: solapaMuescaRedonda,
+  },
+  {
+    value: "Punta de lanza",
+    label: "Punta de Lanza",
+    img: solapaPuntaLanza,
+  },
+  {
+    value: "Punta de lanza curva",
+    label: "Punta de Lanza Curva",
+    img: solapaPuntaLanzaCurva,
+  },
+  {
+    value: "Chal",
+    label: "Cuello Chal",
+    img: solapaChal,
+  },
+  {
+    value: "Chal (6cm - 8cm)",
+    label: "Chal (6cm - 8cm)",
+    img: solapaChal68cm,
+  },
+  {
+    value: "Doble pecho recto",
+    label: "Doble Pecho Recto",
+    img: solapaDoblePechoRecto,
+  },
+  {
+    value: "Chal doble pecho op",
+    label: "Chal Doble Pecho Op",
+    img: solapaChalDoblePechoOp,
+  },
+];
 const opcionesBolsilloInferior = [
-  { value: "Ninguno", label: "Ninguno", img: null },
+  // 1. SIN BOLSILLOS (Lo más limpio/minimalista)
   {
-    value: "dos rectos sin solapa",
-    label: "Dos Rectos sin Solapa",
-    img: dosRectosSinSolapa,
+    value: "sin bolsillos",
+    label: "Sin Bolsillos",
+    img: BolsInferSinBolsillos,
+  },
+
+  // 2. RIBETEADOS / SIN SOLAPA (Formal y liso)
+  {
+    value: "Inclinados sin solapa",
+    label: "Inclinados Sin Solapa",
+    img: BolsInferSinSolapa,
   },
   {
-    value: "dos rectos ribeteados",
-    label: "Dos Rectos Ribeteados",
-    img: dosRectosRibeteados,
+    value: "sin solapa rectos",
+    label: "Sin Solapa (Rectos)",
+    img: BolsInferSinSolapa2Rectos,
   },
   {
-    value: "dos rectos con solapa",
-    label: "Dos Rectos con Solapa",
-    img: dosRectosConSolapa,
+    value: "2 rectos ribeteados",
+    label: "2 Rectos Ribeteados",
+    img: BolsInfer2RectosRibeteados,
   },
   {
-    value: "dos inclinados sin solapa",
-    label: "Dos Inclinados sin Solapa",
-    img: dosInclinadosSinSolapa,
+    value: "2 inclinados ribeteados",
+    label: "2 Inclinados Ribeteados",
+    img: BolsInfer2InclinRibeteados,
+  },
+
+  // 3. CON SOLAPA CLÁSICA (El estándar de los trajes)
+  {
+    value: "inclinados con solapa",
+    label: "Inclinados con Solapa",
+    img: BolsInferInclinConSolapa,
   },
   {
-    value: "dos inclinados ribeteados",
-    label: "Dos Inclinados Ribeteados",
-    img: dosInclinadosRibeteados,
+    value: "2 con solapa cuadrada",
+    label: "2 con Solapa Cuadrada",
+    img: BolsInfer2SolapaCuadrada,
   },
   {
-    value: "dos inclinados con solapa",
-    label: "Dos Inclinados con Solapa",
-    img: dosInclinadosConSolapa,
+    value: "2 con solapa diamante",
+    label: "2 con Solapa Diamante",
+    img: BolsInfer2SolapaDiamante,
   },
+
+  // 4. DE PARCHE (Más casual/sport)
   {
-    value: "dos bolsillos de parche",
-    label: "Dos Bolsillos de Parche",
-    img: dosBolsillosDeParche,
-  },
-  {
-    value: "dos bolsillos de parche con solapa diamante",
-    label: "Dos Bolsillos de Parche con Solapa Diamante",
-    img: dosBolsillosDeParcheConSolapaDiamante,
+    value: "2 bolsillos de parche",
+    label: "2 Bolsillos de Parche",
+    img: BolsInfer2BolsillosParche,
   },
   {
     value: "bolsillos de parche con solapa cuadrada",
     label: "Bolsillos de Parche con Solapa Cuadrada",
-    img: bolsillosDeParcheConSolapaCuadrada,
+    img: BolsInferParcheSolapaCuadrada,
+  },
+  {
+    value: "2 de parche con solapa diamante",
+    label: "2 de Parche con Solapa Diamante",
+    img: BolsInfer2ParcheSolapaDiamante,
   },
   {
     value: "bolsillos de parche con un pliegue",
     label: "Bolsillos de Parche con un Pliegue",
-    img: bolsillosDeParcheConUnPliegue,
-  },
-  {
-    value: "bolsillo con solapa diamante",
-    label: "Bolsillo con Solapa Diamante",
-    img: bolsilloConSolapaDiamante,
+    img: BolsInferParchePliegue,
   },
 ];
 
 const opcionesBotones = [
   {
-    value: "Ninguno",
-    label: "Ninguno",
-    img: null,
-  },
-  {
     value: "1 boton",
     label: "1 Botón",
-    img: btn1Normal,
-  },
-  {
-    value: "1 rolado",
-    label: "1 Rolado",
-    img: btn1Rolado,
+    img: SacoBoton1,
   },
   {
     value: "2 botones",
     label: "2 Botones",
-    img: btn2Botones,
+    img: SacoBoton2,
+  },
+  {
+    value: "3 botones 1 rolado",
+    label: "3 Botones (1 Rolado)",
+    img: SacoBoton3rolado1,
   },
   {
     value: "doble pecho 2 en 1",
     label: "Doble Pecho 2 en 1",
-    img: btnDoble2en1,
+    img: SacoBotonDoblePecho2en1,
   },
   {
-    value: "doblepecho 2 en 4",
+    value: "doble pecho 4 en 1",
+    label: "Doble Pecho 4 en 1",
+    img: SacoBotonDoblePecho4en1,
+  },
+  {
+    value: "doble pecho 2 en 4", // Nota: Mantiene el nombre del archivo 'doblepecho'
     label: "Doble Pecho 2 en 4",
-    img: btnDoble2en4,
+    img: SacoBotonDoblePecho2en4,
   },
   {
     value: "doble pecho 6 en 1",
     label: "Doble Pecho 6 en 1",
-    img: btnDoble6en1,
-  },
-  {
-    value: "doble pecho 6 en 2",
-    label: "Doble Pecho 6 en 2",
-    img: btnDoble6en2,
+    img: SacoBotonDoblePecho6en1,
   },
   {
     value: "doble pecho 6 en 3",
     label: "Doble Pecho 6 en 3",
-    img: btnDoble6en3,
+    img: SacoBotonDoblePecho6en3,
   },
   {
     value: "1 boton de rana",
     label: "1 Botón de Rana",
-    img: btn1Rana,
+    img: SacoBotonRana,
+  },
+  {
+    value: "1 boton de rana 2",
+    label: "1 Botón de Rana 2",
+    img: SacoBotonRana2,
+  },
+  {
+    value: "1 boton de rana 3",
+    label: "1 Botón de Rana 3",
+    img: SacoBotonRana3,
+  },
+  {
+    value: "1 boton de rana 4",
+    label: "1 Botón de Rana 4",
+    img: SacoBotonRana4,
+  },
+  {
+    value: "doble pecho dos botones de rana",
+    label: "Doble Pecho con 2 Botones de Rana",
+    img: SacoBotonDoblePecho2Rana,
   },
 ];
 
 const opcionesBolsilloTicket = [
   {
-    value: "Ninguno",
-    label: "Ninguno",
-    img: null,
+    value: "Bolsillo ticket recto sin solapa",
+    label: "Bolsillo ticket recto sin solapa",
+    img: BolsilloTicketRectoSinSolapa,
   },
   {
     value: "Bolsillo ticket recto con solapa",
-    label: "Recto c/ Solapa",
-    img: btRectoSolapa,
+    label: "Bolsillo ticket recto con solapa",
+    img: BolsilloTicketRectoSolapa,
   },
   {
-    value: "Bolsillo ticket sin solapa diamante",
-    label: "Sin Solapa Diamante",
-    img: btSinSolapaDiamante,
-  },
-  {
-    value: "Bolsillo ticket con ribete diamante",
-    label: "Ribete Diamante",
-    img: btRibeteDiamante,
+    value: "Bolsillo ticket recto con doble ribete",
+    label: "Bolsillo ticket recto con doble ribete",
+    img: BolsilloTicketRectoDobleRibete,
   },
   {
     value: "Bolsillo ticket inclinado sin solapa",
-    label: "Inclinado s/ Solapa",
-    img: btInclinadoSinSolapa,
+    label: "Bolsillo ticket inclinado sin solapa",
+    img: BolsilloTicketInclinadoSinSolapa,
   },
   {
-    value: "Bolsillo ticket inclinado con solapa",
-    label: "Inclinado c/ Solapa",
-    img: btInclinadoSolapa,
+    value: "Bolsillo inclinado con doble Solapa",
+    label: "Bolsillo inclinado con doble Solapa",
+    img: BolsilloTicketInclinadoDobleSolapa,
   },
   {
-    value: "Bolsillo ticket inclinado con ribete diamante",
-    label: "Inclinado Ribete Diamante",
-    img: btInclinadoRibeteDiamante,
+    value: "Bolsillo inclinado con doble ribete",
+    label: "Bolsillo inclinado con doble ribete",
+    img: BolsilloTicketInclinadoDobleRibete,
   },
+  // --- Estilo Parche ---
   {
     value: "Bolsillo ticket de parche",
     label: "De Parche",
-    img: btParche,
+    img: BolsilloTicketParche,
   },
 ];
 
 const opcionesBolsilloPecho = [
-  {
-    value: "Ninguno",
-    label: "Ninguno",
-    img: null,
-  },
+  // 1. CLÁSICOS / SASTRE TRADICIONAL (Lo más formal)
   {
     value: "Recto Clásico",
     label: "Recto Clásico",
     img: bpRecto,
   },
+  {
+    value: "Curvo",
+    label: "Curvo", // También conocido como estilo "Barchetta"
+    img: bpCurvo,
+  },
+
+  // 2. RIBETEADOS (Estructurados y limpios)
   {
     value: "Un ribete 1.2 cm",
     label: "Un Ribete 1.2 cm",
@@ -235,11 +1061,8 @@ const opcionesBolsilloPecho = [
     label: "Doble Ribete",
     img: bpDobleRibete,
   },
-  {
-    value: "Curvo",
-    label: "Curvo",
-    img: bpCurvo,
-  },
+
+  // 3. DE PARCHE (Más casual / Sport)
   {
     value: "De Parche",
     label: "De Parche",
@@ -248,16 +1071,10 @@ const opcionesBolsilloPecho = [
   {
     value: "Un bolsillo de parche con flap diamante",
     label: "Un Bolsillo Parche Diamante",
-    img: bpUnoDiamante,
-  },
-  {
-    value: "Dos bolsillos de parche con flap diamante",
-    label: "Dos Bolsillos Parche Diamante",
     img: bpDosDiamante,
   },
 ];
 
-// --- CATÁLOGOS ---
 const catalogs = {
   orden: {
     metodoPago: ["Efectivo", "Tarjeta", "Transferencia"],
@@ -269,40 +1086,13 @@ const catalogs = {
       "Gurkha",
       "Pretina Extendida",
     ],
-    ajuste: ["Hebillas Laterales", "Elástico Interno", "Sin Ajuste"],
-    altura: ["Cintura Alta", "Cintura Media", "Cintura Baja"],
+    ajuste: ["Contrabillas ", "Ajustadores"],
+    altura: ["3.8", "4.5", "5.5", "6.5"],
     pliegues: ["Sin Pliegues (Flat Front)", "1 Pliegue", "2 Pliegues"],
-    bolsilloReloj: ["Ninguno", "En Pretina", "Debajo de Pretina"],
-    bajos: [
-      "Liso (Sin bastilla)",
-      "Valvulla (Cuff) 3cm",
-      "Valvulla (Cuff) 4cm",
-      "Valvulla (Cuff) 5cm",
-    ],
+    bolsilloReloj: ["Invisible", "Un ribete", "Con flap diamante"],
+    bajos: ["Sin bastilla", "Con bastilla"],
   },
   saco: {
-    estiloBotones: [
-      "1 Botón",
-      "2 Botones",
-      "3 Botones",
-      "Cruzado 4x2",
-      "Cruzado 6x2",
-    ],
-    solapa: ["Muesca (Notch)", "Punta (Peak)", "Chal (Shawl)"],
-    tamanoSolapa: ["Estrecha (7cm)", "Regular (8.5cm)", "Ancha (10cm)"],
-    bolsilloPecho: [
-      "Curvo (Barchetta)",
-      "Recto Clásico",
-      "De Parche",
-      "Ninguno",
-    ],
-    bolsilloInf: [
-      "Rectos con Tapa",
-      "Inclinados con Tapa",
-      "De Parche",
-      "Ribeteado (Jetted)",
-    ],
-    bolsilloTicket: ["No", "Sí (Lado Derecho)"],
     ojalIzquierdo: [
       "Sin Ojal",
       "Ojal recto real",
@@ -342,56 +1132,8 @@ const catalogs = {
       "Style L",
     ],
   },
-  chaleco: {
-    cuello: [
-      "Sin Cuello (Clásico)",
-      "Con Solapa Muesca",
-      "Con Solapa Punta",
-      "Cuello Mao",
-    ],
-    botones: [
-      "4 Botones",
-      "5 Botones",
-      "6 Botones",
-      "Cruzado 4x2",
-      "Cruzado 6x3",
-    ],
-    bolsilloPecho: ["Ninguno", "Lado Izquierdo (Ribete)", "Ambos Lados"],
-    bolsilloInf: [
-      "2 Bolsillos de Ribete",
-      "2 Bolsillos con Tapa",
-      "4 Bolsillos (Double Welt)",
-    ],
-    terminacion: ["En Punta (V-Shape)", "Recto", "Redondeado"],
-  },
   camisa: {
     opcionCamisa: ["Manga Larga", "Manga Corta"],
-    cuello: [
-      "Inglés",
-      "Italiano",
-      "Botón (Button-down)",
-      "Mao",
-      "Ópera (Wing tip)",
-    ],
-    tapeta: ["Estándar", "Oculta (Francesa)", "Lisa (Sin tapeta)"],
-    puno: [
-      "Sencillo Botón",
-      "Doble Botón",
-      "Francés (Para mancuernillas)",
-      "Redondeado",
-    ],
-    bolsillo: [
-      "Sin Bolsillo",
-      "Clásico Izquierdo",
-      "Con Solapa",
-      "Doble Bolsillo",
-    ],
-    pliegues: [
-      "Sin Pliegues",
-      "Pliegue Central",
-      "Pliegues Laterales",
-      "Pliegue Frontal",
-    ],
   },
   medidas: {
     fits: [
@@ -507,44 +1249,45 @@ const ImageSelect = ({ label, value, onChange, options }) => {
       {/* 2. MODAL GIGANTE EN FRENTE DE TODO (z-index altísimo) */}
       {showPreview && selectedOption && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 sm:p-10 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
-          {/* Fondo clickeable para cerrar */}
           <button
             onClick={() => setShowPreview(false)}
             className="absolute inset-0 w-full h-full cursor-pointer outline-none"
             title="Cerrar"
           />
 
-          <div className="relative z-10 flex flex-col items-center max-w-5xl w-full animate-in zoom-in-95 duration-500">
+          {/* El contenedor principal crece para permitir una imagen enorme */}
+          <div className="relative z-10 flex flex-col items-center max-w-7xl w-fit animate-in zoom-in-95 duration-500">
             <button
               onClick={() => setShowPreview(false)}
               className="absolute -top-12 right-0 text-white/50 hover:text-white transition-colors flex items-center gap-2 font-bold tracking-widest text-xs uppercase outline-none"
             >
-              Cerrar [X]
+              Cerrar
+              <span className="w-6 h-6 rounded-full border border-current flex items-center justify-center text-[10px]">
+                X
+              </span>
             </button>
 
-            {/* Contenedor principal de la imagen en grande */}
-            <div className="w-full h-[60vh] md:h-[75vh] bg-gradient-to-b from-white/5 to-transparent rounded-3xl border border-white/10 flex items-center justify-center p-8 md:p-16 shadow-[0_0_100px_rgba(255,255,255,0.05)] relative overflow-hidden pointer-events-none">
+            <div className="w-fit h-fit bg-gradient-to-b from-white/5 to-transparent rounded-3xl border border-white/10 flex items-center justify-center p-6 md:p-10 shadow-[0_0_100px_rgba(255,255,255,0.05)] relative overflow-hidden pointer-events-none">
               {selectedOption.img ? (
+                /* IMAGEN DEL MODAL: Ahora permite hasta un 90% de la altura de la pantalla en pantallas grandes */
                 <img
                   src={selectedOption.img}
                   alt={selectedOption.label}
-                  className="w-full h-full object-contain filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                  className="w-auto h-auto max-w-full max-h-[75vh] md:max-h-[85vh] lg:max-h-[90vh] object-contain filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
                 />
               ) : (
-                <span className="text-2xl text-gray-500 font-black uppercase tracking-widest">
+                <span className="text-2xl text-gray-500 font-black uppercase tracking-widest px-10 py-20">
                   {selectedOption.label}
                 </span>
               )}
 
-              {/* Etiqueta flotante dentro del modal */}
-              <div className="absolute bottom-8 bg-black/80 backdrop-blur-md border border-white/20 px-8 py-4 rounded-full shadow-2xl">
-                <span className="text-white font-black text-lg md:text-2xl tracking-[0.2em] uppercase">
+              <div className="absolute bottom-6 md:bottom-8 bg-black/80 backdrop-blur-md border border-white/20 px-8 py-4 rounded-full shadow-2xl">
+                <span className="font-black text-[11px] sm:text-xs tracking-[0.2em] uppercase text-center w-full px-4 leading-tight">
                   {selectedOption.label}
                 </span>
               </div>
             </div>
 
-            {/* Botón de Confirmación para cerrar el modal */}
             <button
               onClick={() => setShowPreview(false)}
               className="mt-8 bg-white text-black px-12 py-4 rounded-full font-black text-sm uppercase tracking-widest shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:scale-105 transition-all duration-300 outline-none"
@@ -634,52 +1377,414 @@ const Section = ({ title, isOpen, onToggle, children, icon: Icon }) => (
   </div>
 );
 
+const CAMPOS_POR_SECCION = {
+  saco: [
+    "saco_numero_produccion",
+    "tela_saco",
+    "saco_forro_cod",
+    "saco_boton_cod",
+    "saco_monograma",
+    "saco_tamano_solapa",
+    "saco_solapa",
+    "saco_botones",
+    "saco_b_pecho",
+    "saco_b_inf",
+    "saco_b_ticket",
+    "saco_ojalIzquierdo",
+    "saco_ojalDerecho",
+    "precio_saco",
+    "obs_saco",
+    "collarSaco",
+    "longitudFrontalSaco",
+    "longitudEspaldaSaco",
+    "hombrosSaco",
+    "pechoSaco",
+    "pechoDelanteroSaco",
+    "estomagoSaco",
+    "vientreSaco",
+    "caderasSaco",
+    "longitudMangaISaco",
+    "longitudMangaDSaco",
+    "bicepsSaco",
+    "anteBrazoSaco",
+    "muñecaSaco",
+    "hombroDelanteroSaco",
+    "anchoTraseroSaco",
+    "nucaCinturaSaco",
+    "longitudCinturaDelanteraSaco",
+  ],
+  chaleco: [
+    "chal_numero_produccion",
+    "chal_tela",
+    "chal_boton",
+    "chal_cuello",
+    "chal_botones",
+    "chal_b_pecho",
+    "chal_b_inf",
+    "chal_terminacion",
+    "precio_chaleco",
+    "obs_chaleco",
+    "collarChaleco",
+    "longitudFrontalChaleco",
+    "longitudEspaldaChaleco",
+    "pechoChaleco",
+    "pechoDelanteroChaleco",
+    "estomagoChaleco",
+    "vientreChaleco",
+    "caderasChaleco",
+    "tamañoInferiorChaleco",
+    "longitudCinturaDChaleco",
+    "nucaCinturaChaleco",
+  ],
+  camisa: [
+    "camisa_numero_produccion",
+    "opcion_camisa",
+    "camisa_tela",
+    "camisa_contraste",
+    "camisa_pos_contraste",
+    "camisa_iniciales",
+    "camisa_cuello",
+    "camisa_puno",
+    "camisa_tapeta",
+    "camisa_bolsillo",
+    "camisa_solapa_bolsillo",
+    "camisa_pliegues",
+    "precio_camisa",
+    "camisa_obs",
+    "collarCamisa",
+    "longitudFrontalCamisa",
+    "longitudEspaldaCamisa",
+    "hombrosCamisa",
+    "pechoCamisa",
+    "pechoDelanteroCamisa",
+    "estomagoCamisa",
+    "vientreCamisa",
+    "caderasCamisa",
+    "longitudMangaICamisa",
+    "longitudMangaDCamisa",
+    "bicepsCamisa",
+    "anteBrazoCamisa",
+    "muñecaCamisa",
+    "hombroDelanteroCamisa",
+    "anchoTraseroCamisa",
+    "nucaCinturaCamisa",
+    "longitudCinturaDelanteraCamisa",
+  ],
+  pantalon: [
+    "pant_numero_produccion",
+    "tela_pantalon",
+    "pant_boton",
+    "pant_ajuste",
+    "pant_altura",
+    "pant_pretina",
+    "pant_pliegues",
+    "pant_bolsillo_reloj",
+    "pant_bajos",
+    "precio_pantalon",
+    "obs_pantalon",
+    "longitudIPantalon",
+    "longitudDPantalon",
+    "cinturaPantalon",
+    "caderaPantalon",
+    "musloPantalon",
+    "rodillaPantalon",
+    "alTerrillaPantalon",
+    "brazaletePantalon",
+    "entrepiernaPantalon",
+    "alturaCinturaTPantalon",
+    "alturaCinturaDPantalon",
+  ],
+  zapato: [
+    "zapato_numero_produccion",
+    "zapato_estilo",
+    "precio_zapato",
+    "obs_zapato",
+    "tallaZapato",
+    "anchoEmpeineZapato",
+    "largoPieZapato",
+  ],
+};
+
 const Ordenes = () => {
   const [ordenes, setOrdenes] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [sucursales, setSucursales] = useState([]);
   const [estatusList, setEstatusList] = useState([]);
   const [tiposTrajeList, setTiposTrajeList] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewingOrder, setViewingOrder] = useState(null);
   const [detallesSaco, setDetallesSaco] = useState(null);
   const [detallesCamisa, setDetallesCamisa] = useState(null);
+  const [detallesPantalon, setDetallesPantalon] = useState(null);
+  const [detallesChaleco, setDetallesChaleco] = useState(null);
+  const [detallesZapato, setDetallesZapato] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [alert, setAlert] = useState({ type: "", message: "" });
   const [editingId, setEditingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filtroEstatus, setFiltroEstatus] = useState("");
+
+  const getNombreCliente = (id) => {
+    if (!id) return "No asignado";
+    const cliente = clientes.find((c) => c.idCliente === id);
+    return cliente ? `${cliente.nombreCompleto}` : `ID: ${id}`;
+  };
+
+  const descargarResumenOrden = (orden) => {
+    const nombreTraje =
+      orden.tipoTraje?.descripcion ||
+      CATALOGO_TRAJES[orden.idTipoTraje] ||
+      `Desconocido (${orden.idTipoTraje})`;
+
+    const nombreCompleto = getNombreCliente(orden.idCliente);
+
+    const siNo = (val) => (val ? "SÍ" : "NO");
+
+    // Buscamos las medidas donde sea que vengan armadas
+    const m = orden.medidasOrden || orden.medidas || orden || {};
+
+    let contenido = `
+=========================================
+RESUMEN DE ORDEN #${orden.idOrden} - HANTONIO JARAMILLO
+=========================================
+TALLA: PRENDA HECHA A MEDIDA
+=========================================
+
+DATOS DEL CLIENTE
+-----------------------------------------
+Nombre: ${nombreCompleto}
+
+CONFIGURACIÓN GENERAL
+-----------------------------------------
+Tipo de Prenda Principal: ${nombreTraje}
+Incluye Camisa Extra: ${siNo(orden.incluyeCamisa)}
+Incluye Zapatos Extra: ${siNo(orden.incluyeZapato)}
+Es Smoking 3 Piezas: ${siNo(orden.esSmoking3Piezas)}
+`;
+
+    // --- DETALLES DE DISEÑO Y MEDIDAS POR PRENDA ---
+
+    // DETALLES DEL SACO
+    if (orden.detalleSaco) {
+      const d = orden.detalleSaco;
+      contenido += `
+=========================================
+ESPECIFICACIONES DEL SACO
+=========================================
+Número de producción: ${d.numeroProduccion || "N/A"}
+Código de Tela: ${d.codigoTela || "N/A"}
+Código de Forro: ${d.codigoForro || "N/A"}
+Estilo de Solapa: ${d.estiloSolapa || "N/A"} (Tamaño: ${d.tamanoSolapa || "N/A"})
+Estilo de Botones: ${d.estiloBotones || "N/A"} (Cód: ${d.codigoBoton || "N/A"})
+Bolsillo de Pecho: ${d.estiloBolsilloPecho || "N/A"}
+Bolsillos Inferiores: ${d.estiloBolsilloInf || "N/A"}
+Bolsillo Ticket: ${d.estiloBolsilloTicket || "N/A"}
+Ojal Izquierdo: ${d.estiloOjalIzquierdo || "N/A"}
+Ojal Derecho: ${d.estiloOjalDerecho || "N/A"}
+Monograma: ${d.monograma || "Sin monograma"}
+Observaciones: ${d.observaciones || "Ninguna"}
+-----------------------------------------
+MEDIDAS DEL SACO
+-----------------------------------------
+Collar: ${m.collarSaco ?? "N/A"}
+Longitud Frontal: ${m.longitudFrontalSaco ?? "N/A"}
+Longitud Espalda: ${m.longitudEspaldaSaco ?? "N/A"}
+Hombros: ${m.hombrosSaco ?? "N/A"}
+Pecho total: ${m.pechoSaco ?? "N/A"}
+Estómago: ${m.estomagoSaco ?? "N/A"}
+Barriga: ${m.vientreSaco ?? "N/A"}
+Caderas: ${m.caderasSaco ?? "N/A"}
+Longitud Manga Izq.: ${m.longitudMangaISaco ?? "N/A"}
+Longitud Manga Der.: ${m.longitudMangaDSaco ?? "N/A"}
+Bíceps: ${m.bicepsSaco ?? "N/A"}
+Antebrazo: ${m.antebrazoSaco ?? "N/A"}
+Muñeca: ${m.muñecaSaco ?? "N/A"}
+Frente Hombro: ${m.hombroDelanteroSaco ?? "N/A"}
+Espalda Ancha: ${m.anchoTraseroSaco ?? "N/A"}
+Hombro - Estómago Posterior: ${m.nucaCinturaSaco ?? "N/A"}
+Hombro - Estómago Delantera: ${m.longitudCinturaDelanteraSaco ?? "N/A"}
+`;
+    }
+
+    // DETALLES DEL PANTALÓN
+    if (orden.detallePantalon) {
+      const d = orden.detallePantalon;
+      contenido += `
+=========================================
+ESPECIFICACIONES DEL PANTALÓN
+=========================================
+Número de producción: ${d.numeroProduccion || "N/A"}
+Código de Tela: ${d.codigoTela || "N/A"}
+Código de Botón: ${d.codigoBoton || "N/A"}
+Estilo de Pretina: ${d.estiloPretina || "N/A"} (Altura: ${d.alturaPretina || "N/A"})
+Ajuste de Cintura: ${d.ajusteCintura || "N/A"}
+Estilo de Pliegues: ${d.estiloPliegues || "Sin pliegues"}
+Estilo de Bajos: ${d.estiloBajos || "N/A"}
+Bolsillo de Reloj: ${d.estiloBolsilloReloj || "N/A"}
+Observaciones: ${d.observaciones || "Ninguna"}
+Precio (Individual): $${d.precioPantalon || "N/A"}
+-----------------------------------------
+MEDIDAS DEL PANTALÓN
+-----------------------------------------
+Longitud Izquierda: ${m.longitudIPantalon ?? "N/A"}
+Longitud Derecha: ${m.longitudDPantalon ?? "N/A"}
+Cintura: ${m.cinturaPantalon ?? "N/A"}
+Cadera: ${m.caderaPantalon ?? "N/A"}
+Muslo: ${m.musloPantalon ?? "N/A"}
+Rodilla: ${m.rodillaPantalon ?? "N/A"}
+Pantorrilla: ${m.alTerrillaPantalon ?? "N/A"}
+Brazalete (Bajo): ${m.brazaletePantalon ?? "N/A"}
+Entrepierna: ${m.entrepiernaPantalon ?? "N/A"}
+Altura Cintura Trasera: ${m.alturaCinturaTPantalon ?? "N/A"}
+Altura Cintura Delantera: ${m.alturaCinturaDPantalon ?? "N/A"}
+`;
+    }
+
+    // DETALLES DEL CHALECO
+    if (orden.detalleChaleco) {
+      const d = orden.detalleChaleco;
+      contenido += `
+=========================================
+ESPECIFICACIONES DEL CHALECO
+=========================================
+Número de producción: ${d.numeroProduccion || "N/A"}
+Código de Tela: ${d.codigoTela || "N/A"}
+Estilo de Cuello: ${d.estiloCuello || "N/A"}
+Estilo de Botones: ${d.estiloBotones || "N/A"} (Cód: ${d.codigoBoton || "N/A"})
+Bolsillo de Pecho: ${d.estiloBolsilloPecho || "N/A"}
+Bolsillos Inferiores: ${d.estiloBolsilloInf || "N/A"}
+Terminación Inferior: ${d.terminacionInf || "N/A"}
+Observaciones: ${d.observaciones || "Ninguna"}
+Precio (Individual): $${d.precioChaleco || "N/A"}
+-----------------------------------------
+MEDIDAS DEL CHALECO
+-----------------------------------------
+Collar: ${m.collarChaleco ?? "N/A"}
+Longitud Frontal: ${m.longitudFrontalChaleco ?? "N/A"}
+Longitud Espalda: ${m.longitudEspaldaChaleco ?? "N/A"}
+Pecho total: ${m.pechoChaleco ?? "N/A"}
+Estómago: ${m.estomagoChaleco ?? "N/A"}
+Caderas: ${m.caderasChaleco ?? "N/A"}
+Hombro - Estómago Delantero: ${m.longitudCinturaDChaleco ?? "N/A"}
+Hombro - Estómago Posterior: ${m.nucaCinturaChaleco ?? "N/A"}
+`;
+    }
+
+    // DETALLES DE LA CAMISA
+    if (orden.detalleCamisa) {
+      const d = orden.detalleCamisa;
+      contenido += `
+=========================================
+ESPECIFICACIONES DE LA CAMISA
+=========================================
+Número de producción: ${d.numeroProduccion || "N/A"}
+Opción de Camisa: ${d.opcionCamisa || "N/A"}
+Código de Tela: ${d.codigoTela || "N/A"}
+Contraste de Tela: ${d.contrasteTela || "N/A"} (Posición: ${d.posicionContraste || "N/A"})
+Estilo de Cuello: ${d.estiloCuello || "N/A"}
+Estilo de Puño: ${d.estiloPuno || "N/A"}
+Estilo de Tapeta: ${d.estiloTapeta || "N/A"}
+Estilo de Bolsillo: ${d.estiloBolsillo || "N/A"} (Solapa: ${d.solapaBolsillo || "N/A"})
+Pliegues Frontales: ${d.plieguesFrontales || "N/A"}
+Iniciales: ${d.iniciales || "N/A"}
+Observaciones: ${d.observaciones || "Ninguna"}
+Precio (Individual): $${d.precioCamisa || "N/A"}
+-----------------------------------------
+MEDIDAS DE LA CAMISA
+-----------------------------------------
+Collar: ${m.collarCamisa ?? "N/A"}
+Longitud Frontal: ${m.longitudFrontalCamisa ?? "N/A"}
+Longitud Espalda: ${m.longitudEspaldaCamisa ?? "N/A"}
+Hombros: ${m.hombrosCamisa ?? "N/A"}
+Pecho total: ${m.pechoCamisa ?? "N/A"}
+Estómago: ${m.estomagoCamisa ?? "N/A"}
+Barriga: ${m.vientreCamisa ?? "N/A"}
+Caderas: ${m.caderasCamisa ?? "N/A"}
+Longitud Manga Izq.: ${m.longitudMangaICamisa ?? "N/A"}
+Longitud Manga Der.: ${m.longitudMangaDCamisa ?? "N/A"}
+Bíceps: ${m.bicepsCamisa ?? "N/A"}
+Antebrazo: ${m.antebrazoCamisa ?? "N/A"}
+Muñeca: ${m.muñecaCamisa ?? "N/A"}
+Frente Hombro: ${m.hombroDelanteroCamisa ?? "N/A"}
+Espalda Ancha: ${m.anchoTraseroCamisa ?? "N/A"}
+Hombro - Estómago Posterior: ${m.nucaCinturaCamisa ?? "N/A"}
+Hombro - Estómago Delantero: ${m.longitudCinturaDelanteraCamisa ?? "N/A"}
+`;
+    }
+
+    // DETALLES DEL ZAPATO
+    if (orden.detalleZapato) {
+      const d = orden.detalleZapato;
+      contenido += `
+=========================================
+ESPECIFICACIONES DEL CALZADO
+=========================================
+Número de producción: ${d.numeroProduccion || "N/A"}
+Estilo de Zapato: ${d.estiloZapato || "N/A"}
+Observaciones: ${d.observaciones || "Ninguna"}
+Precio (Individual): $${d.precioZapato || "N/A"}
+-----------------------------------------
+MEDIDAS DEL CALZADO
+-----------------------------------------
+Talla de Zapato: ${m.tallaZapato ?? "N/A"}
+Ancho de Empeine: ${m.anchoEmpeineZapato ?? "N/A"}
+Largo de Pie: ${m.largoPieZapato ?? "N/A"}
+`;
+    }
+
+    contenido += `
+=========================================
+      DOCUMENTO DE CONTROL INTERNO
+=========================================
+`;
+
+    // Generación y descarga del archivo
+    const blob = new Blob([contenido], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute(
+      "download",
+      `Orden_${orden.idOrden}_${nombreCompleto || "Cliente"}.txt`,
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const initialState = {
     id_cliente: "",
     id_sucursal: "",
     fecha_evento: "",
+    fecha_entrega: "",
     fecha_cita: "",
-    id_estatus: "1",
+    id_estatus: "",
     id_tipo_traje: "",
     incluye_camisa: false,
-    es_smoking_3_piezas: false, // <-- NUEVO ESTADO PARA SMOKING
+    incluye_zapato: false,
+    es_smoking_3_piezas: false,
     costo_total: "",
     monto_abonado: "",
     metodo_pago: "",
-
     precio_saco: "",
     precio_pantalon: "",
     precio_chaleco: "",
     precio_camisa: "",
-
+    precio_zapato: "",
+    pant_numero_produccion: "",
     tela_pantalon: "",
     pant_boton: "",
-    pant_pretina: "Estándar con trabillas",
-    pant_ajuste: "Sin Ajuste",
-    pant_altura: "Cintura Media",
-    pant_pliegues: "Sin Pliegues (Flat Front)",
-    pant_bolsillo_reloj: "Ninguno",
-    pant_bajos: "Liso (Sin bastilla)",
+    pant_pretina: "",
+    pant_ajuste: "",
+    pant_altura: "",
+    pant_pliegues: "",
+    pant_bolsillo_reloj: "",
+    pant_bajos: "",
     obs_pantalon: "",
-
+    saco_numero_produccion: "",
     tela_saco: "",
     saco_forro_cod: "",
     saco_boton_cod: "",
@@ -693,48 +1798,97 @@ const Ordenes = () => {
     saco_ojalDerecho: "",
     saco_monograma: "",
     obs_saco: "",
-
+    chal_numero_produccion: "",
     chal_tela: "",
     chal_boton: "",
-    chal_cuello: "Sin Cuello (Clásico)",
-    chal_botones: "5 Botones",
-    chal_b_pecho: "Ninguno",
-    chal_b_inf: "2 Bolsillos de Ribete",
-    chal_terminacion: "En Punta (V-Shape)",
+    chal_cuello: "",
+    chal_botones: "",
+    chal_b_pecho: "",
+    chal_b_inf: "",
+    chal_terminacion: "",
     obs_chaleco: "",
-
-    camisa_opcion: "Manga Larga",
+    camisa_numero_produccion: "",
+    camisa_opcion: "",
     camisa_tela: "",
-    camisa_cuello: "Inglés",
+    camisa_cuello: "",
     camisa_contraste: "",
-    camisa_tapeta: "Estándar",
-    camisa_puno: "Sencillo Botón",
-    camisa_bolsillo: "Sin Bolsillo",
-    camisa_pliegues: "Sin Pliegues",
+    camisa_tapeta: "",
+    camisa_puno: "",
+    camisa_bolsillo: "",
+    camisa_solapa_bolsillo: "",
+    camisa_pos_contraste: "",
+    camisa_pliegues: "",
     camisa_iniciales: "",
     camisa_obs: "",
+    zapato_numero_produccion: "",
+    zapato_estilo: "",
+    zapato_obs: "",
 
+    //Medidas
     altura: "",
     peso: "",
-    talla_zapato: "",
-    fit: "Regular Fit",
-    saco_l_frente: "",
-    saco_l_espalda: "",
-    saco_hombros: "",
-    saco_pecho: "",
-    saco_estomago: "",
-    saco_m_izq: "",
-    saco_m_der: "",
-    saco_biceps: "",
-    saco_cadera: "",
-    pant_l_izq: "",
-    pant_l_der: "",
-    pant_cintura: "",
-    pant_cadera: "",
-    pant_muslo: "",
-    pant_tiro: "",
-    camisa_cuello_med: "",
-    camisa_manga_med: "",
+    fit: "",
+    collarSaco: "",
+    longitudFrontalSaco: "",
+    longitudEspaldaSaco: "",
+    hombrosSaco: "",
+    pechoSaco: "",
+    pechoDelanteroSaco: "",
+    estomagoSaco: "",
+    vientreSaco: "",
+    caderasSaco: "",
+    longitudMangaISaco: "",
+    longitudMangaDSaco: "",
+    bicepsSaco: "",
+    antebrazoSaco: "",
+    muñecaSaco: "",
+    hombroDelanteroSaco: "",
+    anchoTraseroSaco: "",
+    nucaCinturaSaco: "",
+    longitudCinturaDelanteraSaco: "",
+    collarCamisa: "",
+    longitudFrontalCamisa: "",
+    longitudEspaldaCamisa: "",
+    hombrosCamisa: "",
+    pechoCamisa: "",
+    pechoDelanteroCamisa: "",
+    estomagoCamisa: "",
+    vientreCamisa: "",
+    caderasCamisa: "",
+    longitudMangaICamisa: "",
+    longitudMangaDCamisa: "",
+    bicepsCamisa: "",
+    antebrazoCamisa: "",
+    muñecaCamisa: "",
+    hombroDelanteroCamisa: "",
+    anchoTraseroCamisa: "",
+    nucaCinturaCamisa: "",
+    longitudCinturaDelanteraCamisa: "",
+    longitudIPantalon: "",
+    longitudDPantalon: "",
+    cinturaPantalon: "",
+    caderaPantalon: "",
+    musloPantalon: "",
+    rodillaPantalon: "",
+    alTerrillaPantalon: "",
+    brazaletePantalon: "",
+    entrepiernaPantalon: "",
+    alturaCinturaTPantalon: "",
+    alturaCinturaDPantalon: "",
+    collarChaleco: "",
+    longitudFrontalChaleco: "",
+    longitudEspaldaChaleco: "",
+    pechoChaleco: "",
+    pechoDelanteroChaleco: "",
+    estomagoChaleco: "",
+    vientreChaleco: "",
+    caderasChaleco: "",
+    tamañoInferiorChaleco: "",
+    longitudCinturaDChaleco: "",
+    nucaCinturaChaleco: "",
+    tallaZapato: "",
+    anchoEmpeineZapato: "",
+    largoPieZapato: "",
   };
 
   const [formData, setFormData] = useState(initialState);
@@ -745,12 +1899,32 @@ const Ordenes = () => {
     saco: false,
     chaleco: false,
     camisa: false,
+    zapato: false,
     medidas: false,
     finanzas: false,
+  });
+  const [sectionsView, setSectionsView] = useState({
+    cliente: true,
+    prenda: true,
+    pantalon: true,
+    saco: true,
+    chaleco: true,
+    camisa: true,
+    zapato: true,
+    medidas: true,
+    finanzas: true,
   });
 
   const toggleSection = (key) =>
     setSections((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  useEffect(() => {
+    fetchData();
+    fetchOrdenes();
+  }, []);
+
+  const toggleSectionView = (key) =>
+    setSectionsView((prev) => ({ ...prev, [key]: !prev[key] }));
 
   useEffect(() => {
     fetchData();
@@ -794,28 +1968,6 @@ const Ordenes = () => {
     }
   };
 
-  useEffect(() => {
-    if (showViewModal && viewingOrder) {
-      // Frac (7), Chaque (8), Smoking (9) también llevan Saco
-      if ([1, 2, 3, 7, 8, 9].includes(viewingOrder.idTipoTraje)) {
-        detallesService
-          .obtenerSacoPorOrden(viewingOrder.idOrden)
-          .then((response) => setDetallesSaco(response.data))
-          .catch((err) =>
-            console.error("Error al cargar detalles del saco:", err),
-          );
-      }
-      if (viewingOrder.idTipoTraje === 6 || viewingOrder.incluyeCamisa) {
-        detallesService
-          .obtenerCamisaPorOrden(viewingOrder.idOrden)
-          .then((response) => setDetallesCamisa(response.data))
-          .catch((err) =>
-            console.error("Error al cargar detalles de la camisa:", err),
-          );
-      }
-    }
-  }, [showViewModal, viewingOrder]);
-
   // --- LÓGICA DE VISIBILIDAD DE PIEZAS (ACTUALIZADA) ---
   const trajeId = parseInt(formData.id_tipo_traje);
   const tieneSaco = [1, 2, 3, 7, 8, 9].includes(trajeId);
@@ -826,6 +1978,7 @@ const Ordenes = () => {
     [2, 5, 7, 8].includes(trajeId) ||
     (trajeId === 9 && formData.es_smoking_3_piezas);
   const tieneCamisa = formData.incluye_camisa || trajeId === 6;
+  const tieneZapato = formData.incluye_zapato || trajeId === 10;
 
   // --- EFECTO PARA AUTO-CALCULAR EL COSTO TOTAL ---
   useEffect(() => {
@@ -837,8 +1990,9 @@ const Ordenes = () => {
       ? parseFloat(formData.precio_chaleco) || 0
       : 0;
     const pCamisa = tieneCamisa ? parseFloat(formData.precio_camisa) || 0 : 0;
+    const pZapato = tieneZapato ? parseFloat(formData.precio_zapato) || 0 : 0;
 
-    const totalCalculado = pSaco + pPantalon + pChaleco + pCamisa;
+    const totalCalculado = pSaco + pPantalon + pChaleco + pCamisa + pZapato;
 
     setFormData((prev) => {
       if (parseFloat(prev.costo_total || 0) !== totalCalculado) {
@@ -854,32 +2008,502 @@ const Ordenes = () => {
     formData.precio_pantalon,
     formData.precio_chaleco,
     formData.precio_camisa,
+    formData.precio_zapato,
     tieneSaco,
     tienePantalon,
     tieneChaleco,
     tieneCamisa,
+    tieneZapato,
   ]);
 
+  useEffect(() => {
+    // Solo auto-completamos si la orden incluye AMBAS prendas
+    if (tieneSaco && tieneCamisa) {
+      setFormData((prev) => {
+        // 1. Capturamos las medidas del saco (si están vacías, son 0)
+        const sacoCollar = parseFloat(prev.collarSaco) || 0;
+        const sacoMangaI = parseFloat(prev.longitudMangaISaco) || 0;
+        const sacoMangaD = parseFloat(prev.longitudMangaDSaco) || 0;
+        const sacoMuñeca = parseFloat(prev.muñecaSaco) || 0;
+        const sacoBiceps = parseFloat(prev.bicepsSaco) || 0; // Corregido: leemos del saco
+
+        // 2. Definimos tus aumentos fijos
+        const aumentoManga = 4.0;
+        const aumentoMuñeca = 6.7;
+        const aumentoCuello = 1.5;
+        const aumentoBiceps = 6; // Nuevo aumento para bíceps
+
+        return {
+          ...prev,
+          // --- MEDIDAS CON FÓRMULAS MATEMÁTICAS ---
+          collarCamisa:
+            sacoCollar > 0
+              ? (sacoCollar + aumentoCuello).toFixed(2).replace(/\.00$/, "")
+              : prev.collarCamisa,
+          longitudMangaICamisa:
+            sacoMangaI > 0
+              ? (sacoMangaI + aumentoManga).toFixed(2).replace(/\.00$/, "")
+              : prev.longitudMangaICamisa,
+          longitudMangaDCamisa:
+            sacoMangaD > 0
+              ? (sacoMangaD + aumentoManga).toFixed(2).replace(/\.00$/, "")
+              : prev.longitudMangaDCamisa,
+          muñecaCamisa:
+            sacoMuñeca > 0
+              ? (sacoMuñeca + aumentoMuñeca).toFixed(2).replace(/\.00$/, "")
+              : prev.muñecaCamisa,
+          bicepsCamisa:
+            sacoBiceps > 0
+              ? (sacoBiceps + aumentoBiceps).toFixed(2).replace(/\.00$/, "")
+              : prev.bicepsCamisa,
+
+          // --- MEDIDAS QUE SE COPIAN EXACTAMENTE IGUAL AL SACO ---
+          longitudFrontalCamisa: prev.longitudFrontalSaco,
+          longitudEspaldaCamisa: prev.longitudEspaldaSaco,
+          hombrosCamisa: prev.hombrosSaco,
+          pechoCamisa: prev.pechoSaco,
+          pechoDelanteroCamisa: prev.pechoDelanteroSaco,
+          estomagoCamisa: prev.estomagoSaco,
+          vientreCamisa: prev.vientreSaco,
+          caderasCamisa: prev.caderasSaco,
+          anteBrazoCamisa: prev.anteBrazoSaco,
+          hombroDelanteroCamisa: prev.hombroDelanteroSaco,
+          anchoTraseroCamisa: prev.anchoTraseroSaco,
+          nucaCinturaCamisa: prev.nucaCinturaSaco,
+          longitudCinturaDelanteraCamisa: prev.longitudCinturaDelanteraSaco,
+        };
+      });
+    }
+  }, [
+    tieneSaco,
+    tieneCamisa,
+    formData.collarSaco,
+    formData.longitudMangaISaco,
+    formData.longitudMangaDSaco,
+    formData.muñecaSaco, // React reaccionará cuando cambie la muñeca del saco
+    formData.longitudFrontalSaco,
+    formData.longitudEspaldaSaco,
+    formData.hombrosSaco,
+    formData.pechoSaco,
+    formData.pechoDelanteroSaco,
+    formData.estomagoSaco,
+    formData.vientreSaco,
+    formData.caderasSaco,
+    formData.bicepsSaco,
+    formData.anteBrazoSaco,
+    formData.hombroDelanteroSaco,
+    formData.anchoTraseroSaco,
+    formData.nucaCinturaSaco,
+    formData.longitudCinturaDelanteraSaco,
+  ]);
+
+  // --- NUEVA FUNCIÓN AYUDANTE ---
+  const mapearDatosOrden = (orden) => {
+    return {
+      ...initialState, // Empezamos con el molde limpio
+
+      // --- GENERALES ---
+      id_cliente: orden.idCliente || "",
+      id_sucursal: orden.idSucursal || "",
+      id_tipo_traje: orden.idTipoTraje || "",
+      id_estatus: orden.idEstatus || "",
+      fecha_cita: orden.fechaCitaMedidas
+        ? orden.fechaCitaMedidas.split("T")[0]
+        : "",
+      fecha_entrega: orden.fechaEntrega ? orden.fechaEntrega.split("T")[0] : "",
+      fecha_evento: orden.fechaEventoEntrega
+        ? orden.fechaEventoEntrega.split("T")[0]
+        : "",
+      costo_total: orden.costoTotal || 0,
+      monto_abonado: orden.montoAbonado || 0,
+      metodo_pago: orden.metodoPago || "",
+      incluye_camisa: orden.incluyeCamisa || false,
+      incluye_zapato: orden.incluyeZapato || false,
+      es_smoking_3_piezas: orden.esSmoking3Piezas || false,
+
+      // --- MEDIDAS (Cuerpo y prendas) ---
+      altura: orden.medidas?.altura || "",
+      peso: orden.medidas?.peso || "",
+      fit: orden.medidas?.tipoFit || "",
+
+      collarSaco: orden.medidas?.collarSaco || "",
+      longitudFrontalSaco: orden.medidas?.longitudFrontalSaco || "",
+      longitudEspaldaSaco: orden.medidas?.longitudEspaldaSaco || "",
+      hombrosSaco: orden.medidas?.hombrosSaco || "",
+      pechoSaco: orden.medidas?.pechoSaco || "",
+      pechoDelanteroSaco: orden.medidas?.pechoDelanteroSaco || "",
+      estomagoSaco: orden.medidas?.estomagoSaco || "",
+      vientreSaco: orden.medidas?.vientreSaco || "",
+      caderasSaco: orden.medidas?.caderasSaco || "",
+      longitudMangaISaco: orden.medidas?.longitudMangaISaco || "",
+      longitudMangaDSaco: orden.medidas?.longitudMangaDSaco || "",
+      bicepsSaco: orden.medidas?.bicepsSaco || "",
+      anteBrazoSaco: orden.medidas?.antebrazoSaco || "",
+      muñecaSaco: orden.medidas?.muñecaSaco || "",
+      hombroDelanteroSaco: orden.medidas?.hombroDelanteroSaco || "",
+      anchoTraseroSaco: orden.medidas?.anchoTraseroSaco || "",
+      nucaCinturaSaco: orden.medidas?.nucaCinturaSaco || "",
+      longitudCinturaDelanteraSaco:
+        orden.medidas?.longitudCinturaDelantera || "",
+
+      collarChaleco: orden.medidas?.collarChaleco || "",
+      longitudFrontalChaleco: orden.medidas?.longitudFrontalChaleco || "",
+      longitudEspaldaChaleco: orden.medidas?.longitudEspaldaChaleco || "",
+      pechoChaleco: orden.medidas?.pechoChaleco || "",
+      pechoDelanteroChaleco: orden.medidas?.pechoDelanteroChaleco || "",
+      estomagoChaleco: orden.medidas?.estomagoChaleco || "",
+      vientreChaleco: orden.medidas?.vientreChaleco || "",
+      caderasChaleco: orden.medidas?.caderasChaleco || "",
+      tamañoInferiorChaleco: orden.medidas?.tamañoInferiorChaleco || "",
+      longitudCinturaDChaleco: orden.medidas?.longitudCinturaDChaleco || "",
+      nucaCinturaChaleco: orden.medidas?.nucaCinturaChaleco || "",
+
+      collarCamisa: orden.medidas?.collarCamisa || "",
+      longitudFrontalCamisa: orden.medidas?.longitudFrontalCamisa || "",
+      longitudEspaldaCamisa: orden.medidas?.longitudEspaldaCamisa || "",
+      hombrosCamisa: orden.medidas?.hombrosCamisa || "",
+      pechoCamisa: orden.medidas?.pechoCamisa || "",
+      pechoDelanteroCamisa: orden.medidas?.pechoDelanteroCamisa || "",
+      estomagoCamisa: orden.medidas?.estomagoCamisa || "",
+      vientreCamisa: orden.medidas?.vientreCamisa || "",
+      caderasCamisa: orden.medidas?.caderasCamisa || "",
+      longitudMangaICamisa: orden.medidas?.longitudMangaICamisa || "",
+      longitudMangaDCamisa: orden.medidas?.longitudMangaDCamisa || "",
+      bicepsCamisa: orden.medidas?.bicepsCamisa || "",
+      anteBrazoCamisa: orden.medidas?.antebrazoCamisa || "",
+      muñecaCamisa: orden.medidas?.muñecaCamisa || "",
+      hombroDelanteroCamisa: orden.medidas?.hombroDelanteroCamisa || "",
+      anchoTraseroCamisa: orden.medidas?.anchoTraseroCamisa || "",
+      nucaCinturaCamisa: orden.medidas?.nucaCinturaCamisa || "",
+      longitudCinturaDelanteraCamisa:
+        orden.medidas?.longitudCinturaDelanteraCamisa || "",
+
+      longitudIPantalon: orden.medidas?.longitudIPantalon || "",
+      longitudDPantalon: orden.medidas?.longitudDPantalon || "",
+      cinturaPantalon: orden.medidas?.cinturaPantalon || "",
+      caderaPantalon: orden.medidas?.caderaPantalon || "",
+      musloPantalon: orden.medidas?.musloPantalon || "",
+      rodillaPantalon: orden.medidas?.rodillaPantalon || "",
+      alTerrillaPantalon: orden.medidas?.alTerrillaPantalon || "",
+      brazaletePantalon: orden.medidas?.brazaletePantalon || "",
+      entrepiernaPantalon: orden.medidas?.entrepiernaPantalon || "",
+      alturaCinturaTPantalon: orden.medidas?.alturaCinturaTPantalon || "",
+      alturaCinturaDPantalon: orden.medidas?.alturaCinturaDPantalon || "",
+
+      tallaZapato: orden.medidas?.tallaZapato || "",
+      anchoEmpeineZapato: orden.medidas?.anchoEmpeineZapato || "",
+      largoPieZapato: orden.medidas?.largoPieZapato || "",
+
+      // --- DETALLES DE PRENDAS ---
+      precio_saco: orden.detalleSaco?.precioSaco || "",
+      saco_numero_produccion: orden.detalleSaco?.numeroProduccion || "",
+      tela_saco: orden.detalleSaco?.codigoTela || "",
+      saco_forro_cod: orden.detalleSaco?.codigoForro || "",
+      saco_boton_cod: orden.detalleSaco?.codigoBoton || "",
+      saco_botones: orden.detalleSaco?.estiloBotones || "",
+      saco_solapa: orden.detalleSaco?.estiloSolapa || "",
+      saco_tamano_solapa: orden.detalleSaco?.tamanoSolapa || "",
+      saco_b_pecho: orden.detalleSaco?.estiloBolsilloPecho || "",
+      saco_b_inf: orden.detalleSaco?.estiloBolsilloInf || "",
+      saco_b_ticket: orden.detalleSaco?.estiloBolsilloTicket || "",
+      saco_ojalIzquierdo: orden.detalleSaco?.estiloOjalIzquierdo || "",
+      saco_ojalDerecho: orden.detalleSaco?.estiloOjalDerecho || "",
+      saco_monograma: orden.detalleSaco?.monograma || "",
+      obs_saco: orden.detalleSaco?.observaciones || "",
+
+      chal_numero_produccion: orden.detalleChaleco?.numeroProduccion || "",
+      precio_chaleco: orden.detalleChaleco?.precioChaleco || "",
+      chal_tela: orden.detalleChaleco?.codigoTela || "",
+      chal_boton: orden.detalleChaleco?.codigoBoton || "",
+      chal_cuello: orden.detalleChaleco?.estiloCuello || "",
+      chal_botones: orden.detalleChaleco?.estiloBotones || "",
+      chal_b_pecho: orden.detalleChaleco?.estiloBolsilloPecho || "",
+      chal_b_inf: orden.detalleChaleco?.estiloBolsilloInf || "",
+      chal_terminacion: orden.detalleChaleco?.terminacionInf || "",
+      obs_chaleco: orden.detalleChaleco?.observaciones || "",
+
+      camisa_numero_produccion: orden.detalleCamisa?.numeroProduccion || "",
+      opcion_camisa: orden.detalleCamisa?.opcionCamisa || "",
+      precio_camisa: orden.detalleCamisa?.precioCamisa || "",
+      camisa_tela: orden.detalleCamisa?.codigoTela || "",
+      camisa_cuello: orden.detalleCamisa?.estiloCuello || "",
+      camisa_contraste: orden.detalleCamisa?.contrasteTela || "",
+      camisa_tapeta: orden.detalleCamisa?.estiloTapeta || "",
+      camisa_puno: orden.detalleCamisa?.estiloPuno || "",
+      camisa_bolsillo: orden.detalleCamisa?.estiloBolsillo || "",
+      camisa_solapa_bolsillo: orden.detalleCamisa?.solapaBolsillo || "",
+      camisa_pos_contraste: orden.detalleCamisa?.posicionContraste || "",
+      camisa_pliegues: orden.detalleCamisa?.plieguesFrontales || "",
+      camisa_iniciales: orden.detalleCamisa?.iniciales || "",
+      camisa_obs: orden.detalleCamisa?.observaciones || "",
+
+      zapato_numero_produccion: orden.detalleZapato?.numeroProduccion || "",
+      precio_zapato: orden.detalleZapato?.precioZapato || "",
+      zapato_estilo: orden.detalleZapato?.estiloZapato || "",
+      zapato_obs: orden.detalleZapato?.observaciones || "",
+
+      pant_numero_produccion: orden.detallePantalon?.numeroProduccion || "",
+      precio_pantalon: orden.detallePantalon?.precioPantalon || "",
+      tela_pantalon: orden.detallePantalon?.codigoTela || "",
+      pant_boton: orden.detallePantalon?.codigoBoton || "",
+      pant_pretina: orden.detallePantalon?.estiloPretina || "",
+      pant_ajuste: orden.detallePantalon?.ajusteCintura || "",
+      pant_altura: orden.detallePantalon?.alturaPretina || "",
+      pant_pliegues: orden.detallePantalon?.estiloPliegues || "",
+      pant_bolsillo_reloj: orden.detallePantalon?.estiloBolsilloReloj || "",
+      pant_bajos: orden.detallePantalon?.estiloBajos || "",
+      obs_pantalon: orden.detallePantalon?.observaciones || "",
+    };
+  };
+
   const handleViewOrder = async (orden) => {
+    setFormData(mapearDatosOrden(orden));
     setViewingOrder(orden);
     setShowViewModal(true);
 
-    try {
-      if ([1, 2, 3, 7, 8, 9].includes(orden.idTipoTraje)) {
-        const respSaco = await detallesService.obtenerSacoPorOrden(
-          orden.idOrden,
-        );
-        setDetallesSaco(respSaco.data);
+    // 0. Limpieza total de estados secundarios
+    setDetallesSaco(null);
+    setDetallesCamisa(null);
+    setDetallesChaleco(null);
+    setDetallesPantalon(null);
+    setDetallesZapato(null);
+
+    // 1. Saco
+    if (orden.detalleSaco || [1, 2, 3, 7, 8, 9].includes(orden.idTipoTraje)) {
+      try {
+        const resp = await detallesService.obtenerSacoPorOrden(orden.idOrden);
+        if (resp.data) setDetallesSaco(resp.data);
+      } catch (e) {
+        console.log("Sin detalle de saco");
       }
-      if (orden.idTipoTraje === 6 || orden.incluyeCamisa) {
+    }
+
+    // 2. CAMISA (Basado en tu modelo DetalleCamisa)
+    // Cambiamos 'orden.incluyeCamisa' por 'orden.detalleCamisa' que es lo que manda C#
+    if (orden.detalleCamisa || orden.idTipoTraje === 6) {
+      try {
         const respCamisa = await detallesService.obtenerCamisaPorOrden(
           orden.idOrden,
         );
-        setDetallesCamisa(respCamisa.data);
+        if (respCamisa && respCamisa.data) {
+          setDetallesCamisa(respCamisa.data);
+        }
+      } catch (error) {
+        console.error("No se encontró el objeto DetalleCamisa en la BD");
       }
-    } catch (error) {
-      console.error("Error al cargar detalles completos:", error);
     }
+
+    // 3. Chaleco
+    if (orden.detalleChaleco || [2, 5, 7, 8].includes(orden.idTipoTraje)) {
+      try {
+        const respChaleco = await detallesService.obtenerChalecoPorOrden(
+          orden.idOrden,
+        );
+        if (respChaleco.data) setDetallesChaleco(respChaleco.data);
+      } catch (e) {
+        console.log("Sin detalle de chaleco");
+      }
+    }
+
+    // 4. Pantalón
+    if (
+      orden.detallePantalon ||
+      [1, 2, 4, 7, 8, 9].includes(orden.idTipoTraje)
+    ) {
+      try {
+        const respPantalon = await detallesService.obtenerPantalonPorOrden(
+          orden.idOrden,
+        );
+        if (respPantalon.data) setDetallesPantalon(respPantalon.data);
+      } catch (e) {
+        console.log("Sin detalle de pantalón");
+      }
+    }
+
+    if (orden.detalleZapato || orden.idTipoTraje === 6) {
+      try {
+        const respZapato = await detallesService.obtenerZapatoPorOrden(
+          orden.idOrden,
+        );
+        if (respZapato && respZapato.data) {
+          setDetallesZapato(respZapato.data);
+        }
+      } catch (error) {
+        console.error("No se encontró el objeto DetalleZapato en la BD");
+      }
+    }
+  };
+
+  // FUNCIÓN PARA CARGAR LOS DATOS AL FORMULARIO
+  const handleEditClick = (orden) => {
+    setEditingId(orden.idOrden);
+
+    setFormData({
+      // --- GENERALES ---
+      id_cliente: orden.idCliente || "",
+      id_sucursal: orden.idSucursal || "",
+      id_tipo_traje: orden.idTipoTraje || "",
+      id_estatus: orden.idEstatus || "",
+      fecha_cita: orden.fechaCitaMedidas
+        ? orden.fechaCitaMedidas.split("T")[0]
+        : "",
+      fecha_entrega: orden.fechaEntrega ? orden.fechaEntrega.split("T")[0] : "",
+      fecha_evento: orden.fechaEventoEntrega
+        ? orden.fechaEventoEntrega.split("T")[0]
+        : "",
+      costo_total: orden.costoTotal || 0,
+      monto_abonado: orden.montoAbonado || 0,
+      metodo_pago: orden.metodoPago || "",
+      incluye_camisa: orden.incluyeCamisa || false,
+      incluye_zapato: orden.incluyeZapato || false,
+      es_smoking_3_piezas: orden.esSmoking3Piezas || false, // Ajusta si tienes esta bandera en el backend
+
+      // --- MEDIDAS (Cuerpo y prendas) ---
+      altura: orden.medidas?.altura || "",
+      peso: orden.medidas?.peso || "",
+      fit: orden.medidas?.tipoFit || "",
+
+      // Saco Medidas
+      collarSaco: orden.medidas?.collarSaco || "",
+      longitudFrontalSaco: orden.medidas?.longitudFrontalSaco || "",
+      longitudEspaldaSaco: orden.medidas?.longitudEspaldaSaco || "",
+      hombrosSaco: orden.medidas?.hombrosSaco || "",
+      pechoSaco: orden.medidas?.pechoSaco || "",
+      pechoDelanteroSaco: orden.medidas?.pechoDelanteroSaco || "",
+      estomagoSaco: orden.medidas?.estomagoSaco || "",
+      vientreSaco: orden.medidas?.vientreSaco || "",
+      caderasSaco: orden.medidas?.caderasSaco || "",
+      longitudMangaISaco: orden.medidas?.longitudMangaISaco || "",
+      longitudMangaDSaco: orden.medidas?.longitudMangaDSaco || "",
+      bicepsSaco: orden.medidas?.bicepsSaco || "",
+      anteBrazoSaco: orden.medidas?.antebrazoSaco || "",
+      muñecaSaco: orden.medidas?.muñecaSaco || "",
+      hombroDelanteroSaco: orden.medidas?.hombroDelanteroSaco || "",
+      anchoTraseroSaco: orden.medidas?.anchoTraseroSaco || "",
+      nucaCinturaSaco: orden.medidas?.nucaCinturaSaco || "",
+      longitudCinturaDelanteraSaco:
+        orden.medidas?.longitudCinturaDelantera || "",
+
+      // Chaleco Medidas
+      collarChaleco: orden.medidas?.collarChaleco || "",
+      longitudFrontalChaleco: orden.medidas?.longitudFrontalChaleco || "",
+      longitudEspaldaChaleco: orden.medidas?.longitudEspaldaChaleco || "",
+      pechoChaleco: orden.medidas?.pechoChaleco || "",
+      pechoDelanteroChaleco: orden.medidas?.pechoDelanteroChaleco || "",
+      estomagoChaleco: orden.medidas?.estomagoChaleco || "",
+      vientreChaleco: orden.medidas?.vientreChaleco || "",
+      caderasChaleco: orden.medidas?.caderasChaleco || "",
+      tamañoInferiorChaleco: orden.medidas?.tamañoInferiorChaleco || "",
+      longitudCinturaDChaleco: orden.medidas?.longitudCinturaDChaleco || "",
+      nucaCinturaChaleco: orden.medidas?.nucaCinturaChaleco || "",
+
+      // Camisa Medidas
+      collarCamisa: orden.medidas?.collarCamisa || "",
+      longitudFrontalCamisa: orden.medidas?.longitudFrontalCamisa || "",
+      longitudEspaldaCamisa: orden.medidas?.longitudEspaldaCamisa || "",
+      hombrosCamisa: orden.medidas?.hombrosCamisa || "",
+      pechoCamisa: orden.medidas?.pechoCamisa || "",
+      pechoDelanteroCamisa: orden.medidas?.pechoDelanteroCamisa || "",
+      estomagoCamisa: orden.medidas?.estomagoCamisa || "",
+      vientreCamisa: orden.medidas?.vientreCamisa || "",
+      caderasCamisa: orden.medidas?.caderasCamisa || "",
+      longitudMangaICamisa: orden.medidas?.longitudMangaICamisa || "",
+      longitudMangaDCamisa: orden.medidas?.longitudMangaDCamisa || "",
+      bicepsCamisa: orden.medidas?.bicepsCamisa || "",
+      anteBrazoCamisa: orden.medidas?.antebrazoCamisa || "",
+      muñecaCamisa: orden.medidas?.muñecaCamisa || "",
+      hombroDelanteroCamisa: orden.medidas?.hombroDelanteroCamisa || "",
+      anchoTraseroCamisa: orden.medidas?.anchoTraseroCamisa || "",
+      nucaCinturaCamisa: orden.medidas?.nucaCinturaCamisa || "",
+      longitudCinturaDelanteraCamisa:
+        orden.medidas?.longitudCinturaDelanteraCamisa || "",
+
+      // Pantalón Medidas
+      longitudIPantalon: orden.medidas?.longitudIPantalon || "",
+      longitudDPantalon: orden.medidas?.longitudDPantalon || "",
+      cinturaPantalon: orden.medidas?.cinturaPantalon || "",
+      caderaPantalon: orden.medidas?.caderaPantalon || "",
+      musloPantalon: orden.medidas?.musloPantalon || "",
+      rodillaPantalon: orden.medidas?.rodillaPantalon || "",
+      alTerrillaPantalon: orden.medidas?.alTerrillaPantalon || "",
+      brazaletePantalon: orden.medidas?.brazaletePantalon || "",
+      entrepiernaPantalon: orden.medidas?.entrepiernaPantalon || "",
+      alturaCinturaTPantalon: orden.medidas?.alturaCinturaTPantalon || "",
+      alturaCinturaDPantalon: orden.medidas?.alturaCinturaDPantalon || "",
+
+      // Zapato Medidas
+      tallaZapato: orden.medidas?.tallaZapato || "",
+      anchoEmpeineZapato: orden.medidas?.anchoEmpeineZapato || "",
+      largoPieZapato: orden.medidas?.largoPieZapato || "",
+
+      // --- DETALLES DE PRENDAS ---
+      // Saco
+      precio_saco: orden.detalleSaco?.precioSaco || "",
+      saco_numero_produccion: orden.detalleSaco?.numeroProduccion || "",
+      tela_saco: orden.detalleSaco?.codigoTela || "",
+      saco_forro_cod: orden.detalleSaco?.codigoForro || "",
+      saco_boton_cod: orden.detalleSaco?.codigoBoton || "",
+      saco_botones: orden.detalleSaco?.estiloBotones || "",
+      saco_solapa: orden.detalleSaco?.estiloSolapa || "",
+      saco_tamano_solapa: orden.detalleSaco?.tamanoSolapa || "",
+      saco_b_pecho: orden.detalleSaco?.estiloBolsilloPecho || "",
+      saco_b_inf: orden.detalleSaco?.estiloBolsilloInf || "",
+      saco_b_ticket: orden.detalleSaco?.estiloBolsilloTicket || "",
+      saco_ojalIzquierdo: orden.detalleSaco?.estiloOjalIzquierdo || "",
+      saco_ojalDerecho: orden.detalleSaco?.estiloOjalDerecho || "",
+      saco_monograma: orden.detalleSaco?.monograma || "",
+      obs_saco: orden.detalleSaco?.observaciones || "",
+
+      // Chaleco
+      precio_chaleco: orden.detalleChaleco?.precioChaleco || "",
+      chal_numero_produccion: orden.detalleChaleco?.numeroProduccion || "",
+      chal_tela: orden.detalleChaleco?.codigoTela || "",
+      chal_boton: orden.detalleChaleco?.codigoBoton || "",
+      chal_cuello: orden.detalleChaleco?.estiloCuello || "",
+      chal_botones: orden.detalleChaleco?.estiloBotones || "",
+      chal_b_pecho: orden.detalleChaleco?.estiloBolsilloPecho || "",
+      chal_b_inf: orden.detalleChaleco?.estiloBolsilloInf || "",
+      chal_terminacion: orden.detalleChaleco?.terminacionInf || "",
+      obs_chaleco: orden.detalleChaleco?.observaciones || "",
+
+      // Camisa
+      opcion_camisa: orden.detalleCamisa?.opcionCamisa || "",
+      camisa_numero_produccion: orden.detalleCamisa?.numeroProduccion || "",
+      precio_camisa: orden.detalleCamisa?.precioCamisa || "",
+      camisa_tela: orden.detalleCamisa?.codigoTela || "",
+      camisa_cuello: orden.detalleCamisa?.estiloCuello || "",
+      camisa_contraste: orden.detalleCamisa?.contrasteTela || "",
+      camisa_tapeta: orden.detalleCamisa?.estiloTapeta || "",
+      camisa_puno: orden.detalleCamisa?.estiloPuno || "",
+      camisa_bolsillo: orden.detalleCamisa?.estiloBolsillo || "",
+      camisa_solapa_bolsillo: orden.detalleCamisa?.solapaBolsillo || "",
+      camisa_pos_contraste: orden.detalleCamisa?.posicionContraste || "",
+      camisa_pliegues: orden.detalleCamisa?.plieguesFrontales || "",
+      camisa_iniciales: orden.detalleCamisa?.iniciales || "",
+      camisa_obs: orden.detalleCamisa?.observaciones || "",
+
+      // Pantalón
+      precio_pantalon: orden.detallePantalon?.precioPantalon || "",
+      pant_numero_produccion: orden.detallePantalon?.numeroProduccion || "",
+      tela_pantalon: orden.detallePantalon?.codigoTela || "",
+      pant_boton: orden.detallePantalon?.codigoBoton || "",
+      pant_pretina: orden.detallePantalon?.estiloPretina || "",
+      pant_ajuste: orden.detallePantalon?.ajusteCintura || "",
+      pant_altura: orden.detallePantalon?.alturaPretina || "",
+      pant_pliegues: orden.detallePantalon?.estiloPliegues || "",
+      pant_bolsillo_reloj: orden.detallePantalon?.estiloBolsilloReloj || "",
+      pant_bajos: orden.detallePantalon?.estiloBajos || "",
+      obs_pantalon: orden.detallePantalon?.observaciones || "",
+
+      // Zapato
+      precio_zapato: orden.detalleZapato?.precioZapato || "",
+      zapato_numero_produccion: orden.detalleZapato?.numeroProduccion || "",
+      zapato_estilo: orden.detalleZapato?.estiloZapato || "",
+      zapato_obs: orden.detalleZapato?.observaciones || "",
+    });
+
+    // Abrimos el formulario
+    setShowForm(true);
   };
 
   const handleSubmit = async (e) => {
@@ -889,44 +2513,115 @@ const Ordenes = () => {
     const payload = {
       IdCliente: parseInt(formData.id_cliente),
       IdSucursal: parseInt(formData.id_sucursal),
-      IdTipoTraje: parseInt(formData.id_tipo_traje),
+      IdTipoTraje: formData.id_tipo_traje
+        ? parseInt(formData.id_tipo_traje)
+        : null,
       IdEstatus: parseInt(formData.id_estatus),
-      IncluyeCamisa: tieneCamisa,
+      IncluyeCamisa: formData.incluye_camisa || false,
+      IncluyeZapato: formData.incluye_zapato || false,
+      EsSmoking3Piezas: formData.es_smoking_3_piezas || false,
       CostoTotal: parseFloat(formData.costo_total) || 0,
       MontoAbonado: parseFloat(formData.monto_abonado) || 0,
       MetodoPago: formData.metodo_pago,
       FechaCitaMedidas: formData.fecha_cita
         ? new Date(formData.fecha_cita).toISOString()
         : null,
+      FechaEntrega: formData.fecha_entrega
+        ? new Date(formData.fecha_entrega).toISOString()
+        : null,
       FechaEventoEntrega: formData.fecha_evento
         ? new Date(formData.fecha_evento).toISOString()
         : null,
       MedidasOrden: {
+        // Datos Generales
         Altura: parseFloat(formData.altura) || null,
         Peso: parseFloat(formData.peso) || null,
-        TallaZapato: formData.talla_zapato || null,
         TipoFit: formData.fit || null,
-        SacoLargoFrente: parseFloat(formData.saco_l_frente) || null,
-        SacoLargoEspalda: parseFloat(formData.saco_l_espalda) || null,
-        SacoHombros: parseFloat(formData.saco_hombros) || null,
-        SacoPecho: parseFloat(formData.saco_pecho) || null,
-        SacoEstomago: parseFloat(formData.saco_estomago) || null,
-        SacoMangaIzq: parseFloat(formData.saco_m_izq) || null,
-        SacoMangaDer: parseFloat(formData.saco_m_der) || null,
-        SacoBiceps: parseFloat(formData.saco_biceps) || null,
-        SacoCadera: parseFloat(formData.saco_cadera) || null,
-        PantLargoIzq: parseFloat(formData.pant_l_izq) || null,
-        PantLargoDer: parseFloat(formData.pant_l_der) || null,
-        PantCintura: parseFloat(formData.pant_cintura) || null,
-        PantCadera: parseFloat(formData.pant_cadera) || null,
-        PantMuslo: parseFloat(formData.pant_muslo) || null,
-        PantTiro: parseFloat(formData.pant_tiro) || null,
-        CamisaCuello: parseFloat(formData.camisa_cuello_med) || null,
-        CamisaManga: parseFloat(formData.camisa_manga_med) || null,
+
+        // Medidas de Saco
+        CollarSaco: parseFloat(formData.collarSaco) || null,
+        LongitudFrontalSaco: parseFloat(formData.longitudFrontalSaco) || null,
+        LongitudEspaldaSaco: parseFloat(formData.longitudEspaldaSaco) || null,
+        HombrosSaco: parseFloat(formData.hombrosSaco) || null,
+        PechoSaco: parseFloat(formData.pechoSaco) || null,
+        PechoDelanteroSaco: parseFloat(formData.pechoDelanteroSaco) || null,
+        EstomagoSaco: parseFloat(formData.estomagoSaco) || null,
+        VientreSaco: parseFloat(formData.vientreSaco) || null,
+        CaderasSaco: parseFloat(formData.caderasSaco) || null,
+        LongitudMangaISaco: parseFloat(formData.longitudMangaISaco) || null,
+        LongitudMangaDSaco: parseFloat(formData.longitudMangaDSaco) || null,
+        BicepsSaco: parseFloat(formData.bicepsSaco) || null,
+        AntebrazoSaco: parseFloat(formData.anteBrazoSaco) || null,
+        MuñecaSaco: parseFloat(formData.muñecaSaco) || null,
+        HombroDelanteroSaco: parseFloat(formData.hombroDelanteroSaco) || null,
+        AnchoTraseroSaco: parseFloat(formData.anchoTraseroSaco) || null,
+        NucaCinturaSaco: parseFloat(formData.nucaCinturaSaco) || null,
+        LongitudCinturaDelantera:
+          parseFloat(formData.longitudCinturaDelanteraSaco) || null,
+
+        // Medidas de Camisa
+        CollarCamisa: parseFloat(formData.collarCamisa) || null,
+        LongitudFrontalCamisa:
+          parseFloat(formData.longitudFrontalCamisa) || null,
+        LongitudEspaldaCamisa:
+          parseFloat(formData.longitudEspaldaCamisa) || null,
+        HombrosCamisa: parseFloat(formData.hombrosCamisa) || null,
+        PechoCamisa: parseFloat(formData.pechoCamisa) || null,
+        PechoDelanteroCamisa: parseFloat(formData.pechoDelanteroCamisa) || null,
+        EstomagoCamisa: parseFloat(formData.estomagoCamisa) || null,
+        VientreCamisa: parseFloat(formData.vientreCamisa) || null,
+        CaderasCamisa: parseFloat(formData.caderasCamisa) || null,
+        LongitudMangaICamisa: parseFloat(formData.longitudMangaICamisa) || null,
+        LongitudMangaDCamisa: parseFloat(formData.longitudMangaDCamisa) || null,
+        BicepsCamisa: parseFloat(formData.bicepsCamisa) || null,
+        AntebrazoCamisa: parseFloat(formData.anteBrazoCamisa) || null,
+        MuñecaCamisa: parseFloat(formData.muñecaCamisa) || null,
+        HombroDelanteroCamisa:
+          parseFloat(formData.hombroDelanteroCamisa) || null,
+        AnchoTraseroCamisa: parseFloat(formData.anchoTraseroCamisa) || null,
+        NucaCinturaCamisa: parseFloat(formData.nucaCinturaCamisa) || null,
+        LongitudCinturaDelanteraCamisa:
+          parseFloat(formData.longitudCinturaDelanteraCamisa) || null,
+        // Medidas de Pantalón
+        LongitudIPantalon: parseFloat(formData.longitudIPantalon) || null,
+        LongitudDPantalon: parseFloat(formData.longitudDPantalon) || null,
+        CinturaPantalon: parseFloat(formData.cinturaPantalon) || null,
+        CaderaPantalon: parseFloat(formData.caderaPantalon) || null,
+        MusloPantalon: parseFloat(formData.musloPantalon) || null,
+        RodillaPantalon: parseFloat(formData.rodillaPantalon) || null,
+        AlTerrillaPantalon: parseFloat(formData.alTerrillaPantalon) || null,
+        BrazaletePantalon: parseFloat(formData.brazaletePantalon) || null,
+        EntrepiernaPantalon: parseFloat(formData.entrepiernaPantalon) || null,
+        AlturaCinturaTPantalon:
+          parseFloat(formData.alturaCinturaTPantalon) || null,
+        AlturaCinturaDPantalon:
+          parseFloat(formData.alturaCinturaDPantalon) || null,
+
+        // Medidas de Chaleco
+        CollarChaleco: parseFloat(formData.collarChaleco) || null,
+        LongitudFrontalChaleco:
+          parseFloat(formData.longitudFrontalChaleco) || null,
+        LongitudEspaldaChaleco:
+          parseFloat(formData.longitudEspaldaChaleco) || null,
+        PechoChaleco: parseFloat(formData.pechoChaleco) || null,
+        PechoDelanteroChaleco:
+          parseFloat(formData.pechoDelanteroChaleco) || null,
+        EstomagoChaleco: parseFloat(formData.estomagoChaleco) || null,
+        VientreChaleco: parseFloat(formData.vientreChaleco) || null,
+        CaderasChaleco: parseFloat(formData.caderasChaleco) || null,
+        TamañoInferiorChaleco:
+          parseFloat(formData.tamañoInferiorChaleco) || null,
+        LongitudCinturaDChaleco:
+          parseFloat(formData.longitudCinturaDChaleco) || null,
+        NucaCinturaChaleco: parseFloat(formData.nucaCinturaChaleco) || null,
+        TallaZapato: parseFloat(formData.tallaZapato) || null,
+        AnchoEmpeineZapato: parseFloat(formData.anchoEmpeineZapato) || null,
+        LargoPieZapato: parseFloat(formData.largoPieZapato) || null,
       },
       DetalleSaco: tieneSaco
         ? {
             PrecioSaco: parseFloat(formData.precio_saco) || 0,
+            NumeroProduccion: formData.saco_numero_produccion,
             CodigoTela: formData.tela_saco,
             CodigoForro: formData.saco_forro_cod,
             CodigoBoton: formData.saco_boton_cod,
@@ -945,6 +2640,7 @@ const Ordenes = () => {
       DetallePantalon: tienePantalon
         ? {
             PrecioPantalon: parseFloat(formData.precio_pantalon) || 0,
+            NumeroProduccion: formData.pant_numero_produccion,
             CodigoTela: formData.tela_pantalon,
             CodigoBoton: formData.pant_boton,
             EstiloPretina: formData.pant_pretina,
@@ -959,6 +2655,7 @@ const Ordenes = () => {
       DetalleCamisa: tieneCamisa
         ? {
             OpcionCamisa: formData.opcion_camisa,
+            NumeroProduccion: formData.camisa_numero_produccion,
             PrecioCamisa: parseFloat(formData.precio_camisa) || 0,
             CodigoTela: formData.camisa_tela,
             EstiloCuello: formData.camisa_cuello,
@@ -966,6 +2663,10 @@ const Ordenes = () => {
             EstiloTapeta: formData.camisa_tapeta,
             EstiloPuno: formData.camisa_puno,
             EstiloBolsillo: formData.camisa_bolsillo,
+            // LOS NUEVOS CAMPOS AQUÍ:
+            SolapaBolsillo: formData.camisa_solapa_bolsillo,
+            PosicionContraste: formData.camisa_pos_contraste,
+            // ---------------------
             PlieguesFrontales: formData.camisa_pliegues,
             Iniciales: formData.camisa_iniciales,
             Observaciones: formData.camisa_obs,
@@ -974,6 +2675,7 @@ const Ordenes = () => {
       DetalleChaleco: tieneChaleco
         ? {
             PrecioChaleco: parseFloat(formData.precio_chaleco) || 0,
+            NumeroProduccion: formData.chal_numero_produccion,
             CodigoTela: formData.chal_tela,
             CodigoBoton: formData.chal_boton,
             EstiloCuello: formData.chal_cuello,
@@ -984,13 +2686,34 @@ const Ordenes = () => {
             Observaciones: formData.obs_chaleco,
           }
         : null,
+      DetalleZapato: tieneZapato
+        ? {
+            PrecioZapato: parseFloat(formData.precio_zapato) || 0,
+            NumeroProduccion: formData.zapato_numero_produccion,
+            EstiloZapato: formData.zapato_estilo,
+            Observaciones: formData.zapato_obs,
+          }
+        : null,
     };
 
     try {
-      await ordenesService.crearCompleta(payload);
-      setAlert({ type: "success", message: "Orden integral creada con éxito" });
+      if (editingId) {
+        // MODO EDICIÓN
+        await ordenesService.actualizarCompleta(editingId, payload);
+        setAlert({ type: "success", message: "Orden actualizada con éxito" });
+      } else {
+        // MODO CREACIÓN
+        await ordenesService.crearCompleta(payload);
+        setAlert({
+          type: "success",
+          message: "Orden integral creada con éxito",
+        });
+      }
+
       setShowForm(false);
-      fetchOrdenes();
+      setEditingId(null);
+      setFormData(initialState); // <-- Agrega esta línea// MUY IMPORTANTE: Limpiar el ID
+      fetchOrdenes(); // Recargamos la tabla
     } catch (error) {
       console.error("Error:", error);
       setAlert({ type: "error", message: "Error al guardar los detalles." });
@@ -999,17 +2722,157 @@ const Ordenes = () => {
     }
   };
 
+  const CATALOGO_TRAJES = {
+    1: "Dos piezas",
+    2: "Tres piezas",
+    3: "Saco",
+    4: "Pantalón",
+    5: "Chaleco",
+    6: "Camisa",
+    7: "Frac",
+    8: "Chaque",
+    9: "Smoking",
+    10: "Zapatos",
+  };
+
+  const formatDateVisual = (dateString) => {
+    if (!dateString) return "-";
+    return dateString.split("T")[0];
+  };
+
   const filteredOrdenes = ordenes.filter((o) => {
+    // 1. Condición de búsqueda por texto (Folio o Cliente)
     const clienteNombre =
       clientes.find((c) => c.idCliente === o.idCliente)?.nombreCompleto || "";
-    return (
+
+    const coincideTexto =
       o.idOrden.toString().includes(searchTerm) ||
-      clienteNombre.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+      clienteNombre.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // 2. Condición de filtro por estatus
+    // Si filtroEstatus está vacío (""), mostramos todos.
+    // Si tiene un valor, validamos que el idEstatus de la orden coincida.
+    const coincideEstatus =
+      filtroEstatus === "" || o.idEstatus.toString() === filtroEstatus;
+
+    // 3. La orden DEBE cumplir ambas condiciones para mostrarse
+    return coincideTexto && coincideEstatus;
   });
 
+  // --- FUNCIÓN PARA DAR COLOR A CADA ESTATUS ---
+  const getEstatusColor = (idEstatus) => {
+    const colores = {
+      1: "bg-blue-900/30 text-blue-400 border-blue-900/50", // Nueva orden (Azul)
+      2: "bg-indigo-900/30 text-indigo-400 border-indigo-900/50", // En revisión (Índigo)
+      3: "bg-orange-900/30 text-orange-400 border-orange-900/50", // Pendiente de medidas (Naranja)
+      4: "bg-yellow-900/30 text-yellow-400 border-yellow-900/50", // Medidas registradas (Amarillo)
+      5: "bg-teal-900/30 text-teal-400 border-teal-900/50", // Autorizado para producción (Turquesa)
+      6: "bg-fuchsia-900/30 text-fuchsia-400 border-fuchsia-900/50", // En confección (Fucsia/Magenta)
+      7: "bg-emerald-900/30 text-emerald-400 border-emerald-900/50", // Listo para entrega (Esmeralda)
+      8: "bg-green-900/30 text-green-400 border-green-900/50", // Entregado (Verde vibrante)
+      9: "bg-red-900/30 text-red-400 border-red-900/50", // Cancelado (Rojo)
+    };
+
+    // Si por alguna razón llega un ID desconocido, le pone gris por defecto
+    return (
+      colores[idEstatus] || "bg-gray-900/30 text-gray-400 border-gray-900/50"
+    );
+  };
+
+  const handleCopiarOrden = (e) => {
+    e.preventDefault(); // Evita que el formulario se envíe por error
+
+    const dataToCopy = { ...formData };
+    // Eliminamos el ID para no sobreescribir una orden existente por accidente
+    delete dataToCopy.idOrden;
+
+    localStorage.setItem("ordenCopiadaJaramillo", JSON.stringify(dataToCopy));
+    alert("¡Orden copiada! Ahora puedes crear una orden nueva y pegarla.");
+  };
+
+  const handlePegarOrden = (e) => {
+    e.preventDefault();
+    const savedData = localStorage.getItem("ordenCopiadaJaramillo");
+
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+
+      // Extraemos datos que NO queremos sobreescribir (para mantener el cliente y fechas actuales)
+      const {
+        idCliente,
+        fecha_cita,
+        fecha_entrega,
+        fecha_evento,
+        ...restoDeDatos
+      } = parsedData;
+
+      setFormData((prev) => ({
+        ...prev,
+        ...restoDeDatos,
+      }));
+
+      alert("¡Medidas y especificaciones pegadas con éxito!");
+    } else {
+      alert("No hay ninguna orden guardada en el portapapeles.");
+    }
+  };
+
+  // --- FUNCIONES POR SECCIÓN INDIVIDUAL ---
+  const handleCopiarSeccion = (e, seccion) => {
+    e.preventDefault();
+    const datosSeccion = {};
+    CAMPOS_POR_SECCION[seccion].forEach((campo) => {
+      datosSeccion[campo] = formData[campo];
+    });
+    localStorage.setItem(`jaramillo_${seccion}`, JSON.stringify(datosSeccion));
+    alert(`¡Especificaciones y medidas de ${seccion.toUpperCase()} copiadas!`);
+  };
+
+  const handlePegarSeccion = (e, seccion) => {
+    e.preventDefault();
+    const guardado = localStorage.getItem(`jaramillo_${seccion}`);
+    if (guardado) {
+      setFormData((prev) => ({
+        ...prev,
+        ...JSON.parse(guardado),
+      }));
+    } else {
+      alert(`No hay datos copiados previamente para ${seccion.toUpperCase()}.`);
+    }
+  };
+
+  const handleLimpiarSeccion = (e, seccion) => {
+    e.preventDefault();
+    if (
+      window.confirm(
+        `¿Seguro que deseas limpiar todos los datos del ${seccion.toUpperCase()}?`,
+      )
+    ) {
+      const resetData = {};
+      CAMPOS_POR_SECCION[seccion].forEach((campo) => {
+        resetData[campo] = ""; // Los vacía
+      });
+      setFormData((prev) => ({
+        ...prev,
+        ...resetData,
+      }));
+    }
+  };
+
+  // --- FUNCIÓN PARA LIMPIAR TODO EL FORMULARIO ---
+  const handleLimpiarTodo = (e) => {
+    e.preventDefault();
+    if (
+      window.confirm(
+        "¿Seguro que deseas limpiar TODA la orden? Perderás lo no guardado.",
+      )
+    ) {
+      setFormData(initialState);
+    }
+  };
+
   return (
-    <div className="p-4 lg:p-8 max-w-[1600px] mx-auto min-h-screen bg-[#121212] text-gray-200 font-sans">
+    <div className="p-6 lg:p-8 max-w-[1600px] mx-auto min-h-screen text-gray-200">
       <Alert
         type={alert.type}
         message={alert.message}
@@ -1017,11 +2880,9 @@ const Ordenes = () => {
       />
 
       {/* HEADER Y TABLA */}
-      <div className="flex justify-between items-end mb-8 pb-4 border-b border-gray-800">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white uppercase tracking-tight flex items-center gap-3">
-            <Ruler size={28} /> Libro de Órdenes
-          </h1>
+          <h1 className="text-3xl font-bold text-white">Órdenes</h1>
           <p className="text-gray-500 mt-1">
             Administra las{" "}
             <span className="font-semibold text-white">
@@ -1036,17 +2897,29 @@ const Ordenes = () => {
             placeholder="Buscar orden..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-4 py-2 bg-black text-white rounded-lg border border-gray-800 text-sm outline-none w-64 focus:border-white transition-all"
+            className="px-5 py-2 bg-black text-white rounded-lg border border-gray-800 focus:border-white transition-all text-sm outline-none w-64"
           />
+          <select
+            value={filtroEstatus}
+            onChange={(e) => setFiltroEstatus(e.target.value)}
+            className="px-5 py-2 bg-black text-white rounded-lg border border-gray-800 focus:border-white transition-all text-sm outline-none w-64"
+          >
+            <option value="">Filtrar por estatus...</option>
+            {estatusList.map((estatus) => (
+              <option key={estatus.idEstatus} value={estatus.idEstatus}>
+                {estatus.descripcion}
+              </option>
+            ))}
+          </select>
           <button
             onClick={() => {
               setFormData(initialState);
               setEditingId(null);
               setShowForm(true);
             }}
-            className="bg-white text-black px-5 py-2 rounded-lg text-xs font-bold uppercase flex items-center gap-2 hover:bg-gray-200 transition-colors"
+            className="flex items-center gap-2 px-5 py-2 bg-white text-black rounded-lg font-bold hover:bg-gray-200 transition-all text-sm"
           >
-            <Plus size={16} /> Nueva Orden
+            + Nueva Orden
           </button>
         </div>
       </div>
@@ -1061,7 +2934,7 @@ const Ordenes = () => {
           </div>
         ) : filteredOrdenes.length === 0 ? (
           <div className="p-16 text-center text-gray-500">
-            <p className="text-lg font-bold">No se encontraron órdenes</p>
+            <p className="text-lg font-bold">Sin resultados</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -1093,11 +2966,6 @@ const Ordenes = () => {
                           <div className="w-9 h-9 bg-white text-black rounded-full flex items-center justify-center font-bold text-xs">
                             #{o.idOrden}
                           </div>
-                          <div>
-                            <p className="font-bold text-white text-sm leading-none mb-1">
-                              Folio de Confección
-                            </p>
-                          </div>
                         </div>
                       </td>
                       <td className="p-4 md:table-cell">
@@ -1111,7 +2979,9 @@ const Ordenes = () => {
                         </div>
                       </td>
                       <td className="p-4 lg:table-cell">
-                        <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-blue-900/20 text-blue-400 rounded-md text-[10px] font-black tracking-widest border border-blue-900/30 uppercase">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-black tracking-widest border uppercase transition-colors ${getEstatusColor(o.idEstatus)}`}
+                        >
                           {estatus?.descripcion || "Pendiente"}
                         </span>
                       </td>
@@ -1125,13 +2995,21 @@ const Ordenes = () => {
                             className="text-gray-400 hover:text-white transition-colors text-lg"
                             title="Ver Detalles"
                           >
-                            👁️
+                            <Eye size={18} strokeWidth={2.5} />
                           </button>
                           <button
+                            onClick={() => handleEditClick(o)}
                             className="text-gray-400 hover:text-white transition-colors text-lg"
                             title="Editar"
                           >
-                            ✏️
+                            <Edit size={18} strokeWidth={2.5} />{" "}
+                          </button>
+                          <button
+                            onClick={() => descargarResumenOrden(o)}
+                            title="Descargar Resumen"
+                            className="text-gray-400 hover:text-blue-400 transition-colors"
+                          >
+                            <Download size={18} strokeWidth={2.5} />
                           </button>
                         </div>
                       </td>
@@ -1228,7 +3106,21 @@ const Ordenes = () => {
                   </div>
                   <div className="flex-1 min-w-[200px]">
                     <Input
-                      label="Fecha Entrega"
+                      label="Fecha de Entrega"
+                      type="date"
+                      value={formData.fecha_entrega}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          fecha_entrega: e.target.value,
+                        })
+                      }
+                      style={{ colorScheme: "dark" }}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-[200px]">
+                    <Input
+                      label="Fecha de Evento"
                       type="date"
                       value={formData.fecha_evento}
                       onChange={(e) =>
@@ -1250,6 +3142,7 @@ const Ordenes = () => {
                 icon={Layers}
               >
                 <div className="space-y-6">
+                  {/* BOTONES DE TIPOS DE TRAJE */}
                   <div className="flex flex-wrap gap-3">
                     {tiposTrajeList.map((tipo) => (
                       <button
@@ -1261,18 +3154,21 @@ const Ordenes = () => {
                             id_tipo_traje: tipo.idTipoTraje,
                           })
                         }
-                        className={`px-6 py-4 border rounded-md text-[11px] font-bold uppercase transition-all ${formData.id_tipo_traje === tipo.idTipoTraje ? "bg-white text-black border-white scale-105" : "text-gray-500 border-gray-800"}`}
+                        className={`px-6 py-4 border rounded-md text-[11px] font-bold uppercase transition-all ${
+                          formData.id_tipo_traje === tipo.idTipoTraje
+                            ? "bg-white text-black border-white scale-105"
+                            : "text-gray-500 border-gray-800 hover:border-gray-600"
+                        }`}
                       >
                         {tipo.descripcion}
                       </button>
                     ))}
                   </div>
 
-                  {/* CHECKBOXES DE CAMISA Y SMOKING 3 PIEZAS */}
-                  {[1, 2, 7, 8, 9].includes(
-                    parseInt(formData.id_tipo_traje),
-                  ) && (
-                    <div className="pt-4 border-t border-gray-800 flex flex-col sm:flex-row gap-6 bg-gray-900/40 p-4 rounded-lg">
+                  {/* CAJA DE OPCIONES ADICIONALES (Aparece siempre que haya un traje seleccionado) */}
+                  {formData.id_tipo_traje && (
+                    <div className="pt-4 border-t border-gray-800 flex flex-col sm:flex-row flex-wrap gap-6 bg-gray-900/40 p-4 rounded-lg">
+                      {/* CHECKBOX: Smoking 3 piezas (Exclusivo del ID 9) */}
                       {parseInt(formData.id_tipo_traje) === 9 && (
                         <div className="flex items-center gap-4">
                           <input
@@ -1291,22 +3187,46 @@ const Ordenes = () => {
                           </label>
                         </div>
                       )}
-                      <div className="flex items-center gap-4">
-                        <input
-                          type="checkbox"
-                          checked={formData.incluye_camisa}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              incluye_camisa: e.target.checked,
-                            })
-                          }
-                          className="w-5 h-5 accent-white"
-                        />
-                        <label className="text-[11px] font-bold text-white uppercase">
-                          ¿Incluir Camisa a Medida?
-                        </label>
-                      </div>
+
+                      {/* CHECKBOX: Camisa (AHORA APARECE EN TODOS LOS TIPOS) */}
+                      {parseInt(formData.id_tipo_traje) !== 6 && (
+                        <div className="flex items-center gap-4">
+                          <input
+                            type="checkbox"
+                            checked={formData.incluye_camisa}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                incluye_camisa: e.target.checked,
+                              })
+                            }
+                            className="w-5 h-5 accent-white"
+                          />
+                          <label className="text-[11px] font-bold text-white uppercase">
+                            ¿Incluir Camisa a Medida?
+                          </label>
+                        </div>
+                      )}
+
+                      {/* CHECKBOX: Zapatos (Aparece en todos MENOS en el ID 10) */}
+                      {parseInt(formData.id_tipo_traje) !== 10 && (
+                        <div className="flex items-center gap-4">
+                          <input
+                            type="checkbox"
+                            checked={formData.incluye_zapato || false}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                incluye_zapato: e.target.checked,
+                              })
+                            }
+                            className="w-5 h-5 accent-white"
+                          />
+                          <label className="text-[11px] font-bold text-white uppercase">
+                            ¿Incluir Zapatos?
+                          </label>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1320,11 +3240,46 @@ const Ordenes = () => {
                   onToggle={() => toggleSection("saco")}
                   icon={Scissors}
                 >
+                  {/* Ejemplo para la sección del SACO */}
+                  <div className="flex justify-end gap-2 mb-6 border-b border-gray-800 pb-4">
+                    <button
+                      type="button"
+                      onClick={(e) => handleCopiarSeccion(e, "saco")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded text-[10px] font-bold uppercase transition-colors"
+                    >
+                      <Copy size={12} /> Copiar Saco
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => handlePegarSeccion(e, "saco")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded text-[10px] font-bold uppercase transition-colors"
+                    >
+                      <ClipboardPaste size={12} /> Pegar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => handleLimpiarSeccion(e, "saco")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-red-900/20 hover:bg-red-900/40 text-red-400 hover:text-red-300 border border-red-900/50 rounded text-[10px] font-bold uppercase transition-colors ml-2"
+                    >
+                      <Trash2 size={12} /> Limpiar
+                    </button>
+                  </div>
                   <div className="animate-in fade-in duration-500">
                     <div
                       className="grid gap-4 sm:gap-6 mb-8 
                       grid-cols-[repeat(auto-fit,minmax(250px,1fr))]"
                     >
+                      <Input
+                        label="Número de Producción"
+                        placeholder="Ej. ZG-881"
+                        value={formData.saco_numero_produccion}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            saco_numero_produccion: e.target.value,
+                          })
+                        }
+                      />
                       <Input
                         label="Código Tela Saco"
                         placeholder="Ej. ZG-881"
@@ -1371,21 +3326,6 @@ const Ordenes = () => {
                             saco_monograma: e.target.value,
                           })
                         }
-                      />
-
-                      <Select
-                        label="Estilo Solapa"
-                        value={formData.saco_solapa}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            saco_solapa: e.target.value,
-                          })
-                        }
-                        options={catalogs.saco.solapa.map((opt) => ({
-                          value: opt,
-                          label: opt,
-                        }))}
                       />
 
                       <Input
@@ -1448,6 +3388,17 @@ const Ordenes = () => {
                       className="grid gap-8 border-t border-gray-800 pt-8 mb-8
                       grid-cols-1 lg:grid-cols-2"
                     >
+                      <ImageSelect
+                        label="Estilo Solapa"
+                        value={formData.saco_solapa}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            saco_solapa: e.target.value,
+                          })
+                        }
+                        options={opcionesSolapa}
+                      />
                       <ImageSelect
                         label="Estilo Botonadura"
                         value={formData.saco_botones}
@@ -1525,87 +3476,69 @@ const Ordenes = () => {
                   onToggle={() => toggleSection("chaleco")}
                   icon={Scissors}
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
-                    <Input
-                      label="Código Tela Chaleco"
-                      value={formData.chal_tela}
-                      onChange={(e) =>
-                        setFormData({ ...formData, chal_tela: e.target.value })
-                      }
-                      placeholder="Ej. ZG-881"
-                    />
-                    <Input
-                      label="Código Botón"
-                      value={formData.chal_boton}
-                      onChange={(e) =>
-                        setFormData({ ...formData, chal_boton: e.target.value })
-                      }
-                    />
-                    <Select
-                      label="Estilo de Cuello"
-                      value={formData.chal_cuello}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          chal_cuello: e.target.value,
-                        })
-                      }
-                      options={catalogs.chaleco.cuello}
-                    />
-                    <Select
-                      label="Estilo Botones"
-                      value={formData.chal_botones}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          chal_botones: e.target.value,
-                        })
-                      }
-                      options={catalogs.chaleco.botones}
-                    />
-                    <Select
-                      label="Bolsillo Pecho"
-                      value={formData.chal_b_pecho}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          chal_b_pecho: e.target.value,
-                        })
-                      }
-                      options={catalogs.chaleco.bolsilloPecho}
-                    />
-                    <Select
-                      label="Bolsillos Inferiores"
-                      value={formData.chal_b_inf}
-                      onChange={(e) =>
-                        setFormData({ ...formData, chal_b_inf: e.target.value })
-                      }
-                      options={catalogs.chaleco.bolsilloInf}
-                    />
-                    <Select
-                      label="Terminación Inferior"
-                      value={formData.chal_terminacion}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          chal_terminacion: e.target.value,
-                        })
-                      }
-                      options={catalogs.chaleco.terminacion}
-                    />
-                    <div className="lg:col-span-2">
+                  <div className="flex justify-end gap-2 mb-6 border-b border-gray-800 pb-4">
+                    <button
+                      type="button"
+                      onClick={(e) => handleCopiarSeccion(e, "chaleco")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded text-[10px] font-bold uppercase transition-colors"
+                    >
+                      <Copy size={12} /> Copiar Chaleco
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => handlePegarSeccion(e, "chaleco")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded text-[10px] font-bold uppercase transition-colors"
+                    >
+                      <ClipboardPaste size={12} /> Pegar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => handleLimpiarSeccion(e, "chaleco")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-red-900/20 hover:bg-red-900/40 text-red-400 hover:text-red-300 border border-red-900/50 rounded text-[10px] font-bold uppercase transition-colors ml-2"
+                    >
+                      <Trash2 size={12} /> Limpiar
+                    </button>
+                  </div>
+                  <div className="animate-in fade-in duration-500">
+                    {/* 1. SECCIÓN SUPERIOR: Inputs y Selects Estándar */}
+                    <div
+                      className="grid gap-4 sm:gap-6 mb-8 
+        grid-cols-[repeat(auto-fit,minmax(250px,1fr))]"
+                    >
                       <Input
-                        label="Observaciones Chaleco"
-                        value={formData.obs_chaleco}
+                        label="Número de Producción"
+                        placeholder="Ej. ZG-881"
+                        value={formData.chal_numero_produccion}
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            obs_chaleco: e.target.value,
+                            chal_numero_produccion: e.target.value,
                           })
                         }
                       />
-                    </div>
-                    <div className="lg:col-span-3 p-4 bg-blue-900/10 border border-blue-900/30 rounded-lg">
+                      <Input
+                        label="Código Tela Chaleco"
+                        value={formData.chal_tela}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            chal_tela: e.target.value,
+                          })
+                        }
+                        placeholder="Ej. ZG-881"
+                      />
+
+                      <Input
+                        label="Código Botón"
+                        value={formData.chal_boton}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            chal_boton: e.target.value,
+                          })
+                        }
+                      />
+
                       <Input
                         label="Precio de Chaleco ($)"
                         type="number"
@@ -1620,6 +3553,92 @@ const Ordenes = () => {
                         }
                       />
                     </div>
+
+                    {/* 2. SECCIÓN MEDIA: Selectores de Imágenes */}
+                    <div
+                      className="grid gap-8 border-t border-gray-800 pt-8 mb-8
+        grid-cols-1 lg:grid-cols-2"
+                    >
+                      <ImageSelect
+                        label="Estilo de Cuello"
+                        value={formData.chal_cuello}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            chal_cuello: e.target.value,
+                          })
+                        }
+                        options={opcionesCuello}
+                      />
+
+                      <ImageSelect
+                        label="Estilo Botones"
+                        value={formData.chal_botones}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            chal_botones: e.target.value,
+                          })
+                        }
+                        options={opcionesBotonesChaleco}
+                      />
+
+                      <ImageSelect
+                        label="Bolsillo Pecho"
+                        value={formData.chal_b_pecho}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            chal_b_pecho: e.target.value,
+                          })
+                        }
+                        options={opcionesBolsilloPechoChaleco}
+                      />
+
+                      <ImageSelect
+                        label="Bolsillos Inferiores"
+                        value={formData.chal_b_inf}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            chal_b_inf: e.target.value,
+                          })
+                        }
+                        options={opcionesBolsillos}
+                      />
+
+                      <ImageSelect
+                        label="Terminación Inferior"
+                        value={formData.chal_terminacion}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            chal_terminacion: e.target.value,
+                          })
+                        }
+                        options={opcionesEstiloInferior}
+                      />
+                    </div>
+
+                    {/* 3. SECCIÓN INFERIOR: Observaciones */}
+                    <div className="grid gap-6 border-t border-gray-800 pt-8">
+                      <div className="col-span-full">
+                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2">
+                          Observaciones Chaleco
+                        </label>
+                        <textarea
+                          value={formData.obs_chaleco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              obs_chaleco: e.target.value,
+                            })
+                          }
+                          className="w-full bg-black border border-gray-800 px-4 py-3 text-sm text-white outline-none focus:border-white transition-colors rounded-md resize-none min-h-[100px]"
+                          placeholder="Notas adicionales..."
+                        />
+                      </div>
+                    </div>
                   </div>
                 </Section>
               )}
@@ -1632,121 +3651,95 @@ const Ordenes = () => {
                   onToggle={() => toggleSection("camisa")}
                   icon={Scissors}
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-right-4 duration-500">
-                    <Select
-                      label="Opción de Camisa"
-                      value={formData.opcion_camisa}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          opcion_camisa: e.target.value,
-                        })
-                      }
-                      options={catalogs.camisa.opcionCamisa}
-                    />
-                    <Input
-                      label="Código Tela Camisa"
-                      value={formData.camisa_tela}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          camisa_tela: e.target.value,
-                        })
-                      }
-                      placeholder="Ej. OX-200"
-                    />
-                    <Input
-                      label="Tela Contraste"
-                      value={formData.camisa_contraste}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          camisa_contraste: e.target.value,
-                        })
-                      }
-                      placeholder="Ej. Blanco en cuello y puños"
-                    />
-                    <Input
-                      label="Iniciales (Monograma)"
-                      value={formData.camisa_iniciales}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          camisa_iniciales: e.target.value,
-                        })
-                      }
-                      maxLength={10}
-                      placeholder="Ej. H.A.J."
-                    />
-                    <Select
-                      label="Estilo de Cuello"
-                      value={formData.camisa_cuello}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          camisa_cuello: e.target.value,
-                        })
-                      }
-                      options={catalogs.camisa.cuello}
-                    />
-                    <Select
-                      label="Estilo de Tapeta"
-                      value={formData.camisa_tapeta}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          camisa_tapeta: e.target.value,
-                        })
-                      }
-                      options={catalogs.camisa.tapeta}
-                    />
-                    <Select
-                      label="Estilo de Puño"
-                      value={formData.camisa_puno}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          camisa_puno: e.target.value,
-                        })
-                      }
-                      options={catalogs.camisa.puno}
-                    />
-                    <Select
-                      label="Estilo de Bolsillo"
-                      value={formData.camisa_bolsillo}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          camisa_bolsillo: e.target.value,
-                        })
-                      }
-                      options={catalogs.camisa.bolsillo}
-                    />
-                    <Select
-                      label="Pliegues Frontales"
-                      value={formData.camisa_pliegues}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          camisa_pliegues: e.target.value,
-                        })
-                      }
-                      options={catalogs.camisa.pliegues}
-                    />
-                    <div className="lg:col-span-1">
+                  <div className="flex justify-end gap-2 mb-6 border-b border-gray-800 pb-4">
+                    <button
+                      type="button"
+                      onClick={(e) => handleCopiarSeccion(e, "camisa")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded text-[10px] font-bold uppercase transition-colors"
+                    >
+                      <Copy size={12} /> Copiar Camisa
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => handlePegarSeccion(e, "camisa")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded text-[10px] font-bold uppercase transition-colors"
+                    >
+                      <ClipboardPaste size={12} /> Pegar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => handleLimpiarSeccion(e, "camisa")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-red-900/20 hover:bg-red-900/40 text-red-400 hover:text-red-300 border border-red-900/50 rounded text-[10px] font-bold uppercase transition-colors ml-2"
+                    >
+                      <Trash2 size={12} /> Limpiar
+                    </button>
+                  </div>
+                  <div className="animate-in fade-in duration-500">
+                    {/* 1. SECCIÓN SUPERIOR: Inputs y Selects Estándar */}
+                    <div
+                      className="grid gap-4 sm:gap-6 mb-8 
+        grid-cols-[repeat(auto-fit,minmax(250px,1fr))]"
+                    >
                       <Input
-                        label="Observaciones de la Camisa"
-                        value={formData.camisa_obs}
+                        label="Número de Producción"
+                        placeholder="Ej. ZG-881"
+                        value={formData.camisa_numero_produccion}
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            camisa_obs: e.target.value,
+                            camisa_numero_produccion: e.target.value,
                           })
                         }
-                        placeholder="Notas..."
                       />
-                    </div>
-                    <div className="lg:col-span-3 p-4 bg-blue-900/10 border border-blue-900/30 rounded-lg">
+                      <Select
+                        label="Opción de Camisa"
+                        value={formData.opcion_camisa}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            opcion_camisa: e.target.value,
+                          })
+                        }
+                        options={catalogs.camisa.opcionCamisa}
+                      />
+
+                      <Input
+                        label="Código Tela Camisa"
+                        value={formData.camisa_tela}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            camisa_tela: e.target.value,
+                          })
+                        }
+                        placeholder="Ej. OX-200"
+                      />
+
+                      <Input
+                        label="Tela Contraste"
+                        value={formData.camisa_contraste}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            camisa_contraste: e.target.value,
+                          })
+                        }
+                        placeholder="Ej. Blanco en cuello y puños"
+                      />
+
+                      <Input
+                        label="Iniciales (Monograma)"
+                        value={formData.camisa_iniciales}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            camisa_iniciales: e.target.value,
+                          })
+                        }
+                        maxLength={10}
+                        placeholder="Ej. H.A.J."
+                      />
+
                       <Input
                         label="Precio de Camisa ($)"
                         type="number"
@@ -1761,6 +3754,116 @@ const Ordenes = () => {
                         }
                       />
                     </div>
+
+                    {/* 2. SECCIÓN MEDIA: Selectores Visuales */}
+                    <div
+                      className="grid gap-8 border-t border-gray-800 pt-8 mb-8
+        grid-cols-1 lg:grid-cols-2"
+                    >
+                      <ImageSelect
+                        label="Estilo de Cuello"
+                        value={formData.camisa_cuello}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            camisa_cuello: e.target.value,
+                          })
+                        }
+                        options={opcionesCollar}
+                      />
+
+                      <ImageSelect
+                        label="Estilo de Tapeta / Pechera"
+                        value={formData.camisa_tapeta}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            camisa_tapeta: e.target.value,
+                          })
+                        }
+                        options={opcionesEstiloBotones}
+                      />
+
+                      <ImageSelect
+                        label="Estilo de Puño"
+                        value={formData.camisa_puno}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            camisa_puno: e.target.value,
+                          })
+                        }
+                        options={opcionesBotonManga}
+                      />
+
+                      <ImageSelect
+                        label="Estilo de Bolsillo"
+                        value={formData.camisa_bolsillo}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            camisa_bolsillo: e.target.value,
+                          })
+                        }
+                        options={opcionesPocket}
+                      />
+
+                      <ImageSelect
+                        label="Solapa de Bolsillos"
+                        value={formData.camisa_solapa_bolsillo}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            camisa_solapa_bolsillo: e.target.value,
+                          })
+                        }
+                        options={opcionesSolapaBolsillos}
+                      />
+
+                      <ImageSelect
+                        label="Pliegues Frontales / Estilo"
+                        value={formData.camisa_pliegues}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            camisa_pliegues: e.target.value,
+                          })
+                        }
+                        options={opcionesEstilo}
+                      />
+
+                      <ImageSelect
+                        label="Posición de Contraste"
+                        value={formData.camisa_pos_contraste}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            camisa_pos_contraste: e.target.value,
+                          })
+                        }
+                        options={opcionesContrastPosition}
+                      />
+                    </div>
+
+                    {/* 3. SECCIÓN INFERIOR: Observaciones */}
+                    <div className="grid gap-6 border-t border-gray-800 pt-8">
+                      <div className="col-span-full">
+                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2">
+                          Observaciones de la Camisa
+                        </label>
+                        <textarea
+                          value={formData.camisa_obs}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              camisa_obs: e.target.value,
+                            })
+                          }
+                          className="w-full bg-black border border-gray-800 px-4 py-3 text-sm text-white outline-none focus:border-white transition-colors rounded-md resize-none min-h-[100px]"
+                          placeholder="Notas adicionales..."
+                        />
+                      </div>
+                    </div>
                   </div>
                 </Section>
               )}
@@ -1773,101 +3876,132 @@ const Ordenes = () => {
                   onToggle={() => toggleSection("pantalon")}
                   icon={Scissors}
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <Input
-                      label="Código Tela"
-                      value={formData.tela_pantalon}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          tela_pantalon: e.target.value,
-                        })
-                      }
-                      placeholder="Ej. LP-99"
-                    />
-                    <Input
-                      label="Código Botón"
-                      value={formData.pant_boton}
-                      onChange={(e) =>
-                        setFormData({ ...formData, pant_boton: e.target.value })
-                      }
-                    />
-                    <Select
-                      label="Estilo Pretina"
-                      value={formData.pant_pretina}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          pant_pretina: e.target.value,
-                        })
-                      }
-                      options={catalogs.pantalon.pretina}
-                    />
-                    <Select
-                      label="Ajuste Cintura"
-                      value={formData.pant_ajuste}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          pant_ajuste: e.target.value,
-                        })
-                      }
-                      options={catalogs.pantalon.ajuste}
-                    />
-                    <Select
-                      label="Altura Pretina"
-                      value={formData.pant_altura}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          pant_altura: e.target.value,
-                        })
-                      }
-                      options={catalogs.pantalon.altura}
-                    />
-                    <Select
-                      label="Pliegues"
-                      value={formData.pant_pliegues}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          pant_pliegues: e.target.value,
-                        })
-                      }
-                      options={catalogs.pantalon.pliegues}
-                    />
-                    <Select
-                      label="Bolsillo Reloj"
-                      value={formData.pant_bolsillo_reloj}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          pant_bolsillo_reloj: e.target.value,
-                        })
-                      }
-                      options={catalogs.pantalon.bolsilloReloj}
-                    />
-                    <Select
-                      label="Estilo Bajos"
-                      value={formData.pant_bajos}
-                      onChange={(e) =>
-                        setFormData({ ...formData, pant_bajos: e.target.value })
-                      }
-                      options={catalogs.pantalon.bajos}
-                    />
-                    <div className="lg:col-span-3">
+                  <div className="flex justify-end gap-2 mb-6 border-b border-gray-800 pb-4">
+                    <button
+                      type="button"
+                      onClick={(e) => handleCopiarSeccion(e, "pantalon")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded text-[10px] font-bold uppercase transition-colors"
+                    >
+                      <Copy size={12} /> Copiar Pantalón
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => handlePegarSeccion(e, "pantalon")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded text-[10px] font-bold uppercase transition-colors"
+                    >
+                      <ClipboardPaste size={12} /> Pegar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => handleLimpiarSeccion(e, "pantalon")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-red-900/20 hover:bg-red-900/40 text-red-400 hover:text-red-300 border border-red-900/50 rounded text-[10px] font-bold uppercase transition-colors ml-2"
+                    >
+                      <Trash2 size={12} /> Limpiar
+                    </button>
+                  </div>
+                  <div className="animate-in fade-in duration-500">
+                    {/* 1. SECCIÓN SUPERIOR: Inputs y Selects Estándar */}
+                    <div
+                      className="grid gap-4 sm:gap-6 mb-8 
+        grid-cols-[repeat(auto-fit,minmax(250px,1fr))]"
+                    >
                       <Input
-                        label="Observaciones"
-                        value={formData.obs_pantalon}
+                        label="Número de Producción"
+                        placeholder="Ej. ZG-881"
+                        value={formData.pant_numero_produccion}
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            obs_pantalon: e.target.value,
+                            pant_numero_produccion: e.target.value,
                           })
                         }
                       />
-                    </div>
-                    <div className="lg:col-span-3 p-4 bg-blue-900/10 border border-blue-900/30 rounded-lg">
+                      <Input
+                        label="Código Tela"
+                        placeholder="Ej. LP-99"
+                        value={formData.tela_pantalon}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            tela_pantalon: e.target.value,
+                          })
+                        }
+                      />
+
+                      <Input
+                        label="Código Botón"
+                        placeholder="Ej. Horn-04"
+                        value={formData.pant_boton}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            pant_boton: e.target.value,
+                          })
+                        }
+                      />
+
+                      <Select
+                        label="Ajuste Cintura"
+                        value={formData.pant_ajuste}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            pant_ajuste: e.target.value,
+                          })
+                        }
+                        options={catalogs.pantalon.ajuste}
+                      />
+
+                      <Select
+                        label="Altura Pretina"
+                        value={formData.pant_altura}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            pant_altura: e.target.value,
+                          })
+                        }
+                        options={catalogs.pantalon.altura}
+                      />
+
+                      {/* Regresamos Pliegues como Select normal */}
+                      <Select
+                        label="Pliegues"
+                        value={formData.pant_pliegues}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            pant_pliegues: e.target.value,
+                          })
+                        }
+                        options={catalogs.pantalon.pliegues}
+                      />
+
+                      {/* Regresamos Bolsillo Reloj como Select normal */}
+                      <Select
+                        label="Bolsillo Reloj"
+                        value={formData.pant_bolsillo_reloj}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            pant_bolsillo_reloj: e.target.value,
+                          })
+                        }
+                        options={catalogs.pantalon.bolsilloReloj}
+                      />
+
+                      <Select
+                        label="Estilo Bajos"
+                        value={formData.pant_bajos}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            pant_bajos: e.target.value,
+                          })
+                        }
+                        options={catalogs.pantalon.bajos}
+                      />
+
                       <Input
                         label="Precio de Pantalón ($)"
                         type="number"
@@ -1882,6 +4016,138 @@ const Ordenes = () => {
                         }
                       />
                     </div>
+
+                    {/* 2. SECCIÓN MEDIA: Solo Estilo Pretina en imágenes */}
+                    <div
+                      className="grid gap-8 border-t border-gray-800 pt-8 mb-8
+        grid-cols-1 lg:grid-cols-2"
+                    >
+                      <ImageSelect
+                        label="Estilo Pretina"
+                        value={formData.pant_pretina}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            pant_pretina: e.target.value,
+                          })
+                        }
+                        options={opcionesPretinas} // Asegúrate de usar el nombre correcto del array
+                      />
+                    </div>
+
+                    {/* 3. SECCIÓN INFERIOR: Observaciones unificadas */}
+                    <div className="grid gap-6 border-t border-gray-800 pt-8">
+                      <div className="col-span-full">
+                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2">
+                          Observaciones Pantalón
+                        </label>
+                        <textarea
+                          value={formData.obs_pantalon}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              obs_pantalon: e.target.value,
+                            })
+                          }
+                          className="w-full bg-black border border-gray-800 px-4 py-3 text-sm text-white outline-none focus:border-white transition-colors rounded-md resize-none min-h-[100px]"
+                          placeholder="Notas adicionales..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </Section>
+              )}
+
+              {tieneZapato && (
+                <Section
+                  title="Especificaciones del Zapato"
+                  isOpen={sections.zapato}
+                  onToggle={() => toggleSection("zapato")}
+                  icon={Scissors}
+                >
+                  <div className="flex justify-end gap-2 mb-6 border-b border-gray-800 pb-4">
+                    <button
+                      type="button"
+                      onClick={(e) => handleCopiarSeccion(e, "zapato")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded text-[10px] font-bold uppercase transition-colors"
+                    >
+                      <Copy size={12} /> Copiar Zapato
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => handlePegarSeccion(e, "zapato")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded text-[10px] font-bold uppercase transition-colors"
+                    >
+                      <ClipboardPaste size={12} /> Pegar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => handleLimpiarSeccion(e, "zapato")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-red-900/20 hover:bg-red-900/40 text-red-400 hover:text-red-300 border border-red-900/50 rounded text-[10px] font-bold uppercase transition-colors ml-2"
+                    >
+                      <Trash2 size={12} /> Limpiar
+                    </button>
+                  </div>
+                  <div className="animate-in fade-in duration-500">
+                    {/* 1. SECCIÓN SUPERIOR: Inputs y Selects Estándar */}
+                    <div
+                      className="grid gap-4 sm:gap-6 mb-8 
+        grid-cols-[repeat(auto-fit,minmax(250px,1fr))]"
+                    >
+                      <Input
+                        label="Número de Producción"
+                        placeholder="Ej. ZG-881"
+                        value={formData.zapato_numero_produccion}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            zapato_numero_produccion: e.target.value,
+                          })
+                        }
+                      />
+                      <Input
+                        label="Estilo de Zapato"
+                        placeholder="Ej. Oxford, Derby, Monkstrap"
+                        value={formData.zapato_estilo} // CORREGIDO
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            zapato_estilo: e.target.value, // CORREGIDO
+                          })
+                        }
+                      />
+                      <Input
+                        label="Precio de Zapatos ($)"
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={formData.precio_zapato}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            precio_zapato: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="grid gap-6 border-t border-gray-800 pt-8">
+                      <div className="col-span-full">
+                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2">
+                          Observaciones Zapato
+                        </label>
+                        <textarea
+                          value={formData.zapato_obs}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              zapato_obs: e.target.value,
+                            })
+                          }
+                          className="w-full bg-black border border-gray-800 px-4 py-3 text-sm text-white outline-none focus:border-white transition-colors rounded-md resize-none min-h-[100px]"
+                          placeholder="Notas adicionales..."
+                        />
+                      </div>
+                    </div>
                   </div>
                 </Section>
               )}
@@ -1894,16 +4160,13 @@ const Ordenes = () => {
                 icon={Ruler}
               >
                 <div className="space-y-10 animate-in fade-in duration-700">
+                  {/* --- 0. CUERPO Y CALZADO --- */}
                   <div>
                     <h3 className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                       <span className="w-8 h-[1px] bg-white/20"></span>
-                      Cuerpo y Calzado
+                      Cuerpo
                     </h3>
-
-                    <div
-                      className="grid gap-4 sm:gap-6
-                      grid-cols-[repeat(auto-fit,minmax(200px,1fr))]"
-                    >
+                    <div className="grid gap-4 sm:gap-6 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
                       <Input
                         label="Altura (cm)"
                         type="number"
@@ -1922,16 +4185,6 @@ const Ordenes = () => {
                           setFormData({ ...formData, peso: e.target.value })
                         }
                       />
-                      <Input
-                        label="Talla Zapato"
-                        value={formData.talla_zapato}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            talla_zapato: e.target.value,
-                          })
-                        }
-                      />
                       <Select
                         label="Tipo de Fit"
                         value={formData.fit}
@@ -1943,26 +4196,35 @@ const Ordenes = () => {
                     </div>
                   </div>
 
+                  {/* --- 1. ESPECIFICACIONES SACO --- */}
                   {tieneSaco && (
-                    <div>
+                    <div className="animate-in slide-in-from-left duration-500">
                       <h3 className="text-[9px] font-black text-blue-400/60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                         <span className="w-8 h-[1px] bg-blue-400/30"></span>
                         Especificaciones Saco
                       </h3>
-
-                      <div
-                        className="grid gap-4 sm:gap-6
-                        grid-cols-[repeat(auto-fit,minmax(180px,1fr))]"
-                      >
+                      <div className="grid gap-4 sm:gap-6 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
+                        <Input
+                          label="Collar"
+                          type="number"
+                          step="0.01"
+                          value={formData.collarSaco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              collarSaco: e.target.value,
+                            })
+                          }
+                        />
                         <Input
                           label="Largo Frente"
                           type="number"
                           step="0.01"
-                          value={formData.saco_l_frente}
+                          value={formData.longitudFrontalSaco}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              saco_l_frente: e.target.value,
+                              longitudFrontalSaco: e.target.value,
                             })
                           }
                         />
@@ -1970,11 +4232,11 @@ const Ordenes = () => {
                           label="Largo Espalda"
                           type="number"
                           step="0.01"
-                          value={formData.saco_l_espalda}
+                          value={formData.longitudEspaldaSaco}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              saco_l_espalda: e.target.value,
+                              longitudEspaldaSaco: e.target.value,
                             })
                           }
                         />
@@ -1982,23 +4244,23 @@ const Ordenes = () => {
                           label="Hombros"
                           type="number"
                           step="0.01"
-                          value={formData.saco_hombros}
+                          value={formData.hombrosSaco}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              saco_hombros: e.target.value,
+                              hombrosSaco: e.target.value,
                             })
                           }
                         />
                         <Input
-                          label="Pecho"
+                          label="Pecho total"
                           type="number"
                           step="0.01"
-                          value={formData.saco_pecho}
+                          value={formData.pechoSaco}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              saco_pecho: e.target.value,
+                              pechoSaco: e.target.value,
                             })
                           }
                         />
@@ -2006,11 +4268,35 @@ const Ordenes = () => {
                           label="Estómago"
                           type="number"
                           step="0.01"
-                          value={formData.saco_estomago}
+                          value={formData.estomagoSaco}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              saco_estomago: e.target.value,
+                              estomagoSaco: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Barriga"
+                          type="number"
+                          step="0.01"
+                          value={formData.vientreSaco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              vientreSaco: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Caderas"
+                          type="number"
+                          step="0.01"
+                          value={formData.caderasSaco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              caderasSaco: e.target.value,
                             })
                           }
                         />
@@ -2018,11 +4304,11 @@ const Ordenes = () => {
                           label="Manga Izq"
                           type="number"
                           step="0.01"
-                          value={formData.saco_m_izq}
+                          value={formData.longitudMangaISaco}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              saco_m_izq: e.target.value,
+                              longitudMangaISaco: e.target.value,
                             })
                           }
                         />
@@ -2030,11 +4316,11 @@ const Ordenes = () => {
                           label="Manga Der"
                           type="number"
                           step="0.01"
-                          value={formData.saco_m_der}
+                          value={formData.longitudMangaDSaco}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              saco_m_der: e.target.value,
+                              longitudMangaDSaco: e.target.value,
                             })
                           }
                         />
@@ -2042,23 +4328,83 @@ const Ordenes = () => {
                           label="Bíceps"
                           type="number"
                           step="0.01"
-                          value={formData.saco_biceps}
+                          value={formData.bicepsSaco}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              saco_biceps: e.target.value,
+                              bicepsSaco: e.target.value,
                             })
                           }
                         />
                         <Input
-                          label="Cadera Saco"
+                          label="Antebrazo"
                           type="number"
                           step="0.01"
-                          value={formData.saco_cadera}
+                          value={formData.anteBrazoSaco}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              saco_cadera: e.target.value,
+                              anteBrazoSaco: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Muñeca"
+                          type="number"
+                          step="0.01"
+                          value={formData.muñecaSaco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              muñecaSaco: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Frente Hombro"
+                          type="number"
+                          step="0.01"
+                          value={formData.hombroDelanteroSaco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              hombroDelanteroSaco: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Espalda Ancha"
+                          type="number"
+                          step="0.01"
+                          value={formData.anchoTraseroSaco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              anchoTraseroSaco: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Hombro - Estómago Posterior"
+                          type="number"
+                          step="0.01"
+                          value={formData.nucaCinturaSaco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              nucaCinturaSaco: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Hombro - Estómago Frente"
+                          type="number"
+                          step="0.01"
+                          value={formData.longitudCinturaDelanteraSaco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              longitudCinturaDelanteraSaco: e.target.value,
                             })
                           }
                         />
@@ -2066,26 +4412,353 @@ const Ordenes = () => {
                     </div>
                   )}
 
+                  {/* --- 2. ESPECIFICACIONES CHALECO --- */}
+                  {tieneChaleco && (
+                    <div className="animate-in slide-in-from-left duration-500">
+                      <h3 className="text-[9px] font-black text-purple-400/60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <span className="w-8 h-[1px] bg-purple-400/30"></span>
+                        Especificaciones Chaleco
+                      </h3>
+                      <div className="grid gap-4 sm:gap-6 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
+                        <Input
+                          label="Collar"
+                          type="number"
+                          step="0.01"
+                          value={formData.collarChaleco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              collarChaleco: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Largo Frente"
+                          type="number"
+                          step="0.01"
+                          value={formData.longitudFrontalChaleco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              longitudFrontalChaleco: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Largo Espalda"
+                          type="number"
+                          step="0.01"
+                          value={formData.longitudEspaldaChaleco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              longitudEspaldaChaleco: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Pecho Total"
+                          type="number"
+                          step="0.01"
+                          value={formData.pechoChaleco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              pechoChaleco: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Estómago"
+                          type="number"
+                          step="0.01"
+                          value={formData.estomagoChaleco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              estomagoChaleco: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Caderas"
+                          type="number"
+                          step="0.01"
+                          value={formData.caderasChaleco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              caderasChaleco: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Hombro - Estómago Frente"
+                          type="number"
+                          step="0.01"
+                          value={formData.longitudCinturaDChaleco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              longitudCinturaDChaleco: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Hombro - Estómago Posterior"
+                          type="number"
+                          step="0.01"
+                          value={formData.nucaCinturaChaleco}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              nucaCinturaChaleco: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* --- 3. ESPECIFICACIONES CAMISA --- */}
+                  {tieneCamisa && (
+                    <div className="animate-in slide-in-from-left duration-500">
+                      <h3 className="text-[9px] font-black text-green-400/60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <span className="w-8 h-[1px] bg-green-400/30"></span>
+                        Especificaciones Camisa
+                      </h3>
+                      <div className="grid gap-4 sm:gap-6 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
+                        <Input
+                          label="Collar"
+                          type="number"
+                          step="0.01"
+                          value={formData.collarCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              collarCamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Largo Frente"
+                          type="number"
+                          step="0.01"
+                          value={formData.longitudFrontalCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              longitudFrontalCamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Largo Espalda"
+                          type="number"
+                          step="0.01"
+                          value={formData.longitudEspaldaCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              longitudEspaldaCamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Hombros"
+                          type="number"
+                          step="0.01"
+                          value={formData.hombrosCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              hombrosCamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Pecho total"
+                          type="number"
+                          step="0.01"
+                          value={formData.pechoCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              pechoCamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Estómago"
+                          type="number"
+                          step="0.01"
+                          value={formData.estomagoCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              estomagoCamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Barriga"
+                          type="number"
+                          step="0.01"
+                          value={formData.vientreCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              vientreCamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Caderas"
+                          type="number"
+                          step="0.01"
+                          value={formData.caderasCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              caderasCamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Manga Izq"
+                          type="number"
+                          step="0.01"
+                          value={formData.longitudMangaICamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              longitudMangaICamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Manga Der"
+                          type="number"
+                          step="0.01"
+                          value={formData.longitudMangaDCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              longitudMangaDCamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Bíceps"
+                          type="number"
+                          step="0.01"
+                          value={formData.bicepsCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              bicepsCamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Antebrazo"
+                          type="number"
+                          step="0.01"
+                          value={formData.anteBrazoCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              anteBrazoCamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <div>
+                          <Input
+                            label="Muñeca"
+                            type="number"
+                            step="0.01"
+                            value={formData.muñecaCamisa}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                muñecaCamisa: e.target.value,
+                              })
+                            }
+                          />
+                          <span className="col-span-full text-center text-sm text-gray-500 italic">
+                            (Agregar 6.7 cm si es de manga larga)
+                          </span>
+                        </div>
+
+                        <Input
+                          label="Frente Hombro"
+                          type="number"
+                          step="0.01"
+                          value={formData.hombroDelanteroCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              hombroDelanteroCamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Espalda Ancha"
+                          type="number"
+                          step="0.01"
+                          value={formData.anchoTraseroCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              anchoTraseroCamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Hombro - Estómago Posterior"
+                          type="number"
+                          step="0.01"
+                          value={formData.nucaCinturaCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              nucaCinturaCamisa: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Hombro - Estómago Frente"
+                          type="number"
+                          step="0.01"
+                          value={formData.longitudCinturaDelanteraCamisa}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              longitudCinturaDelanteraCamisa: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* --- 4. ESPECIFICACIONES PANTALÓN --- */}
                   {tienePantalon && (
-                    <div>
+                    <div className="animate-in slide-in-from-left duration-500">
                       <h3 className="text-[9px] font-black text-amber-400/60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                         <span className="w-8 h-[1px] bg-amber-400/30"></span>
                         Especificaciones Pantalón
                       </h3>
-
-                      <div
-                        className="grid gap-4 sm:gap-6
-                        grid-cols-[repeat(auto-fit,minmax(180px,1fr))]"
-                      >
+                      <div className="grid gap-4 sm:gap-6 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
                         <Input
                           label="Largo Izq"
                           type="number"
                           step="0.01"
-                          value={formData.pant_l_izq}
+                          value={formData.longitudIPantalon}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              pant_l_izq: e.target.value,
+                              longitudIPantalon: e.target.value,
                             })
                           }
                         />
@@ -2093,11 +4766,11 @@ const Ordenes = () => {
                           label="Largo Der"
                           type="number"
                           step="0.01"
-                          value={formData.pant_l_der}
+                          value={formData.longitudDPantalon}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              pant_l_der: e.target.value,
+                              longitudDPantalon: e.target.value,
                             })
                           }
                         />
@@ -2105,11 +4778,11 @@ const Ordenes = () => {
                           label="Cintura"
                           type="number"
                           step="0.01"
-                          value={formData.pant_cintura}
+                          value={formData.cinturaPantalon}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              pant_cintura: e.target.value,
+                              cinturaPantalon: e.target.value,
                             })
                           }
                         />
@@ -2117,11 +4790,11 @@ const Ordenes = () => {
                           label="Cadera"
                           type="number"
                           step="0.01"
-                          value={formData.pant_cadera}
+                          value={formData.caderaPantalon}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              pant_cadera: e.target.value,
+                              caderaPantalon: e.target.value,
                             })
                           }
                         />
@@ -2129,23 +4802,83 @@ const Ordenes = () => {
                           label="Muslo"
                           type="number"
                           step="0.01"
-                          value={formData.pant_muslo}
+                          value={formData.musloPantalon}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              pant_muslo: e.target.value,
+                              musloPantalon: e.target.value,
                             })
                           }
                         />
                         <Input
-                          label="Tiro"
+                          label="Rodilla"
                           type="number"
                           step="0.01"
-                          value={formData.pant_tiro}
+                          value={formData.rodillaPantalon}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              pant_tiro: e.target.value,
+                              rodillaPantalon: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Pantorrilla"
+                          type="number"
+                          step="0.01"
+                          value={formData.alTerrillaPantalon}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              alTerrillaPantalon: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Brazalete (Bajos)"
+                          type="number"
+                          step="0.01"
+                          value={formData.brazaletePantalon}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              brazaletePantalon: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Entrepierna (Tiro)"
+                          type="number"
+                          step="0.01"
+                          value={formData.entrepiernaPantalon}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              entrepiernaPantalon: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Altura Cint. Tras."
+                          type="number"
+                          step="0.01"
+                          value={formData.alturaCinturaTPantalon}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              alturaCinturaTPantalon: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Altura Cint. Del."
+                          type="number"
+                          step="0.01"
+                          value={formData.alturaCinturaDPantalon}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              alturaCinturaDPantalon: e.target.value,
                             })
                           }
                         />
@@ -2153,38 +4886,47 @@ const Ordenes = () => {
                     </div>
                   )}
 
-                  {tieneCamisa && (
-                    <div>
-                      <h3 className="text-[9px] font-black text-green-400/60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                        <span className="w-8 h-[1px] bg-green-400/30"></span>
-                        Especificaciones Camisa
+                  {/* --- 5. ESPECIFICACIONES ZAPATO --- */}
+                  {tieneZapato && (
+                    <div className="animate-in slide-in-from-left duration-500">
+                      <h3 className="text-[9px] font-black text-blue-400/60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <span className="w-8 h-[1px] bg-blue-400/30"></span>
+                        Especificaciones Zapato
                       </h3>
-
-                      <div
-                        className="grid gap-4 sm:gap-6
-                        grid-cols-[repeat(auto-fit,minmax(220px,1fr))]"
-                      >
+                      <div className="grid gap-4 sm:gap-6 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
                         <Input
-                          label="Contorno Cuello"
+                          label="Talla"
                           type="number"
                           step="0.01"
-                          value={formData.camisa_cuello_med}
+                          value={formData.tallaZapato}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              camisa_cuello_med: e.target.value,
+                              tallaZapato: e.target.value,
                             })
                           }
                         />
                         <Input
-                          label="Largo Manga"
+                          label="Ancho Empeine"
                           type="number"
                           step="0.01"
-                          value={formData.camisa_manga_med}
+                          value={formData.anchoEmpeineZapato}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              camisa_manga_med: e.target.value,
+                              anchoEmpeineZapato: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          label="Largo Pie"
+                          type="number"
+                          step="0.01"
+                          value={formData.largoPieZapato}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              largoPieZapato: e.target.value,
                             })
                           }
                         />
@@ -2283,8 +5025,41 @@ const Ordenes = () => {
             </div>
 
             <div className="p-5 bg-black border-t border-gray-800 flex justify-end gap-3 shrink-0">
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleCopiarOrden}
+                  className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-gray-800 rounded-lg text-xs font-black uppercase tracking-wider transition-all"
+                  title="Copiar medidas y estilos de esta orden"
+                >
+                  <Copy size={16} />
+                  <span className="hidden sm:inline">Copiar</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePegarOrden}
+                  className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-gray-800 rounded-lg text-xs font-black uppercase tracking-wider transition-all"
+                  title="Pegar los datos copiados previamente"
+                >
+                  <ClipboardPaste size={16} />
+                  <span className="hidden sm:inline">Pegar</span>
+                </button>
+                <div className="w-[1px] h-full bg-gray-800 mx-1 hidden sm:block"></div>
+                <button
+                  type="button"
+                  onClick={handleLimpiarTodo}
+                  className="flex items-center gap-2 px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded-lg text-xs font-black uppercase transition-all"
+                >
+                  <Trash2 size={16} />{" "}
+                  <span className="hidden sm:inline">Limpiar Todo</span>
+                </button>
+              </div>
               <button
-                onClick={() => setShowForm(false)}
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingId(null); // Evita que se quede en "modo edición"
+                  setFormData(initialState); // Limpia todos los inputs
+                }}
                 className="px-6 py-3 border border-gray-800 rounded-lg text-gray-500 font-bold text-xs uppercase hover:text-white"
               >
                 Cancelar
@@ -2302,135 +5077,43 @@ const Ordenes = () => {
         </div>
       )}
 
-      {/* MODAL DE VISUALIZACIÓN DE ORDEN (SOLO LECTURA) */}
       {showViewModal && viewingOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+          {/* Fondo oscuro (Backdrop) */}
           <div
             className="absolute inset-0 bg-black/90 backdrop-blur-md animate-fadeIn"
-            onClick={() => setShowViewModal(false)}
+            onClick={() => {
+              setShowViewModal(false);
+              setViewingOrder(null);
+              setDetallesSaco(null);
+              setDetallesCamisa(null);
+              if (typeof setDetallesChaleco !== "undefined")
+                setDetallesChaleco(null);
+            }}
           ></div>
-          <div className="bg-[#09090b] border border-gray-800 w-full max-w-6xl max-h-[90vh] flex flex-col shadow-2xl rounded-xl overflow-hidden z-10 animate-slideUp">
+
+          {/* Contenedor Principal (Esqueleto idéntico al Formulario) */}
+          <div className="bg-[#09090b] w-full h-full flex flex-col shadow-2xl overflow-hidden z-10 animate-slideUp">
+            {/* HEADER FIJO */}
             <div className="p-5 bg-black border-b border-gray-800 flex justify-between items-center shrink-0">
-              <h2 className="text-sm font-black uppercase text-white flex items-center gap-2 tracking-widest">
-                <Eye size={16} /> Detalles de Orden #{viewingOrder.idOrden}
-              </h2>
-              <button
-                onClick={() => setShowViewModal(false)}
-                className="text-gray-500 hover:text-white transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-black/20">
-              <Section
-                title="Información General"
-                isOpen={true}
-                onToggle={() => {}}
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InputReadOnly
-                    label="Estatus"
-                    value={
-                      estatusList.find(
-                        (e) => e.idEstatus === viewingOrder.idEstatus,
-                      )?.descripcion
-                    }
-                  />
-                  <InputReadOnly
-                    label="Cliente"
-                    value={
-                      clientes.find(
-                        (c) => c.idCliente === viewingOrder.idCliente,
-                      )?.nombreCompleto
-                    }
-                  />
-                  <InputReadOnly
-                    label="Sucursal"
-                    value={
-                      sucursales.find(
-                        (s) => s.idSucursal === viewingOrder.idSucursal,
-                      )?.nombre
-                    }
-                  />
-                  <InputReadOnly
-                    label="Tipo de Traje"
-                    value={
-                      tiposTrajeList.find(
-                        (t) => t.idTipoTraje === viewingOrder.idTipoTraje,
-                      )?.descripcion
-                    }
-                  />
-                </div>
-              </Section>
-
-              <Section
-                title="Información Financiera"
-                isOpen={true}
-                onToggle={() => {}}
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InputReadOnly
-                    label="Costo Total"
-                    value={`$${parseFloat(viewingOrder.costoTotal || 0).toFixed(2)}`}
-                  />
-                  <InputReadOnly
-                    label="Monto Abonado"
-                    value={`$${parseFloat(viewingOrder.montoAbonado || 0).toFixed(2)}`}
-                  />
-                </div>
-                <div className="mt-4 p-4 bg-blue-900/10 border border-blue-500/20 rounded-lg">
-                  <p className="text-[10px] font-bold text-blue-500 uppercase">
-                    Saldo Pendiente
-                  </p>
-                  <p className="text-2xl font-mono text-white">
-                    $
-                    {(
-                      parseFloat(viewingOrder.costoTotal || 0) -
-                      parseFloat(viewingOrder.montoAbonado || 0)
-                    ).toFixed(2)}
-                  </p>
-                </div>
-              </Section>
-            </div>
-
-            <div className="p-5 bg-black border-t border-gray-800 flex justify-end gap-3 shrink-0">
-              <button
-                onClick={() => setShowViewModal(false)}
-                className="px-6 py-3 bg-white text-black rounded-lg font-bold text-xs uppercase hover:bg-gray-200"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* VISTA TÉCNICA DETALLADA */}
-      {showViewModal && viewingOrder && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
-          <div className="bg-[#121212] border border-gray-800 w-full max-w-6xl max-h-[95vh] overflow-y-auto rounded-xl shadow-2xl">
-            <div className="sticky top-0 bg-[#121212]/90 backdrop-blur-md border-b border-gray-800 p-6 flex justify-between items-center z-10">
-              <div>
-                <div className="flex items-center gap-4">
-                  <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-                    Orden #{viewingOrder.idOrden}
-                  </h2>
-                  <span className="px-3 py-1 bg-blue-900/30 text-blue-400 text-[10px] font-bold rounded-full border border-blue-800/50 uppercase">
-                    {
-                      tiposTrajeList.find(
-                        (t) => t.idTipoTraje === viewingOrder.idTipoTraje,
-                      )?.descripcion
-                    }
-                  </span>
-                </div>
-                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em] mt-1">
-                  Ficha Técnica de Confección |{" "}
+              <div className="flex items-center gap-4">
+                <h2 className="text-sm font-black uppercase text-white flex items-center gap-2 tracking-widest">
+                  <Eye size={16} /> Detalles de Orden #{viewingOrder.idOrden}
+                </h2>
+                <span className="hidden sm:inline-block px-2 py-0.5 bg-blue-900/30 text-blue-400 text-[9px] font-bold rounded-full border border-blue-800/50 uppercase">
                   {
-                    clientes.find((c) => c.idCliente === viewingOrder.idCliente)
-                      ?.nombreCompleto
+                    tiposTrajeList.find(
+                      (t) => t.idTipoTraje === viewingOrder.idTipoTraje,
+                    )?.descripcion
                   }
-                </p>
+                </span>
+                <span className="hidden sm:inline-block px-2 py-0.5 bg-gray-800/50 text-gray-300 text-[9px] font-bold rounded-full border border-gray-700 uppercase">
+                  {
+                    estatusList.find(
+                      (e) => e.idEstatus === viewingOrder.idEstatus,
+                    )?.descripcion
+                  }
+                </span>
               </div>
               <button
                 onClick={() => {
@@ -2438,302 +5121,1036 @@ const Ordenes = () => {
                   setViewingOrder(null);
                   setDetallesSaco(null);
                   setDetallesCamisa(null);
+                  if (typeof setDetallesChaleco !== "undefined")
+                    setDetallesChaleco(null);
                 }}
-                className="p-2 hover:bg-white/10 rounded-full transition-colors text-white"
+                className="text-gray-500 hover:text-white transition-colors"
               >
-                <X size={24} />
+                <X size={20} />
               </button>
             </div>
 
-            <div className="p-8 space-y-12">
-              {/* SECCIÓN 1: ESPECIFICACIONES DEL SACO */}
-              {detallesSaco && (
-                <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <div className="flex items-center gap-3 mb-6 border-l-4 border-white pl-4">
-                    <Scissors size={20} className="text-white" />
-                    <h3 className="text-white text-lg font-black uppercase tracking-widest">
-                      Detalle del Saco
-                    </h3>
+            {/* CUERPO DEL MODAL (Con Scroll) */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-black/20">
+              {/* --- INFORMACIÓN GENERAL --- */}
+              <Section
+                title="Información General"
+                isOpen={sectionsView.cliente}
+                onToggle={() => toggleSectionView("cliente")}
+                icon={Info}
+              >
+                <div className="flex flex-wrap gap-4 w-full">
+                  <div className="flex-1 min-w-[200px]">
+                    <InputReadOnly
+                      label="Estatus"
+                      value={
+                        estatusList.find(
+                          (e) => e.idEstatus === viewingOrder.idEstatus,
+                        )?.descripcion || "-"
+                      }
+                    />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="flex-1 min-w-[200px]">
                     <InputReadOnly
-                      label="Código Tela"
-                      value={detallesSaco.codigoTela}
+                      label="Cliente"
+                      value={
+                        clientes.find(
+                          (c) => c.idCliente === viewingOrder.idCliente,
+                        )?.nombreCompleto || "-"
+                      }
                     />
+                  </div>
+                  <div className="flex-1 min-w-[200px]">
                     <InputReadOnly
-                      label="Forro"
-                      value={detallesSaco.codigoForro}
+                      label="Sucursal"
+                      value={
+                        sucursales.find(
+                          (s) => s.idSucursal === viewingOrder.idSucursal,
+                        )?.nombre || "-"
+                      }
                     />
+                  </div>
+                  <div className="flex-1 min-w-[200px]">
                     <InputReadOnly
-                      label="Botonería (Código)"
-                      value={detallesSaco.codigoBoton}
+                      label="Tipo de Traje"
+                      value={
+                        tiposTrajeList.find(
+                          (t) => t.idTipoTraje === viewingOrder.idTipoTraje,
+                        )?.descripcion || "-"
+                      }
                     />
+                  </div>
+                  <div className="flex-1 min-w-[200px]">
                     <InputReadOnly
-                      label="Estilo Botones"
-                      value={detallesSaco.estiloBotones}
+                      label="Toma de Medidas"
+                      value={formatDateVisual(
+                        viewingOrder.fecha_cita ||
+                          viewingOrder.fechaCita ||
+                          formData.fecha_cita,
+                      )}
                     />
+                  </div>
+                  <div className="flex-1 min-w-[200px]">
                     <InputReadOnly
-                      label="Estilo Solapa"
-                      value={detallesSaco.estiloSolapa}
+                      label="Fecha de Entrega"
+                      value={formatDateVisual(
+                        viewingOrder.fecha_entrega ||
+                          viewingOrder.fechaEntrega ||
+                          formData.fecha_entrega,
+                      )}
                     />
+                  </div>
+                  <div className="flex-1 min-w-[200px]">
                     <InputReadOnly
-                      label="Tamaño Solapa"
-                      value={detallesSaco.tamanoSolapa}
+                      label="Fecha de Evento"
+                      value={formatDateVisual(
+                        viewingOrder.fecha_evento ||
+                          viewingOrder.fechaEvento ||
+                          formData.fecha_evento,
+                      )}
                     />
-                    <InputReadOnly
-                      label="Bolsillo Pecho"
-                      value={detallesSaco.estiloBolsilloPecho}
-                    />
-                    <InputReadOnly
-                      label="Bolsillo Inferior"
-                      value={detallesSaco.estiloBolsilloInf}
-                    />
-                    <InputReadOnly
-                      label="Bolsillo Ticket"
-                      value={detallesSaco.estiloBolsilloTicket}
-                    />
-                    <InputReadOnly
-                      label="Ojal"
-                      value={detallesSaco.estiloOjalIzquierdo}
-                    />
-                    <InputReadOnly
-                      label="Monograma"
-                      value={detallesSaco.monograma}
-                    />
-                    <div className="md:col-span-3">
+                  </div>
+                </div>
+              </Section>
+
+              {/* --- ESPECIFICACIONES DEL SACO --- */}
+              {(detallesSaco || tieneSaco) && (
+                <Section
+                  title="Especificaciones del Saco"
+                  isOpen={sectionsView.saco}
+                  onToggle={() => toggleSectionView("saco")}
+                  icon={Scissors}
+                >
+                  <div className="animate-in fade-in duration-500">
+                    <div className="grid gap-4 sm:gap-6 mb-8 grid-cols-[repeat(auto-fit,minmax(250px,1fr))]">
                       <InputReadOnly
-                        label="Observaciones de Saco"
-                        value={detallesSaco.observaciones}
+                        label="Numero de Producción"
+                        value={
+                          detallesSaco?.numeroProduccion ||
+                          formData.saco_numero_produccion ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Código Tela"
+                        value={
+                          detallesSaco?.codigoTela || formData.tela_saco || "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Código Forro"
+                        value={
+                          detallesSaco?.codigoForro ||
+                          formData.saco_forro_cod ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Código Botón"
+                        value={
+                          detallesSaco?.codigoBoton ||
+                          formData.saco_boton_cod ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Monograma (Iniciales)"
+                        value={
+                          detallesSaco?.monograma ||
+                          formData.saco_monograma ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Tamaño Solapa"
+                        value={
+                          detallesSaco?.tamanoSolapa ||
+                          formData.saco_tamano_solapa ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Estilo Solapa"
+                        value={
+                          detallesSaco?.estiloSolapa ||
+                          formData.saco_solapa ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Estilo Botones"
+                        value={
+                          detallesSaco?.estiloBotones ||
+                          formData.saco_botones ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Bolsillo Pecho"
+                        value={
+                          detallesSaco?.estiloBolsilloPecho ||
+                          formData.saco_b_pecho ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Bolsillo Inferior"
+                        value={
+                          detallesSaco?.estiloBolsilloInf ||
+                          formData.saco_b_inf ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Bolsillo Ticket"
+                        value={
+                          detallesSaco?.estiloBolsilloTicket ||
+                          formData.saco_b_ticket ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Ojal Izquierdo"
+                        value={
+                          detallesSaco?.estiloOjalIzquierdo ||
+                          formData.saco_ojalIzquierdo ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Ojal Derecho"
+                        value={
+                          detallesSaco?.estiloOjalDerecho ||
+                          formData.saco_ojalDerecho ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Precio Saco ($)"
+                        value={
+                          detallesSaco?.precio
+                            ? `$${detallesSaco.precio}`
+                            : formData.precio_saco
+                              ? `$${formData.precio_saco}`
+                              : "-"
+                        }
                       />
                     </div>
+                    {(detallesSaco?.observaciones || formData.obs_saco) && (
+                      <div className="grid gap-6 border-t border-gray-800 pt-8">
+                        <div className="col-span-full">
+                          <InputReadOnly
+                            label="Observaciones Saco"
+                            value={
+                              detallesSaco?.observaciones ||
+                              formData.obs_saco ||
+                              "-"
+                            }
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </section>
+                </Section>
               )}
 
-              {/* SECCIÓN 2: ESPECIFICACIONES DEL PANTALÓN */}
-              {viewingOrder.detallePantalon && (
-                <section className="border-t border-gray-800 pt-8">
-                  <div className="flex items-center gap-3 mb-6 border-l-4 border-gray-500 pl-4">
-                    <Ruler size={20} className="text-white" />
-                    <h3 className="text-white text-lg font-black uppercase tracking-widest">
-                      Detalle del Pantalón
-                    </h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <InputReadOnly
-                      label="Tela Pantalón"
-                      value={viewingOrder.detallePantalon.codigoTela}
-                    />
-                    <InputReadOnly
-                      label="Estilo Pretina"
-                      value={viewingOrder.detallePantalon.estiloPretina}
-                    />
-                    <InputReadOnly
-                      label="Ajuste Cintura"
-                      value={viewingOrder.detallePantalon.ajusteCintura}
-                    />
-                    <InputReadOnly
-                      label="Altura"
-                      value={viewingOrder.detallePantalon.alturaPretina}
-                    />
-                    <InputReadOnly
-                      label="Pliegues"
-                      value={viewingOrder.detallePantalon.estiloPliegues}
-                    />
-                    <InputReadOnly
-                      label="Bolsillo Reloj"
-                      value={viewingOrder.detallePantalon.estiloBolsilloReloj}
-                    />
-                    <InputReadOnly
-                      label="Bajos"
-                      value={viewingOrder.detallePantalon.estiloBajos}
-                    />
-                    <div className="md:col-span-2">
+              {/* --- ESPECIFICACIONES DEL CHALECO --- */}
+              {(detallesChaleco || tieneChaleco) && (
+                <Section
+                  title="Especificaciones del Chaleco"
+                  isOpen={sectionsView.chaleco}
+                  onToggle={() => toggleSectionView("chaleco")}
+                  icon={Layers}
+                >
+                  <div className="animate-in fade-in duration-500">
+                    <div className="grid gap-4 sm:gap-6 mb-8 grid-cols-[repeat(auto-fit,minmax(250px,1fr))]">
                       <InputReadOnly
-                        label="Observaciones Pantalón"
-                        value={viewingOrder.detallePantalon.observaciones}
+                        label="Numero de Producción"
+                        value={
+                          detallesChaleco?.numeroProduccion ||
+                          formData.chal_numero_produccion ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Código Tela"
+                        value={
+                          detallesChaleco?.codigoTela ||
+                          formData.chal_tela ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Código Botón"
+                        value={
+                          detallesChaleco?.codigoBoton ||
+                          formData.chal_boton ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Estilo Cuello"
+                        value={
+                          detallesChaleco?.estiloCuello ||
+                          formData.chal_cuello ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Estilo Botones"
+                        value={
+                          detallesChaleco?.estiloBotones ||
+                          formData.chal_botones ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Bolsillo Pecho"
+                        value={
+                          detallesChaleco?.estiloBolsilloPecho ||
+                          formData.chal_b_pecho ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Bolsillos Inferiores"
+                        value={
+                          detallesChaleco?.estiloBolsilloInf ||
+                          formData.chal_b_inf ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Terminación Inferior"
+                        value={
+                          detallesChaleco?.terminacionInf ||
+                          formData.chal_terminacion ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Precio Chaleco ($)"
+                        value={
+                          detallesChaleco?.precio
+                            ? `$${detallesChaleco.precio}`
+                            : formData.precio_chaleco
+                              ? `$${formData.precio_chaleco}`
+                              : "-"
+                        }
                       />
                     </div>
+                    {(detallesChaleco?.observaciones ||
+                      formData.obs_chaleco) && (
+                      <div className="grid gap-6 border-t border-gray-800 pt-8">
+                        <div className="col-span-full">
+                          <InputReadOnly
+                            label="Observaciones Chaleco"
+                            value={
+                              detallesChaleco?.observaciones ||
+                              formData.obs_chaleco ||
+                              "-"
+                            }
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </section>
+                </Section>
               )}
 
-              {/* SECCIÓN 3: CAMISA (Si aplica) */}
-              {detallesCamisa && (
-                <section className="border-t border-gray-800 pt-8">
-                  <div className="flex items-center gap-3 mb-6 border-l-4 border-yellow-600 pl-4">
-                    <Layers size={20} className="text-white" />
-                    <h3 className="text-white text-lg font-black uppercase tracking-widest">
-                      Detalle de Camisa
-                    </h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <InputReadOnly
-                      label="Opc. Camisa"
-                      value={detallesCamisa.opcionCamisa}
-                    />
-                    <InputReadOnly
-                      label="Tela"
-                      value={detallesCamisa.codigoTela}
-                    />
-                    <InputReadOnly
-                      label="Cuello"
-                      value={detallesCamisa.estiloCuello}
-                    />
-                    <InputReadOnly
-                      label="Puño"
-                      value={detallesCamisa.estiloPuno}
-                    />
-                    <InputReadOnly
-                      label="Tapeta"
-                      value={detallesCamisa.estiloTapeta}
-                    />
-                    <InputReadOnly
-                      label="Iniciales"
-                      value={detallesCamisa.iniciales}
-                    />
-                    <div className="md:col-span-3">
+              {/* --- ESPECIFICACIONES DE LA CAMISA --- */}
+              {(detallesCamisa || tieneCamisa) && (
+                <Section
+                  title="Detalles de la Camisa"
+                  isOpen={sectionsView.camisa}
+                  onToggle={() => toggleSectionView("camisa")}
+                  icon={Scissors}
+                >
+                  <div className="animate-in fade-in duration-500">
+                    <div className="grid gap-4 sm:gap-6 mb-8 grid-cols-[repeat(auto-fit,minmax(250px,1fr))]">
                       <InputReadOnly
-                        label="Observaciones Camisa"
-                        value={detallesCamisa.observaciones}
+                        label="Numero de Producción"
+                        value={
+                          detallesCamisa?.numeroProduccion ||
+                          formData.camisa_numero_produccion ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Opción Camisa"
+                        value={
+                          detallesCamisa?.opcionCamisa ||
+                          formData.opcion_camisa ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Código Tela"
+                        value={
+                          detallesCamisa?.codigoTela ||
+                          formData.camisa_tela ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Tela Contraste"
+                        value={
+                          detallesCamisa?.contrasteTela ||
+                          formData.camisa_contraste ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Posición Contraste"
+                        value={
+                          detallesCamisa?.posicionContraste ||
+                          formData.camisa_pos_contraste ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Iniciales"
+                        value={
+                          detallesCamisa?.iniciales ||
+                          formData.camisa_iniciales ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Estilo Cuello"
+                        value={
+                          detallesCamisa?.estiloCuello ||
+                          formData.camisa_cuello ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Estilo Puño"
+                        value={
+                          detallesCamisa?.estiloPuno ||
+                          formData.camisa_puno ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Estilo Tapeta"
+                        value={
+                          detallesCamisa?.estiloTapeta ||
+                          formData.camisa_tapeta ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Estilo Bolsillo"
+                        value={
+                          detallesCamisa?.estiloBolsillo ||
+                          formData.camisa_bolsillo ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Solapa Bolsillo"
+                        value={
+                          detallesCamisa?.solapaBolsillo ||
+                          formData.camisa_solapa_bolsillo ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Pliegues Frontales"
+                        value={
+                          detallesCamisa?.plieguesFrontales ||
+                          formData.camisa_pliegues ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Precio Camisa ($)"
+                        value={
+                          detallesCamisa?.precio
+                            ? `$${detallesCamisa.precio}`
+                            : formData.precio_camisa
+                              ? `$${formData.precio_camisa}`
+                              : "-"
+                        }
                       />
                     </div>
+                    {(detallesCamisa?.observaciones || formData.camisa_obs) && (
+                      <div className="grid gap-6 border-t border-gray-800 pt-8">
+                        <div className="col-span-full">
+                          <InputReadOnly
+                            label="Observaciones Camisa"
+                            value={
+                              detallesCamisa?.observaciones ||
+                              formData.camisa_obs ||
+                              "-"
+                            }
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </section>
+                </Section>
               )}
 
-              <section className="border-t border-gray-800 pt-8">
-                <h3 className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-6">
-                  Cuadro de Medidas Finales
-                </h3>
-                <div className="bg-black border border-gray-800 rounded-lg p-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-500 uppercase">
-                      Hombros
-                    </span>
-                    <span className="text-white font-bold">
-                      {viewingOrder.medidas?.sacoHombros || "--"}
-                    </span>
+              {/* --- ESPECIFICACIONES DEL PANTALÓN --- */}
+              {(detallesPantalon || tienePantalon) && (
+                <Section
+                  title="Especificaciones del Pantalón"
+                  isOpen={sectionsView.pantalon}
+                  onToggle={() => toggleSectionView("pantalon")}
+                  icon={Scissors}
+                >
+                  <div className="animate-in fade-in duration-500">
+                    <div className="grid gap-4 sm:gap-6 mb-8 grid-cols-[repeat(auto-fit,minmax(250px,1fr))]">
+                      <InputReadOnly
+                        label="Numero de Producción"
+                        value={
+                          detallesPantalon?.numeroProduccion ||
+                          formData.pant_numero_produccion ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Código Tela"
+                        value={
+                          detallesPantalon?.codigoTela ||
+                          formData.tela_pantalon ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Código Botón"
+                        value={
+                          detallesPantalon?.codigoBoton ||
+                          formData.pant_boton ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Ajuste Cintura"
+                        value={
+                          detallesPantalon?.ajusteCintura ||
+                          formData.pant_ajuste ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Altura Pretina"
+                        value={
+                          detallesPantalon?.alturaPretina ||
+                          formData.pant_altura ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Estilo Pretina"
+                        value={
+                          detallesPantalon?.estiloPretina ||
+                          formData.pant_pretina ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Pliegues"
+                        value={
+                          detallesPantalon?.estiloPliegues ||
+                          formData.pant_pliegues ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Bolsillo Reloj"
+                        value={
+                          detallesPantalon?.estiloBolsilloReloj ||
+                          formData.pant_bolsillo_reloj ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Estilo Bajos"
+                        value={
+                          detallesPantalon?.estiloBajos ||
+                          formData.pant_bajos ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Precio Pantalón ($)"
+                        value={
+                          detallesPantalon?.precio
+                            ? `$${detallesPantalon.precio}`
+                            : formData.precio_pantalon
+                              ? `$${formData.precio_pantalon}`
+                              : "-"
+                        }
+                      />
+                    </div>
+                    {(detallesPantalon?.observaciones ||
+                      formData.obs_pantalon) && (
+                      <div className="grid gap-6 border-t border-gray-800 pt-8">
+                        <div className="col-span-full">
+                          <InputReadOnly
+                            label="Observaciones Pantalón"
+                            value={
+                              detallesPantalon?.observaciones ||
+                              formData.obs_pantalon ||
+                              "-"
+                            }
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-500 uppercase">
-                      Pecho
-                    </span>
-                    <span className="text-white font-bold">
-                      {viewingOrder.medidas?.sacoPecho || "--"}
-                    </span>
+                </Section>
+              )}
+
+              {(detallesZapato || tieneZapato) && (
+                <Section
+                  title="Especificaciones del Zapato"
+                  isOpen={sectionsView.zapato}
+                  onToggle={() => toggleSectionView("zapato")}
+                  icon={Scissors}
+                >
+                  <div className="animate-in fade-in duration-500">
+                    <div className="grid gap-4 sm:gap-6 mb-8 grid-cols-[repeat(auto-fit,minmax(250px,1fr))]">
+                      <InputReadOnly
+                        label="Numero de Producción"
+                        value={
+                          detallesZapato?.numeroProduccion ||
+                          formData.zapato_numero_produccion ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Estilo de Zapato"
+                        value={
+                          detallesZapato?.zapato_estilo ||
+                          formData.zapato_estilo ||
+                          "-"
+                        }
+                      />
+                      <InputReadOnly
+                        label="Precio Zapato ($)"
+                        value={
+                          detallesZapato?.precio_zapato
+                            ? `$${detallesZapato.precio_zapato}`
+                            : formData.precio_zapato
+                              ? `$${formData.precio_zapato}`
+                              : "-"
+                        }
+                      />
+                    </div>
+                    {(detallesZapato?.observaciones || formData.obs_zapato) && (
+                      <div className="grid gap-6 border-t border-gray-800 pt-8">
+                        <div className="col-span-full">
+                          <InputReadOnly
+                            label="Observaciones Zapato"
+                            value={
+                              detallesZapato?.observaciones ||
+                              formData.obs_zapato ||
+                              "-"
+                            }
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-500 uppercase">
-                      Estómago
-                    </span>
-                    <span className="text-white font-bold">
-                      {viewingOrder.medidas?.sacoEstomago || "--"}
-                    </span>
+                </Section>
+              )}
+
+              {/* --- LIBRO DE MEDIDAS TÉCNICAS --- */}
+              <Section
+                title="Libro de Medidas Técnicas"
+                isOpen={sectionsView.medidas}
+                onToggle={() => toggleSectionView("medidas")}
+                icon={Ruler}
+              >
+                <div className="space-y-10 animate-in fade-in duration-700">
+                  {/* CUERPO Y CALZADO */}
+                  <div>
+                    <h3 className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                      <span className="w-8 h-[1px] bg-white/20"></span>
+                      Cuerpo
+                    </h3>
+                    <div className="grid gap-4 sm:gap-6 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
+                      <InputReadOnly
+                        label="Altura (cm)"
+                        value={formData.altura}
+                      />
+                      <InputReadOnly label="Peso (kg)" value={formData.peso} />
+                      <InputReadOnly label="Tipo de Fit" value={formData.fit} />
+                    </div>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-500 uppercase">
-                      Largo Frente
-                    </span>
-                    <span className="text-white font-bold">
-                      {viewingOrder.medidas?.sacoLargoFrente || "--"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-500 uppercase">
-                      Manga Izq.
-                    </span>
-                    <span className="text-white font-bold">
-                      {viewingOrder.medidas?.sacoMangaIzq || "--"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-500 uppercase">
-                      Manga Der.
-                    </span>
-                    <span className="text-white font-bold">
-                      {viewingOrder.medidas?.sacoMangaDer || "--"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-500 uppercase">
-                      Pant. Cintura
-                    </span>
-                    <span className="text-white font-bold">
-                      {viewingOrder.medidas?.pantCintura || "--"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-500 uppercase">
-                      Pant. Cadera
-                    </span>
-                    <span className="text-white font-bold">
-                      {viewingOrder.medidas?.pantCadera || "--"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-500 uppercase">
-                      Largo Pant.
-                    </span>
-                    <span className="text-white font-bold">
-                      {viewingOrder.medidas?.pantLargoIzq || "--"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-500 uppercase">
-                      Camisa Cuello
-                    </span>
-                    <span className="text-white font-bold">
-                      {viewingOrder.medidas?.camisaCuello || "--"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-500 uppercase">
-                      Camisa Manga
-                    </span>
-                    <span className="text-white font-bold">
-                      {viewingOrder.medidas?.camisaManga || "--"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-500 uppercase">
-                      Fit
-                    </span>
-                    <span className="text-white font-bold">
-                      {viewingOrder.medidas?.tipoFit || "--"}
-                    </span>
+
+                  {(detallesSaco || tieneSaco) && (
+                    <div className="animate-in slide-in-from-left duration-500">
+                      <h3 className="text-[9px] font-black text-blue-400/60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <span className="w-8 h-[1px] bg-blue-400/30"></span>
+                        Especificaciones Saco
+                      </h3>
+                      <div className="grid gap-4 sm:gap-6 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
+                        <InputReadOnly
+                          label="Collar"
+                          value={formData.collarSaco}
+                        />
+                        <InputReadOnly
+                          label="Largo Frente"
+                          value={formData.longitudFrontalSaco}
+                        />
+                        <InputReadOnly
+                          label="Largo Espalda"
+                          value={formData.longitudEspaldaSaco}
+                        />
+                        <InputReadOnly
+                          label="Hombros"
+                          value={formData.hombrosSaco}
+                        />
+                        <InputReadOnly
+                          label="Pecho total"
+                          value={formData.pechoSaco}
+                        />
+                        <InputReadOnly
+                          label="Estómago"
+                          value={formData.estomagoSaco}
+                        />
+                        <InputReadOnly
+                          label="Barriga"
+                          value={formData.vientreSaco}
+                        />
+                        <InputReadOnly
+                          label="Caderas"
+                          value={formData.caderasSaco}
+                        />
+                        <InputReadOnly
+                          label="Manga Izq"
+                          value={formData.longitudMangaISaco}
+                        />
+                        <InputReadOnly
+                          label="Manga Der"
+                          value={formData.longitudMangaDSaco}
+                        />
+                        <InputReadOnly
+                          label="Bíceps"
+                          value={formData.bicepsSaco}
+                        />
+                        <InputReadOnly
+                          label="Antebrazo"
+                          value={formData.anteBrazoSaco}
+                        />
+                        <InputReadOnly
+                          label="Muñeca"
+                          value={formData.muñecaSaco}
+                        />
+                        <InputReadOnly
+                          label="Frente Hombro"
+                          value={formData.hombroDelanteroSaco}
+                        />
+                        <InputReadOnly
+                          label="Espalda Ancha"
+                          value={formData.anchoTraseroSaco}
+                        />
+                        <InputReadOnly
+                          label="Hombro - Estómago Posterior"
+                          value={formData.nucaCinturaSaco}
+                        />
+                        <InputReadOnly
+                          label="Hombro - Estómago Frente"
+                          value={formData.longitudCinturaDelanteraSaco}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {(detallesChaleco || tieneChaleco) && (
+                    <div className="animate-in slide-in-from-left duration-500">
+                      <h3 className="text-[9px] font-black text-purple-400/60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <span className="w-8 h-[1px] bg-purple-400/30"></span>
+                        Especificaciones Chaleco
+                      </h3>
+                      <div className="grid gap-4 sm:gap-6 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
+                        <InputReadOnly
+                          label="Collar"
+                          value={formData.collarChaleco}
+                        />
+                        <InputReadOnly
+                          label="Largo Frente"
+                          value={formData.longitudFrontalChaleco}
+                        />
+                        <InputReadOnly
+                          label="Largo Espalda"
+                          value={formData.longitudEspaldaChaleco}
+                        />
+                        <InputReadOnly
+                          label="Pecho total"
+                          value={formData.pechoChaleco}
+                        />
+                        <InputReadOnly
+                          label="Estómago"
+                          value={formData.estomagoChaleco}
+                        />
+                        <InputReadOnly
+                          label="Caderas"
+                          value={formData.caderasChaleco}
+                        />
+                        <InputReadOnly
+                          label="Hombro - Estómago Frente"
+                          value={formData.longitudCinturaDChaleco}
+                        />
+                        <InputReadOnly
+                          label="Hombro - Estómago Posterior"
+                          value={formData.nucaCinturaChaleco}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {(detallesCamisa || tieneCamisa) && (
+                    <div className="animate-in slide-in-from-left duration-500">
+                      <h3 className="text-[9px] font-black text-green-400/60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <span className="w-8 h-[1px] bg-green-400/30"></span>
+                        Especificaciones Camisa
+                      </h3>
+                      <div className="grid gap-4 sm:gap-6 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
+                        <InputReadOnly
+                          label="Collar"
+                          value={formData.collarCamisa}
+                        />
+                        <InputReadOnly
+                          label="Largo Frente"
+                          value={formData.longitudFrontalCamisa}
+                        />
+                        <InputReadOnly
+                          label="Largo Espalda"
+                          value={formData.longitudEspaldaCamisa}
+                        />
+                        <InputReadOnly
+                          label="Hombros"
+                          value={formData.hombrosCamisa}
+                        />
+                        <InputReadOnly
+                          label="Pecho total"
+                          value={formData.pechoCamisa}
+                        />
+                        <InputReadOnly
+                          label="Estómago"
+                          value={formData.estomagoCamisa}
+                        />
+                        <InputReadOnly
+                          label="Barriga"
+                          value={formData.vientreCamisa}
+                        />
+                        <InputReadOnly
+                          label="Caderas"
+                          value={formData.caderasCamisa}
+                        />
+                        <InputReadOnly
+                          label="Manga Izq"
+                          value={formData.longitudMangaICamisa}
+                        />
+                        <InputReadOnly
+                          label="Manga Der"
+                          value={formData.longitudMangaDCamisa}
+                        />
+                        <InputReadOnly
+                          label="Bíceps"
+                          value={formData.bicepsCamisa}
+                        />
+                        <InputReadOnly
+                          label="Antebrazo"
+                          value={formData.anteBrazoCamisa}
+                        />
+                        <InputReadOnly
+                          label="Muñeca"
+                          value={formData.muñecaCamisa}
+                        />
+                        <InputReadOnly
+                          label="Frente Hombro"
+                          value={formData.hombroDelanteroCamisa}
+                        />
+                        <InputReadOnly
+                          label="Espalda Ancha"
+                          value={formData.anchoTraseroCamisa}
+                        />
+                        <InputReadOnly
+                          label="Hombro - Estómago Posterior"
+                          value={formData.nucaCinturaCamisa}
+                        />
+                        <InputReadOnly
+                          label="Hombro - Estómago Delantero"
+                          value={formData.longitudCinturaDelanteraCamisa}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {(detallesPantalon || tienePantalon) && (
+                    <div className="animate-in slide-in-from-left duration-500">
+                      <h3 className="text-[9px] font-black text-amber-400/60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <span className="w-8 h-[1px] bg-amber-400/30"></span>
+                        Especificaciones Pantalón
+                      </h3>
+                      <div className="grid gap-4 sm:gap-6 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
+                        <InputReadOnly
+                          label="Largo Izq"
+                          value={formData.longitudIPantalon}
+                        />
+                        <InputReadOnly
+                          label="Largo Der"
+                          value={formData.longitudDPantalon}
+                        />
+                        <InputReadOnly
+                          label="Cintura"
+                          value={formData.cinturaPantalon}
+                        />
+                        <InputReadOnly
+                          label="Cadera"
+                          value={formData.caderaPantalon}
+                        />
+                        <InputReadOnly
+                          label="Muslo"
+                          value={formData.musloPantalon}
+                        />
+                        <InputReadOnly
+                          label="Rodilla"
+                          value={formData.rodillaPantalon}
+                        />
+                        <InputReadOnly
+                          label="Pantorrilla"
+                          value={formData.alTerrillaPantalon}
+                        />
+                        <InputReadOnly
+                          label="Brazalete (Bajos)"
+                          value={formData.brazaletePantalon}
+                        />
+                        <InputReadOnly
+                          label="Entrepierna (Tiro)"
+                          value={formData.entrepiernaPantalon}
+                        />
+                        <InputReadOnly
+                          label="Altura Cint. Tras."
+                          value={formData.alturaCinturaTPantalon}
+                        />
+                        <InputReadOnly
+                          label="Altura Cint. Del."
+                          value={formData.alturaCinturaDPantalon}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {(detallesZapato || tieneZapato) && (
+                    <div className="animate-in slide-in-from-left duration-500">
+                      <h3 className="text-[9px] font-black text-amber-400/60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <span className="w-8 h-[1px] bg-amber-400/30"></span>
+                        Especificaciones Zapato
+                      </h3>
+                      <div className="grid gap-4 sm:gap-6 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
+                        <InputReadOnly
+                          label="Talla Zapato"
+                          value={formData.tallaZapato}
+                        />
+                        <InputReadOnly
+                          label="Ancho Empeine"
+                          value={formData.anchoEmpeineZapato}
+                        />
+                        <InputReadOnly
+                          label="Largo Pie"
+                          value={formData.largoPieZapato}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Section>
+
+              {/* --- RESUMEN FINANCIERO --- */}
+              <Section
+                title="Resumen Financiero"
+                isOpen={sectionsView.finanzas}
+                onToggle={() => toggleSectionView("finanzas")}
+                icon={DollarSign}
+              >
+                <div className="bg-white/[0.02] p-5 rounded-xl border border-gray-800">
+                  <div className="grid gap-4 sm:gap-6 grid-cols-[repeat(auto-fit,minmax(240px,1fr))]">
+                    <InputReadOnly
+                      label="Costo Total de la Orden"
+                      value={`$${parseFloat(viewingOrder.costoTotal || 0).toFixed(2)}`}
+                    />
+                    <InputReadOnly
+                      label="Monto Abonado"
+                      value={`$${parseFloat(viewingOrder.montoAbonado || 0).toFixed(2)}`}
+                    />
+                    <InputReadOnly
+                      label="Método de Pago"
+                      value={
+                        viewingOrder.metodo_pago ||
+                        viewingOrder.metodoPago ||
+                        formData.metodo_pago ||
+                        "-"
+                      }
+                    />
+
+                    <div className="col-span-full mt-2 p-5 bg-blue-900/10 border border-blue-500/20 rounded-xl flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                      <div>
+                        <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest">
+                          Saldo Restante
+                        </p>
+                        <p className="text-3xl font-mono text-white mt-1">
+                          $
+                          {(
+                            parseFloat(viewingOrder.costoTotal || 0) -
+                            parseFloat(viewingOrder.montoAbonado || 0)
+                          ).toFixed(2)}
+                        </p>
+                      </div>
+
+                      <div className="sm:text-right">
+                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                          Estado de Pago
+                        </p>
+                        <span
+                          className={`inline-block mt-1 text-[11px] px-3 py-1.5 rounded-full font-bold tracking-wide ${
+                            parseFloat(viewingOrder.montoAbonado || 0) >=
+                              parseFloat(viewingOrder.costoTotal || 0) &&
+                            parseFloat(viewingOrder.costoTotal || 0) > 0
+                              ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                              : "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                          }`}
+                        >
+                          {parseFloat(viewingOrder.montoAbonado || 0) >=
+                            parseFloat(viewingOrder.costoTotal || 0) &&
+                          parseFloat(viewingOrder.costoTotal || 0) > 0
+                            ? "LIQUIDADO"
+                            : "PENDIENTE"}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </section>
-              <section className="bg-white/5 rounded-xl p-8 flex flex-wrap justify-between items-center gap-6">
-                <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">
-                    Costo Total
-                  </span>
-                  <span className="text-3xl font-black text-white">
-                    ${viewingOrder.costoTotal}
-                  </span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">
-                    Monto Abonado
-                  </span>
-                  <span className="text-3xl font-black text-green-500">
-                    ${viewingOrder.montoAbonado}
-                  </span>
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">
-                    Saldo Pendiente
-                  </span>
-                  <span className="text-3xl font-black text-red-500">
-                    $
-                    {(
-                      viewingOrder.costoTotal - viewingOrder.montoAbonado
-                    ).toFixed(2)}
-                  </span>
-                </div>
-              </section>
+              </Section>
+            </div>
+
+            {/* FOOTER FIJO */}
+            <div className="p-5 bg-black border-t border-gray-800 flex justify-end gap-3 shrink-0">
+              <button
+                onClick={() => {
+                  setShowViewModal(false);
+                  setViewingOrder(null);
+                  // Limpiar estados secundarios
+                  setDetallesSaco(null);
+                  setDetallesCamisa(null);
+                  if (typeof setDetallesChaleco !== "undefined")
+                    setDetallesChaleco(null);
+                  if (typeof setDetallesPantalon !== "undefined")
+                    setDetallesPantalon(null);
+                  // NUEVO: Purgar los datos principales
+                  setFormData(initialState);
+                }}
+                className="px-8 py-3 bg-white text-black rounded-lg font-black text-xs uppercase shadow-lg hover:bg-gray-200 transition-colors"
+              >
+                Cerrar Visor
+              </button>
             </div>
           </div>
         </div>

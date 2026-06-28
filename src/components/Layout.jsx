@@ -15,7 +15,13 @@ const Layout = () => {
   const menuSections = [
     {
       title: "Principal",
+      requiresAdmin: true, // <--- ¡Solo agrega esta línea aquí!
       items: [{ name: "Dashboard", to: "/" }],
+    },
+    {
+      title: "Finanzas",
+      requiresAdmin: true,
+      items: [{ name: "Costo Beneficio", to: "/finanzas" }],
     },
     {
       title: "Operación",
