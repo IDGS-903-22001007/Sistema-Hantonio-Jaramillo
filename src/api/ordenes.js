@@ -31,6 +31,15 @@ export const ordenesService = {
   /**
    * CREAR COMPLETA: Registra Orden + Detalles + Medidas en una sola petición.
    */
+  // Reemplaza tu método actualizar por este:
+  actualizarCompleta: async (id, datosOrdenMaster) => {
+    const response = await apiClient.put(
+      `/Orden/actualizar-completa/${id}`,
+      datosOrdenMaster,
+    );
+    return response.data;
+  },
+
   crearCompleta: async (datosOrdenMaster) => {
     const response = await apiClient.post(
       "/Orden/crear-completa",
@@ -42,10 +51,6 @@ export const ordenesService = {
   /**
    * Actualiza una orden existente.
    */
-  actualizar: async (id, datosOrden) => {
-    const response = await apiClient.put(`/Orden/${id}`, datosOrden);
-    return response.data;
-  },
 
   /**
    * Elimina una orden (Solo Admin).

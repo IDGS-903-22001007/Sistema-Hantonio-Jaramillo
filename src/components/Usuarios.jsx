@@ -3,6 +3,7 @@ import { usuariosService } from "../api/usuarios";
 import { rolesService } from "../api/roles";
 import { sucursalesService } from "../api/sucursales";
 import Alert from "../components/Alert";
+import { Eye, EyeOff, Edit, UserX, UserCheck } from "lucide-react";
 
 const Usuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -26,15 +27,28 @@ const Usuarios = () => {
   const [isReadOnly, setIsReadOnly] = useState(false); // Nuevo estado para observar
   const [alert, setAlert] = useState({ type: "", message: "" });
   const [editingUsuario, setEditingUsuario] = useState(null);
-
+  const [showPassword, setShowPassword] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
-  const usuariosFiltrados = usuarios.filter(
-    (u) =>
+  const [filtroEstatus, setFiltroEstatus] = useState("");
+  const usuariosFiltrados = usuarios.filter((u) => {
+    // 1. Condición de búsqueda por texto
+    const coincideTexto =
       u.nombreCompleto?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.nombreUsuario?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email?.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+      u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      false;
+
+    // 2. Condición de filtro por estatus booleano
+    let coincideEstatus = true;
+    if (filtroEstatus === "activo") {
+      coincideEstatus = u.estatus === true;
+    } else if (filtroEstatus === "inactivo") {
+      coincideEstatus = u.estatus === false;
+    }
+
+    // 3. Ambas condiciones deben cumplirse
+    return coincideTexto && coincideEstatus;
+  });
 
   useEffect(() => {
     fetchData();
@@ -164,7 +178,7 @@ const Usuarios = () => {
   };
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="p-6 lg:p-8 max-w-[1600px] mx-auto min-h-screen text-gray-200">
       <Alert
         type={alert.type}
         message={alert.message}
@@ -188,6 +202,15 @@ const Usuarios = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="px-5 py-2 bg-black text-white rounded-lg border border-gray-800 focus:border-white transition-all text-sm outline-none w-64"
           />
+          <select
+            value={filtroEstatus}
+            onChange={(e) => setFiltroEstatus(e.target.value)}
+            className="px-5 py-2 bg-black text-white rounded-lg border border-gray-800 focus:border-white transition-all text-sm outline-none w-64"
+          >
+            <option value="">Filtrar por estatus...</option>
+            <option value="activo">Activos</option>
+            <option value="inactivo">Inactivos</option>
+          </select>
           <button
             onClick={() => {
               resetForm();
@@ -214,7 +237,7 @@ const Usuarios = () => {
           </div>
         ) : usuariosFiltrados.length === 0 ? (
           <div className="p-16 text-center text-gray-500">
-            <p className="text-lg font-bold">No se encontraron usuarios</p>
+            <p className="text-lg font-bold">Sin resultados</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -223,7 +246,7 @@ const Usuarios = () => {
                 <tr className="border-b border-gray-800 bg-black/50 text-gray-500 text-xs uppercase font-bold tracking-widest">
                   <th className="p-4">Usuario</th>
                   <th className="p-4">Login</th>
-                  <th className="p-4 hidden md:table-cell">Rol</th>
+                  <th className="p-4 md:table-cell">Rol</th>
                   <th className="p-4 hidden lg:table-cell">Sucursal</th>
                   <th className="p-4">Estatus</th>
                   <th className="p-4 text-right">Acciones</th>
@@ -252,14 +275,21 @@ const Usuarios = () => {
                         @{u.nombreUsuario}
                       </span>
                     </td>
-                    <td className="p-4 hidden md:table-cell">
+                    {/* COLUMNA DE ROL CORREGIDA */}
+                    <td className="p-4 md:table-cell">
                       <span className="text-sm text-gray-300 font-medium">
-                        {u.rol?.nombre || "Sin Rol"}
+                        {u.rol?.nombre ||
+                          roles.find((r) => r.idRol === u.idRol)?.nombre ||
+                          "Sin Rol"}
                       </span>
                     </td>
+                    {/* COLUMNA DE SUCURSAL CORREGIDA */}
                     <td className="p-4 hidden lg:table-cell">
                       <span className="text-sm text-gray-500 italic">
-                        {u.sucursal?.nombre || "No definida"}
+                        {u.sucursal?.nombre ||
+                          sucursales.find((s) => s.idSucursal === u.idSucursal)
+                            ?.nombre ||
+                          "No definida"}
                       </span>
                     </td>
                     <td className="p-4">
@@ -280,23 +310,33 @@ const Usuarios = () => {
                           className="text-gray-400 hover:text-white transition-colors"
                           title="Observar"
                         >
-                          👁️
+                          <Eye size={18} strokeWidth={2.5} />
                         </button>
                         <button
                           onClick={() => openEditForm(u)}
                           className="text-gray-400 hover:text-white transition-colors"
                           title="Editar"
                         >
-                          ✏️
+                          <Edit size={18} strokeWidth={2.5} />
                         </button>
                         <button
                           onClick={() =>
                             handleToggleActivo(u.idUsuario, u.estatus)
                           }
-                          className="text-gray-400 hover:text-white transition-colors"
-                          title={u.estatus ? "Desactivar" : "Activar"}
+                          title={
+                            u.estatus ? "Desactivar Usuario" : "Activar Usuario"
+                          }
+                          className={`transition-all p-2 rounded-md ${
+                            u.estatus
+                              ? "text-gray-400 hover:text-red-400 hover:bg-red-400/10"
+                              : "text-gray-400 hover:text-emerald-400 hover:bg-emerald-400/10"
+                          }`}
                         >
-                          {u.estatus ? "🚫" : "✅"}
+                          {u.estatus ? (
+                            <UserX size={18} strokeWidth={2.5} />
+                          ) : (
+                            <UserCheck size={18} strokeWidth={2.5} />
+                          )}
                         </button>
                       </div>
                     </td>
@@ -381,23 +421,42 @@ const Usuarios = () => {
                   <label className="text-[10px] font-black text-gray-500 uppercase mb-2 block tracking-widest">
                     {editingUsuario ? "Nueva Contraseña" : "Contraseña *"}
                   </label>
-                  <input
-                    type="password"
-                    value={formData.password}
-                    readOnly={isReadOnly}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                    className={`w-full bg-black border border-gray-800 p-3 rounded-lg text-white outline-none focus:border-white transition-all ${isReadOnly ? "opacity-60 cursor-default" : "placeholder-gray-600"}`}
-                    placeholder={
-                      isReadOnly
-                        ? ""
-                        : editingUsuario
-                          ? "Opcional"
-                          : "Mín. 6 caracteres"
-                    }
-                    required={!editingUsuario && !isReadOnly}
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      readOnly={isReadOnly}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
+                      // Se agregó pr-10 para que el texto no se encime con el icono
+                      className={`w-full bg-black border border-gray-800 p-3 pr-10 rounded-lg text-white outline-none focus:border-white transition-all ${isReadOnly ? "opacity-60 cursor-default" : "placeholder-gray-600"}`}
+                      placeholder={
+                        isReadOnly
+                          ? ""
+                          : editingUsuario
+                            ? "Opcional"
+                            : "Mín. 6 caracteres"
+                      }
+                      required={!editingUsuario && !isReadOnly}
+                    />
+
+                    {/* Botón del ojito (solo se muestra si NO está en modo lectura) */}
+                    {!isReadOnly && (
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 inset-y-0 flex items-center justify-center text-gray-500 hover:text-white transition-colors"
+                        tabIndex="-1"
+                      >
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 

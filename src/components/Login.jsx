@@ -23,8 +23,27 @@ const Login = () => {
     setError("");
 
     try {
+      // Esperamos a que la función del contexto haga todo el proceso (llamar a la API y guardar en localStorage)
       await loginUser(login, password);
-      navigate("/");
+
+      // Una vez que terminó, leemos el usuario guardado para saber su rol
+      const storedUser = localStorage.getItem("user");
+
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+
+        // Comprobamos el rol. (Ajusta la validación según cómo venga tu JSON: "Administrador", "Admin", etc.)
+        const rol = userData.rol || userData.nombreRol || "";
+
+        if (rol.toLowerCase().includes("admin")) {
+          navigate("/"); // El admin va al Dashboard
+        } else {
+          navigate("/clientes"); // El empleado va a Clientes
+        }
+      } else {
+        // Fallback por si acaso
+        navigate("/");
+      }
     } catch (err) {
       console.error("Error capturado:", err);
       setError("No se pudo iniciar sesión. Verifique sus datos.");
@@ -35,6 +54,7 @@ const Login = () => {
 
   return (
     <>
+      {/* ... (Toda tu estructura de estilos y JSX se queda exactamente igual) ... */}
       <style>
         {`
           input[type="password"]::-ms-reveal,

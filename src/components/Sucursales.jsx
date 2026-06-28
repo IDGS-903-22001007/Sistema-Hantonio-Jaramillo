@@ -2,6 +2,14 @@ import React, { useState, useEffect } from "react";
 import { sucursalesService } from "../api/sucursales";
 import { usuariosService } from "../api/usuarios";
 import { rolesService } from "../api/roles";
+import {
+  Eye,
+  Edit,
+  XCircle,
+  CheckCircle,
+  Shield,
+  Building,
+} from "lucide-react";
 import Alert from "../components/Alert";
 
 const Sucursales = () => {
@@ -26,7 +34,7 @@ const Sucursales = () => {
   const [alert, setAlert] = useState({ type: "", message: "" });
 
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [filtroEstatus, setFiltroEstatus] = useState("");
   // Helper para obtener nombre
   const getNombreEncargado = (id) => {
     if (!id) return null;
@@ -35,11 +43,23 @@ const Sucursales = () => {
   };
 
   const sucursalesFiltradas = sucursales.filter((s) => {
+    // 1. Condición de búsqueda por texto
     const nombreEncargado = getNombreEncargado(s.idUsuario) || "";
-    return (
+    const coincideTexto =
       s.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      nombreEncargado.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+      nombreEncargado.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      false;
+
+    // 2. Condición de filtro por estatus booleano
+    let coincideEstatus = true;
+    if (filtroEstatus === "activo") {
+      coincideEstatus = s.estatus === true;
+    } else if (filtroEstatus === "inactivo") {
+      coincideEstatus = s.estatus === false;
+    }
+
+    // 3. Ambas condiciones deben cumplirse
+    return coincideTexto && coincideEstatus;
   });
 
   const encargadosDisponibles = usuarios.filter((u) => {
@@ -158,7 +178,7 @@ const Sucursales = () => {
   };
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="p-6 lg:p-8 max-w-[1600px] mx-auto min-h-screen text-gray-200">
       <Alert
         type={alert.type}
         message={alert.message}
@@ -184,6 +204,15 @@ const Sucursales = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="px-5 py-2 bg-black text-white rounded-lg border border-gray-800 focus:border-white transition-all text-sm outline-none w-64"
           />
+          <select
+            value={filtroEstatus}
+            onChange={(e) => setFiltroEstatus(e.target.value)}
+            className="px-5 py-2 bg-black text-white rounded-lg border border-gray-800 focus:border-white transition-all text-sm outline-none w-64"
+          >
+            <option value="">Filtrar por estatus...</option>
+            <option value="activo">Activas</option>
+            <option value="inactivo">Inactivas</option>
+          </select>
           <button
             onClick={() => {
               resetForm();
@@ -206,7 +235,7 @@ const Sucursales = () => {
           </div>
         ) : sucursalesFiltradas.length === 0 ? (
           <div className="p-16 text-center text-gray-500">
-            <p className="text-lg font-bold">No se encontraron sucursales</p>
+            <p className="text-lg font-bold">Sin resultados</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -229,7 +258,7 @@ const Sucursales = () => {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 bg-white text-black rounded-full flex items-center justify-center font-bold text-lg">
-                          🏢
+                          <Building size={18} strokeWidth={2.5} />
                         </div>
                         <div>
                           <p className="font-bold text-white text-sm leading-none mb-1">
@@ -247,7 +276,8 @@ const Sucursales = () => {
                     <td className="p-4 lg:table-cell">
                       {getNombreEncargado(s.idUsuario) ? (
                         <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-blue-900/20 text-blue-400 rounded-md text-sm font-bold border border-blue-900/30">
-                          🛡️ {getNombreEncargado(s.idUsuario)}
+                          <Shield size={18} strokeWidth={2.5} />
+                          {getNombreEncargado(s.idUsuario)}
                         </span>
                       ) : (
                         <span className="text-xs text-gray-600 italic">
@@ -269,23 +299,35 @@ const Sucursales = () => {
                           className="text-gray-400 hover:text-white transition-colors"
                           title="Ver"
                         >
-                          👁️
+                          <Eye size={18} strokeWidth={2.5} />
                         </button>
                         <button
                           onClick={() => openEditForm(s)}
                           className="text-gray-400 hover:text-white transition-colors"
                           title="Editar"
                         >
-                          ✏️
+                          <Edit size={18} strokeWidth={2.5} />
                         </button>
                         <button
                           onClick={() =>
                             handleToggleEstatus(s.idSucursal, s.estatus)
                           }
-                          className="text-gray-400 hover:text-white transition-colors"
-                          title={s.estatus ? "Desactivar" : "Activar"}
+                          title={
+                            s.estatus
+                              ? "Desactivar Sucursal"
+                              : "Activar Sucursal"
+                          }
+                          className={`transition-all p-2 rounded-md ${
+                            s.estatus
+                              ? "text-gray-400 hover:text-red-400 hover:bg-red-400/10"
+                              : "text-gray-400 hover:text-emerald-400 hover:bg-emerald-400/10"
+                          }`}
                         >
-                          {s.estatus ? "🚫" : "✅"}
+                          {s.estatus ? (
+                            <XCircle size={18} strokeWidth={2.5} />
+                          ) : (
+                            <CheckCircle size={18} strokeWidth={2.5} />
+                          )}
                         </button>
                       </div>
                     </td>

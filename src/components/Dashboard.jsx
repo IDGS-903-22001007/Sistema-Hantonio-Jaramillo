@@ -10,6 +10,12 @@ import {
   DollarSign,
   BarChart3 as BarChartIcon,
   MessageCircle,
+  AlertTriangle,
+  Cake,
+  FileText,
+  UserPlus,
+  Building,
+  CalendarDays,
 } from "lucide-react";
 
 import {
@@ -26,6 +32,8 @@ import {
 import { clientesService } from "../api/clientes";
 import { ordenesService } from "../api/ordenes";
 import { usuariosService } from "../api/usuarios";
+// NUEVO: Importamos el servicio de sucursales
+import { sucursalesService } from "../api/sucursales";
 import { useAuth } from "../context/AuthContext";
 
 const CATALOGO_TRAJES = {
@@ -35,6 +43,10 @@ const CATALOGO_TRAJES = {
   4: "Pantalón",
   5: "Chaleco",
   6: "Camisa",
+  7: "Frac",
+  8: "Chaque",
+  9: "Smoking",
+  10: "Zapatos",
 };
 
 const COLORS = [
@@ -47,6 +59,15 @@ const COLORS = [
 ];
 
 const Dashboard = () => {
+  const [rawData, setRawData] = useState({
+    clientes: [],
+    ordenes: [],
+    usuarios: [],
+  });
+
+  // NUEVO: Estado para guardar la lista de sucursales
+  const [sucursales, setSucursales] = useState([]);
+
   const [stats, setStats] = useState({
     clientes: 0,
     ordenes: 0,
@@ -63,111 +84,43 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
+  // Estados para los filtros
+  const [filtroMes, setFiltroMes] = useState(new Date().getMonth().toString());
+  const [filtroAnio, setFiltroAnio] = useState(
+    new Date().getFullYear().toString(),
+  );
+  // NUEVO: Filtro de sucursal (por defecto "todos")
+  const [filtroSucursal, setFiltroSucursal] = useState("todos");
+
+  const anioActual = new Date().getFullYear();
+  const aniosDisponibles = [anioActual, anioActual - 1, anioActual - 2];
+
+  // 1. CARGA INICIAL DE DATOS DESDE LA API
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchAllData = async () => {
       try {
         setLoading(true);
 
-        const [clientes, ordenes, usuarios] = await Promise.all([
-          clientesService.listar(),
-          ordenesService.listarPorSucursal(user?.idSucursal || 0),
-          user?.rol === "Administrador"
-            ? usuariosService.listar()
-            : Promise.resolve([]),
-        ]);
+        // MODIFICADO: Si es admin, trae todas las órdenes y sucursales. Si no, solo las de su sucursal.
+        const [clientesData, ordenesData, usuariosData, sucursalesData] =
+          await Promise.all([
+            clientesService.listar(),
+            user?.rol === "Administrador"
+              ? ordenesService.listar() // Asumiendo que listar() trae todas las órdenes
+              : ordenesService.listarPorSucursal(user?.idSucursal || 0),
+            user?.rol === "Administrador"
+              ? usuariosService.listar()
+              : Promise.resolve([]),
+            user?.rol === "Administrador"
+              ? sucursalesService.listar()
+              : Promise.resolve([]),
+          ]);
 
-        const ahora = new Date();
-        const hoyMidnight = new Date(
-          ahora.getFullYear(),
-          ahora.getMonth(),
-          ahora.getDate(),
-        );
-
-        const pendientes = ordenes.filter((o) => o.idEstatus === 1).length;
-
-        const totalVentas = ordenes.reduce(
-          (acc, o) => acc + (o.costoTotal || 0),
-          0,
-        );
-        const totalAbonado = ordenes.reduce(
-          (acc, o) => acc + (o.montoAbonado || 0),
-          0,
-        );
-        const saldoPendiente = totalVentas - totalAbonado;
-
-        const proximasCitas = ordenes
-          .filter(
-            (o) => o.fechaCitaMedidas && new Date(o.fechaCitaMedidas) >= ahora,
-          )
-          .sort(
-            (a, b) =>
-              new Date(a.fechaCitaMedidas) - new Date(b.fechaCitaMedidas),
-          )
-          .slice(0, 5);
-
-        const conteoTrajes = ordenes.reduce((acc, orden) => {
-          const nombreTraje =
-            orden.tipoTraje?.descripcion ||
-            CATALOGO_TRAJES[orden.idTipoTraje] ||
-            `Desconocido (${orden.idTipoTraje})`;
-
-          acc[nombreTraje] = (acc[nombreTraje] || 0) + 1;
-          return acc;
-        }, {});
-
-        const trajesData = Object.keys(conteoTrajes)
-          .map((key) => ({
-            name: key,
-            value: conteoTrajes[key],
-          }))
-          .sort((a, b) => b.value - a.value);
-
-        // --- LÓGICA DE LISTA DE CUMPLEAÑOS ---
-        let proximosCumples = [];
-        if (clientes.length > 0) {
-          proximosCumples = clientes
-            .filter((c) => c.fechaNacimiento)
-            .map((c) => {
-              const [year, month, day] = c.fechaNacimiento
-                .split("T")[0]
-                .split("-");
-              let cumpleEsteAno = new Date(
-                ahora.getFullYear(),
-                parseInt(month) - 1,
-                parseInt(day),
-              );
-
-              if (cumpleEsteAno < hoyMidnight) {
-                cumpleEsteAno.setFullYear(ahora.getFullYear() + 1);
-              }
-
-              const diffTime = cumpleEsteAno - hoyMidnight;
-              const diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-              return {
-                ...c,
-                diasRestantes,
-                fechaLabel: cumpleEsteAno.toLocaleDateString("es-MX", {
-                  day: "numeric",
-                  month: "long",
-                }),
-              };
-            })
-            .filter((c) => c.diasRestantes <= 30) // Traemos todos los de los próximos 30 días
-            .sort((a, b) => a.diasRestantes - b.diasRestantes); // Ordenados por cercanía
-        }
-
-        setStats({
-          clientes: clientes.length,
-          ordenes: ordenes.length,
-          usuarios: usuarios.length,
-          pendientes,
-          totalVentas,
-          totalAbonado,
-          saldoPendiente,
-          proximasCitas,
-          trajesData,
-          proximosCumples, // Guardamos toda la lista
+        setSucursales(sucursalesData);
+        setRawData({
+          clientes: clientesData,
+          ordenes: ordenesData,
+          usuarios: usuariosData,
         });
       } catch (err) {
         console.error("Error cargando estadísticas:", err);
@@ -176,20 +129,201 @@ const Dashboard = () => {
       }
     };
 
-    if (user) fetchStats();
+    if (user) fetchAllData();
   }, [user]);
+
+  // 2. PROCESAMIENTO Y FILTRADO DE DATOS LOCAL
+  useEffect(() => {
+    const { clientes, ordenes, usuarios } = rawData;
+    if (!clientes || !ordenes) return;
+
+    const ahora = new Date();
+    const hoyMidnight = new Date(
+      ahora.getFullYear(),
+      ahora.getMonth(),
+      ahora.getDate(),
+    );
+
+    // --- FILTRAR ÓRDENES POR MES, AÑO Y SUCURSAL ---
+    const ordenesFiltradas = ordenes.filter((o) => {
+      // Validar Sucursal
+      const matchSucursal =
+        filtroSucursal === "todos" || o.idSucursal === parseInt(filtroSucursal);
+
+      // Si se selecciona "todos" en fecha y coincide la sucursal
+      if (filtroAnio === "todos" && filtroMes === "todos") return matchSucursal;
+
+      const dateStr =
+        o.fechaCreacion || o.fechaCitaMedidas || o.fechaEventoEntrega;
+      if (!dateStr) return false;
+
+      const d = new Date(dateStr);
+      const matchAnio =
+        filtroAnio === "todos" || d.getFullYear().toString() === filtroAnio;
+      const matchMes =
+        filtroMes === "todos" || d.getMonth().toString() === filtroMes;
+
+      return matchAnio && matchMes && matchSucursal;
+    });
+
+    const pendientes = ordenesFiltradas.filter((o) => o.idEstatus === 1).length;
+
+    const totalVentas = ordenesFiltradas.reduce(
+      (acc, o) => acc + (o.costoTotal || 0),
+      0,
+    );
+    const totalAbonado = ordenesFiltradas.reduce(
+      (acc, o) => acc + (o.montoAbonado || 0),
+      0,
+    );
+    const saldoPendiente = totalVentas - totalAbonado;
+
+    // Próximas citas (Aplicando también el filtro de sucursal para mayor congruencia)
+    const proximasCitas = ordenes
+      .filter((o) => {
+        const matchSucursal =
+          filtroSucursal === "todos" ||
+          o.idSucursal === parseInt(filtroSucursal);
+        return (
+          matchSucursal &&
+          o.fechaCitaMedidas &&
+          new Date(o.fechaCitaMedidas) >= ahora
+        );
+      })
+      .sort(
+        (a, b) => new Date(a.fechaCitaMedidas) - new Date(b.fechaCitaMedidas),
+      )
+      .slice(0, 5);
+
+    // --- LÓGICA CORREGIDA PARA CONTEO DE PRENDAS INDIVIDUALES ---
+    const conteoPrendas = {
+      Saco: 0,
+      Pantalón: 0,
+      Chaleco: 0,
+      Camisa: 0,
+      Zapatos: 0,
+    };
+
+    ordenesFiltradas.forEach((orden) => {
+      const tipo = orden.idTipoTraje;
+
+      // Saco: Viene en Dos piezas(1), Tres piezas(2), Saco(3), Frac(7), Chaque(8), Smoking(9) o si se agregó manualmente
+      if (
+        [1, 2, 3, 7, 8, 9].includes(tipo) ||
+        orden.tieneSaco ||
+        orden.detallesSaco ||
+        orden.precio_saco > 0
+      ) {
+        conteoPrendas["Saco"]++;
+      }
+
+      // Pantalón: Viene en Dos piezas(1), Tres piezas(2), Pantalón(4), Frac(7), Chaque(8), Smoking(9) o si se agregó
+      if (
+        [1, 2, 4, 7, 8, 9].includes(tipo) ||
+        orden.tienePantalon ||
+        orden.detallesPantalon ||
+        orden.precio_pantalon > 0
+      ) {
+        conteoPrendas["Pantalón"]++;
+      }
+
+      // Chaleco: Viene en Tres piezas(2), Chaleco(5), Chaque(8) o si se agregó
+      if (
+        [2, 5, 8].includes(tipo) ||
+        orden.tieneChaleco ||
+        orden.detallesChaleco ||
+        orden.precio_chaleco > 0
+      ) {
+        conteoPrendas["Chaleco"]++;
+      }
+
+      // Camisa: Viene sola (6) o si se agregó como extra
+      if (
+        tipo === 6 ||
+        orden.tieneCamisa ||
+        orden.detallesCamisa ||
+        orden.precio_camisa > 0
+      ) {
+        conteoPrendas["Camisa"]++;
+      }
+
+      // Zapatos: Vienen solos (10) o si se agregaron como extra
+      if (
+        tipo === 10 ||
+        orden.tieneZapato ||
+        orden.detallesZapato ||
+        orden.precio_zapato > 0
+      ) {
+        conteoPrendas["Zapatos"]++;
+      }
+    });
+
+    // Formatear para la gráfica (solo mostramos las prendas que tengan al menos 1 solicitud)
+    const trajesData = Object.keys(conteoPrendas)
+      .filter((key) => conteoPrendas[key] > 0)
+      .map((key) => ({
+        name: key,
+        value: conteoPrendas[key],
+      }))
+      .sort((a, b) => b.value - a.value);
+
+    let proximosCumples = [];
+    if (clientes.length > 0) {
+      proximosCumples = clientes
+        .filter((c) => c.fechaNacimiento)
+        .map((c) => {
+          const [year, month, day] = c.fechaNacimiento.split("T")[0].split("-");
+          let cumpleEsteAno = new Date(
+            ahora.getFullYear(),
+            parseInt(month) - 1,
+            parseInt(day),
+          );
+
+          if (cumpleEsteAno < hoyMidnight) {
+            cumpleEsteAno.setFullYear(ahora.getFullYear() + 1);
+          }
+
+          const diffTime = cumpleEsteAno - hoyMidnight;
+          const diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+          return {
+            ...c,
+            diasRestantes,
+            fechaLabel: cumpleEsteAno.toLocaleDateString("es-MX", {
+              day: "numeric",
+              month: "long",
+            }),
+          };
+        })
+        .filter((c) => c.diasRestantes <= 30)
+        .sort((a, b) => a.diasRestantes - b.diasRestantes);
+    }
+
+    setStats({
+      clientes: clientes.length,
+      usuarios: usuarios.length,
+      ordenes: ordenesFiltradas.length,
+      pendientes,
+      totalVentas,
+      totalAbonado,
+      saldoPendiente,
+      proximasCitas,
+      trajesData,
+      proximosCumples,
+    });
+  }, [rawData, filtroMes, filtroAnio, filtroSucursal]); // NUEVO: Añadido filtroSucursal a las dependencias
 
   const mainCards = [
     {
       to: "/clientes",
-      title: "Clientes",
+      title: "Clientes (Total)",
       count: stats.clientes,
       icon: Users,
       color: "text-blue-500",
     },
     {
       to: "/ordenes",
-      title: "Órdenes",
+      title: "Órdenes (Periodo)",
       count: stats.ordenes,
       icon: ClipboardList,
       color: "text-green-500",
@@ -217,26 +351,115 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-[1600px] mx-auto bg-[#09090b] min-h-screen text-white">
-      <div className="mb-8 pb-6 border-b border-gray-800 flex justify-between items-center">
+    <div className="p-6 lg:p-8 max-w-[1600px] mx-auto min-h-screen text-white">
+      {/* HEADER Y FILTROS */}
+      <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-gray-800 pb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
             Panel de Control
           </h1>
           <p className="text-gray-400 mt-1">
-            Sucursal: {user?.nombreSucursal || "Matriz"}
+            Hola, {user?.nombreCompleto || user?.login || "Usuario"}
           </p>
         </div>
-        <div className="text-right hidden sm:block">
-          <p className="text-sm text-gray-400">Fecha Actual</p>
-          <p className="font-mono font-bold">
-            {new Date().toLocaleDateString("es-MX", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
+
+        {/* Controles de Filtro Compactos (Misma fila) */}
+        <div className="flex items-center gap-3 bg-[#18181b] border border-gray-800 p-1.5 rounded-xl shadow-2xl flex-wrap">
+          <div className="flex items-center gap-2 px-3 py-2 text-gray-400 border-r border-gray-800">
+            <CalendarDays size={18} className="text-blue-500" />
+            <span className="text-[10px] font-black uppercase tracking-widest hidden md:block">
+              Filtros
+            </span>
+          </div>
+
+          <div className="flex gap-1 items-center flex-wrap">
+            {/* Select de Mes */}
+            <div className="relative group">
+              <select
+                value={filtroMes}
+                onChange={(e) => setFiltroMes(e.target.value)}
+                className="appearance-none pl-4 pr-10 py-2 bg-transparent text-gray-300 hover:text-white transition-colors text-sm font-medium outline-none cursor-pointer min-w-[140px]"
+              >
+                <option value="todos" className="bg-[#18181b]">
+                  Todos los meses
+                </option>
+                {[
+                  "Enero",
+                  "Febrero",
+                  "Marzo",
+                  "Abril",
+                  "Mayo",
+                  "Junio",
+                  "Julio",
+                  "Agosto",
+                  "Septiembre",
+                  "Octubre",
+                  "Noviembre",
+                  "Diciembre",
+                ].map((mes, i) => (
+                  <option key={i} value={i} className="bg-[#18181b]">
+                    {mes}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 group-hover:text-white transition-colors">
+                <Clock size={14} />
+              </div>
+            </div>
+
+            <div className="w-[1px] h-4 bg-gray-800 mx-1"></div>
+
+            {/* Select de Año */}
+            <div className="relative group">
+              <select
+                value={filtroAnio}
+                onChange={(e) => setFiltroAnio(e.target.value)}
+                className="appearance-none pl-4 pr-10 py-2 bg-transparent text-gray-300 hover:text-white transition-colors text-sm font-medium outline-none cursor-pointer min-w-[110px]"
+              >
+                <option value="todos" className="bg-[#18181b]">
+                  Todo
+                </option>
+                {aniosDisponibles.map((a) => (
+                  <option key={a} value={a} className="bg-[#18181b]">
+                    {a}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 group-hover:text-white transition-colors">
+                <TrendingUp size={14} />
+              </div>
+            </div>
+
+            {/* NUEVO: Select de Sucursal (Solo visible para el Administrador) */}
+            {user?.rol === "Administrador" && (
+              <>
+                <div className="w-[1px] h-4 bg-gray-800 mx-1"></div>
+                <div className="relative group">
+                  <select
+                    value={filtroSucursal}
+                    onChange={(e) => setFiltroSucursal(e.target.value)}
+                    className="appearance-none pl-4 pr-10 py-2 bg-transparent text-gray-300 hover:text-white transition-colors text-sm font-medium outline-none cursor-pointer min-w-[170px]"
+                  >
+                    <option value="todos" className="bg-[#18181b]">
+                      Todas las sucursales
+                    </option>
+                    {sucursales.map((s) => (
+                      <option
+                        key={s.idSucursal}
+                        value={s.idSucursal}
+                        className="bg-[#18181b]"
+                      >
+                        {s.nombre}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 group-hover:text-white transition-colors">
+                    <Building size={14} />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -244,7 +467,7 @@ const Dashboard = () => {
         <div className="bg-[#18181b] border border-gray-800 p-6 rounded-xl relative overflow-hidden">
           <div className="relative z-10">
             <p className="text-gray-500 text-xs font-black uppercase tracking-widest flex items-center gap-2">
-              <TrendingUp size={14} /> Ingresos Proyectados
+              <TrendingUp size={14} /> Ingresos Proyectados (Periodo)
             </p>
             <p className="text-4xl font-bold mt-2">
               ${stats.totalVentas.toLocaleString()}
@@ -271,7 +494,7 @@ const Dashboard = () => {
         </div>
         <div className="bg-[#18181b] border border-gray-800 p-6 rounded-xl border-l-amber-500 border-l-4">
           <p className="text-amber-500 text-xs font-black uppercase tracking-widest flex items-center gap-2">
-            <Clock size={14} /> Saldo por Cobrar
+            <Clock size={14} /> Saldo por Cobrar (Periodo)
           </p>
           <p className="text-4xl font-bold mt-2">
             ${stats.saldoPendiente.toLocaleString()}
@@ -309,12 +532,12 @@ const Dashboard = () => {
           {stats.pendientes > 0 && (
             <div className="bg-amber-500/10 border border-amber-500/20 p-5 rounded-xl">
               <h3 className="text-amber-500 font-bold flex items-center gap-2 uppercase text-xs tracking-tighter">
-                ⚠️ Atención Requerida
+                <AlertTriangle size={16} /> Atención Requerida
               </h3>
               <p className="text-sm mt-2 text-amber-200/80">
                 Hay{" "}
                 <span className="font-bold text-white">{stats.pendientes}</span>{" "}
-                órdenes en estatus pendiente.
+                órdenes en estatus pendiente en el periodo seleccionado.
               </p>
               <Link
                 to="/ordenes"
@@ -329,7 +552,7 @@ const Dashboard = () => {
             <div className="bg-[#18181b] border border-gray-800 rounded-xl overflow-hidden flex flex-col p-5 md:col-span-2 lg:col-span-1 xl:col-span-2">
               <h2 className="font-bold flex items-center gap-2 uppercase text-sm tracking-widest border-b border-gray-800 pb-4 mb-4">
                 <BarChartIcon size={18} className="text-purple-500" /> Prendas
-                más solicitadas
+                más solicitadas (Periodo)
               </h2>
               <div className="flex-1 min-h-[250px] flex items-center justify-center">
                 {stats.trajesData.length > 0 ? (
@@ -377,7 +600,7 @@ const Dashboard = () => {
                   </ResponsiveContainer>
                 ) : (
                   <p className="text-gray-500 italic text-sm">
-                    No hay datos suficientes para la gráfica.
+                    No hay datos suficientes para la gráfica en este periodo.
                   </p>
                 )}
               </div>
@@ -386,19 +609,17 @@ const Dashboard = () => {
         </div>
 
         {/* Columna Derecha: Alertas y Accesos Rápidos */}
-        <div className="space-y-6">
-          {/* LISTA DE CUMPLEAÑOS PRÓXIMOS */}
+        <div className="lg:col-span-2 space-y-8">
           {/* LISTA DE CUMPLEAÑOS PRÓXIMOS */}
           {stats.proximosCumples && stats.proximosCumples.length > 0 && (
             <div className="bg-[#18181b] border border-gray-800 p-6 rounded-xl">
               <h2 className="text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2">
-                <span className="bg-purple-500/20 p-1.5 rounded text-lg">
-                  🎂
+                <span className="bg-purple-500/20 p-1.5 rounded text-purple-400">
+                  <Cake size={18} />
                 </span>{" "}
                 Próximos Cumpleaños
               </h2>
 
-              {/* Contenedor con scroll para evitar que crezca demasiado */}
               <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                 {stats.proximosCumples.map((cumple, index) => (
                   <div
@@ -438,40 +659,48 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* Accesos Rápidos */}
+          {/* Accesos Rápidos (Cambio a iconos de Lucide) */}
           <div className="bg-[#18181b] border border-gray-800 p-6 rounded-xl">
-            <h2 className="text-sm font-black uppercase tracking-widest mb-4">
+            <h2 className="text-sm font-black uppercase tracking-widest pb-4 mb-4 border-b border-gray-800 ">
               Acciones Rápidas
             </h2>
             <div className="grid grid-cols-1 gap-3">
               <Link
                 to="/ordenes"
-                className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-gray-800 transition-all text-sm"
+                className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-gray-800 transition-all text-sm group"
               >
-                <span className="bg-blue-500/20 p-2 rounded">📋</span> Nueva
-                Orden
+                <div className="bg-blue-500/20 text-blue-400 p-2 rounded group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                  <FileText size={18} />
+                </div>
+                Nueva Orden
               </Link>
               <Link
                 to="/clientes"
-                className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-gray-800 transition-all text-sm"
+                className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-gray-800 transition-all text-sm group"
               >
-                <span className="bg-green-500/20 p-2 rounded">👥</span> Agregar
-                Cliente
+                <div className="bg-green-500/20 text-green-400 p-2 rounded group-hover:bg-green-500 group-hover:text-white transition-colors">
+                  <UserPlus size={18} />
+                </div>
+                Agregar Cliente
               </Link>
               {user?.rol === "Administrador" && (
                 <>
                   <Link
                     to="/usuarios"
-                    className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-gray-800 transition-all text-sm"
+                    className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-gray-800 transition-all text-sm group"
                   >
-                    <span className="bg-yellow-500/20 p-2 rounded">👤</span>{" "}
+                    <div className="bg-yellow-500/20 text-yellow-500 p-2 rounded group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                      <UserCheck size={18} />
+                    </div>
                     Agregar Usuario
                   </Link>
                   <Link
                     to="/sucursales"
-                    className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-gray-800 transition-all text-sm"
+                    className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-gray-800 transition-all text-sm group"
                   >
-                    <span className="bg-purple-500/20 p-2 rounded">🏢</span>{" "}
+                    <div className="bg-purple-500/20 text-purple-400 p-2 rounded group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                      <Building size={18} />
+                    </div>
                     Agregar Sucursal
                   </Link>
                 </>
